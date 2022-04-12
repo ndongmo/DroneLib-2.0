@@ -16,7 +16,7 @@ std::string JsonParser::get(const std::string& key)
 		return std::string();
 }
 
-std::string JsonParser::getJson()
+std::string JsonParser::encode()
 {
 	std::string json = "{";
 	for (auto pair : m_data) {
@@ -50,7 +50,7 @@ int JsonParser::decode(char* json)
 			m_data[key] = value;
 		}
 	}
-	catch (std::exception) {
+	catch (...) {
 		err = -1;
 	}
 	return err;

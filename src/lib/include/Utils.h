@@ -1,15 +1,26 @@
 /*!
 * \file Utils.h
-* \brief Implements useful functions.
+* \brief Implements writing and reading buffer functions.
 * \author Ndongmo Silatsa Fabrice
 * \date 08-03-2019
 * \version 2.0
 */
 
-#pragma
+#ifndef UTILS_H
+#define UTILS_H
 
-#include <WS2tcpip.h>
 #include <string>
+
+#ifdef _WIN32 
+#include <WS2tcpip.h>
+#else
+#include <sys/types.h>
+
+typedef uint32_t UINT32;
+typedef uint16_t UINT16;
+typedef uint8_t UINT8;
+
+#endif
 
 class Utils
 {
@@ -43,3 +54,4 @@ public:
 	static UINT16 readUInt16(char *byte, int index);
 };
 
+#endif //UTILS_H

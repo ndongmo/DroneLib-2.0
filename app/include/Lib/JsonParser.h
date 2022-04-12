@@ -6,7 +6,8 @@
 * \version 1.0
 */
 
-#pragma once
+#ifndef JSONPARSER_H
+#define JSONPARSER_H
 
 #include <map>
 #include <string>
@@ -23,3 +24,4 @@ private:
 	std::map<std::string, std::string> m_data;
 };
 
+#endif //JSONPARSER_H
