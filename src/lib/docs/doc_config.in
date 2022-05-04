@@ -1,3 +1,0 @@
-PROJECT_NAME           = "DroneLib: Project"
-OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/doc_doxygen/
-INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/../include/

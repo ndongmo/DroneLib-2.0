@@ -1,0 +1,24 @@
+/*! \mainpage
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation
+ *
+ * \subsection step1 Step 1: Opening the box
+
+ * @startuml
+ * Alice -> Bob : Hello
+ * @enduml
+ *
+ * etc...
+ */
+ 
+/** Sender class. Can be used to send a command to the server.
+ *  The receiver will acknowledge the command by calling Ack().
+ *  \startuml
+ *    Sender->Receiver  : Command()
+ *    Sender<--Receiver : Ack()
+ *  \enduml
+ */
