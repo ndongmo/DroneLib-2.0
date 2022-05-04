@@ -1,21 +1,23 @@
 # DroneLib 2.0 C++ project: Lib package source
 
-PROJECT(Lib)
+PROJECT(${DRONELIB_NAME})
 
 SET(SOURCE_FILES
-	JsonParser.cpp
-    Utils.cpp
-)
-
-INCLUDE_DIRECTORIES(
-	../include
-	${DRONELIB_HOME}/apps/include
+	utils/Config.cpp
+	utils/Logger.cpp
+	net/NetTcp.cpp
+	net/NetUdp.cpp
+	net/NetHelper.cpp
+	net/NetSender.cpp
+	net/NetReceiver.cpp
+	stream/StreamPool.cpp
+	stream/StreamReceiver.cpp
 )
 
 # Apple specific stuff
 if(APPLE)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
 endif(APPLE)
 
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
@@ -33,5 +35,4 @@ INSTALL(TARGETS ${PROJECT_NAME}
 
 INSTALL(DIRECTORY ../include/ DESTINATION ${DRONELIB_HOME}/app/include/${PROJECT_NAME}
 	FILES_MATCHING PATTERN "*.h"
-	PATTERN ".cmake" EXCLUDE
 )
