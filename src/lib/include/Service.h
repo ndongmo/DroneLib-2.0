@@ -37,7 +37,7 @@ public:
      * Get the service state.
      * @return true if the service is running, false otherwise. 
      */
-    bool isRunning() const {
+    virtual bool isRunning() {
         return m_running;
     }
 

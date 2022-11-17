@@ -10,6 +10,8 @@
 
 #include <Controller.h>
 
+#include <string>
+
 /*!
  * Drone controller service class which starts and stops all others services.
  */

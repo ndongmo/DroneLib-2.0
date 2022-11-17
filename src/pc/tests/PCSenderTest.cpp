@@ -32,6 +32,7 @@ TEST_F(PCSenderTest, BeginWithDefaultConfigWorks) {
 
     pcsender.init(VAR_DRONE_PORT, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
     EXPECT_EQ(pcsender.begin(), 1);
+    EXPECT_EQ(pcsender.end(), 1);
 }
 
 // Tests PCSender end

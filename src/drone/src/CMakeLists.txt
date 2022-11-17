@@ -7,6 +7,7 @@ SET(SOURCE_FILES
 	DroneController.cpp
 	DroneReceiver.cpp
 	DroneSender.cpp
+	controller/LedController.cpp
 )
 
 # Apple specific stuff
@@ -18,11 +19,14 @@ endif(APPLE)
 FIND_PACKAGE(Threads)
 
 IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
-	FIND_LIBRARY(LIB_SDL libSDL2.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_SDL libSDL2.a ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WS2811 libws2811.a ${THIRD_PARTY_LIB})
 ELSEIF(APPLE)
 	FIND_LIBRARY(LIB_SDL libSDL2.dylib ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WS2811 libws2811.dylib ${THIRD_PARTY_LIB})
 ELSE()
 	FIND_LIBRARY(LIB_SDL libSDL2 ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WS2811 libws2811 ${THIRD_PARTY_LIB})
 ENDIF()
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
@@ -33,12 +37,14 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		debug ${DRONELIB_NAME}
 		debug ${LIB_SDL}
+		debug ${LIB_WS2811}
 		debug Threads::Threads
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${DRONELIB_NAME}
 		optimized ${LIB_SDL}
+		optimized ${LIB_WS2811}
 		optimized Threads::Threads
 	)
 ENDIF()

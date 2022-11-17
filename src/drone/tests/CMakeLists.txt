@@ -7,6 +7,7 @@ SET(SOURCE_FILES
 	DroneReceiverTest.cpp
 	DroneSenderTest.cpp
 	DroneControllerTest.cpp
+	controller/LedControllerTest.cpp
 )
 
 # Apple specific stuff
@@ -18,17 +19,20 @@ endif(APPLE)
 FIND_PACKAGE(Threads)
 
 IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
-	FIND_LIBRARY(LIB_TEST libgtest.so ${THIRD_PARTY_BIN})
-	FIND_LIBRARY(LIB_MOCK libgmock.so ${THIRD_PARTY_BIN})
-	FIND_LIBRARY(LIB_SDL libSDL2.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_TEST libgtest.a ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_MOCK libgmock.a ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_SDL libSDL2.a ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WS2811 libws2811.a ${THIRD_PARTY_LIB})
 ELSEIF(APPLE)
-	FIND_LIBRARY(LIB_TEST libgtest.dylib ${THIRD_PARTY_BIN})
-	FIND_LIBRARY(LIB_MOCK libgmock.dylib ${THIRD_PARTY_BIN})
-	FIND_LIBRARY(LIB_SDL libSDL2.dylib ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_TEST libgtest.dylib ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_MOCK libgmock.dylib ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_SDL libSDL2.dylib ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WS2811 libws2811.dylib ${THIRD_PARTY_LIB})
 ELSE()
-	FIND_LIBRARY(LIB_TEST libgtest ${THIRD_PARTY_BIN})
-	FIND_LIBRARY(LIB_MOCK libgmock ${THIRD_PARTY_BIN})
-	FIND_LIBRARY(LIB_SDL libSDL2 ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_TEST libgtest ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_MOCK libgmock ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_SDL libSDL2 ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WS2811 libws2811 ${THIRD_PARTY_LIB})
 ENDIF()
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
@@ -42,6 +46,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		debug ${LIB_TEST}
 		debug ${LIB_MOCK}
 		debug ${LIB_SDL}
+		debug ${LIB_WS2811}
 		debug Threads::Threads
 	)
 ELSE()
@@ -51,6 +56,7 @@ ELSE()
 		optimized ${LIB_TEST}
 		optimized ${LIB_MOCK}
 		optimized ${LIB_SDL}
+		optimized ${LIB_WS2811}
 		optimized Threads::Threads
 	)
 ENDIF()

@@ -126,6 +126,8 @@ TEST_F(PCControllerTest, BeginWithDefaultConfigWorks) {
     ASSERT_EQ(VAR_DRONE_SEND_PORT, ctrl.getDroneSendPort());
     ASSERT_EQ(MAX_FRAGMENT_SIZE, ctrl.getMaxFragementSize());
     ASSERT_EQ(MAX_FRAGMENT_NUMBER, ctrl.getMaxFragementNumber());
+
+    ASSERT_EQ(ctrl.end(), 1);
 }
 
 // Tests PCController start and end
@@ -147,7 +149,7 @@ TEST_F(PCControllerTest, StartAndEndWork) {
     sdlevent.type = SDL_QUIT;
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     ASSERT_FALSE(ctrl.isRunning());
 
     droneProcess.join();

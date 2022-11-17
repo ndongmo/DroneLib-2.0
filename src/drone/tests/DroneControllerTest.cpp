@@ -87,6 +87,7 @@ TEST_F(DroneControllerTest, DiscoveryWithDefaultConfigWorks) {
 
     ASSERT_EQ(droneAddr, ctrl.getClientAddr());
     ASSERT_EQ(clientRcvPort, ctrl.getClientRcvPort());
+    ASSERT_EQ(1, ctrl.end());
 }
 
 // Tests Network begin with default config
@@ -112,4 +113,5 @@ TEST_F(DroneControllerTest, BeginWithDefaultConfigWorks) {
 
     ASSERT_EQ(droneAddr, ctrl.getClientAddr());
     ASSERT_EQ(clientRcvPort, ctrl.getClientRcvPort());
+    ASSERT_EQ(1, ctrl.end());
 }

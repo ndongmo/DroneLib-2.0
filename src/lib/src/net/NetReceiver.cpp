@@ -12,8 +12,9 @@ int NetReceiver::end() {
 	if(m_rcvSocket.isOpen()) {
 		m_rcvSocket.close();
 	}
-	
-	m_process.join();
+	if(m_process.joinable()) {
+		m_process.join();
+	}
 
 	return 1;
 }

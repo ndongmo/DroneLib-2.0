@@ -23,6 +23,8 @@ TEST_F(PCWindowTest, BeginWithDefaultConfigWorks) {
     PCWindow window;
 
     ASSERT_EQ(window.begin(), 1);
+    ASSERT_EQ(window.end(), 1);
+    ASSERT_FALSE(window.isRunning());
 }
 
 // Tests PCWindow start
@@ -32,6 +34,8 @@ TEST_F(PCWindowTest, StartServiceWorks) {
     ASSERT_EQ(window.begin(), 1);
     window.start();
     ASSERT_TRUE(window.isRunning());
+    ASSERT_EQ(window.end(), 1);
+    ASSERT_FALSE(window.isRunning());
 }
 
 // Tests PCWindow run
@@ -48,4 +52,5 @@ TEST_F(PCWindowTest, RunServiceWorks) {
 
     window.run();
     ASSERT_FALSE(window.isRunning());
+    ASSERT_EQ(window.end(), 1);
 }

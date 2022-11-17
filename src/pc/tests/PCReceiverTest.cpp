@@ -32,6 +32,7 @@ TEST_F(PCReceiverTest, BeginWithDefaultConfigWorks) {
 
     pcrcv.init(VAR_DRONE_PORT, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
     EXPECT_EQ(pcrcv.begin(), 1);
+    EXPECT_EQ(pcrcv.end(), 1);
 }
 
 // Tests PCReceiver end
