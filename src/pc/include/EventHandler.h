@@ -25,6 +25,7 @@ enum CtrlEvent {
 	GO_DOWN,
 	GO_LEFT,
 	GO_RIGHT,
+	DISCOVER,
 	QUIT,
 };
 

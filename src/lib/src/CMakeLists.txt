@@ -12,6 +12,8 @@ SET(SOURCE_FILES
 	net/NetReceiver.cpp
 	stream/StreamPool.cpp
 	stream/StreamReceiver.cpp
+	ErrorListener.cpp
+	Service.cpp
 )
 
 # Apple specific stuff
@@ -28,11 +30,11 @@ SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES PREFIX "")
 #-----------------------------------------------------
 
 INSTALL(TARGETS ${PROJECT_NAME}
-	RUNTIME DESTINATION ${DRONELIB_HOME}/app/bin
-    LIBRARY DESTINATION ${DRONELIB_HOME}/app/bin
-    ARCHIVE DESTINATION ${DRONELIB_HOME}/app/lib
+	RUNTIME DESTINATION ${APP_OUTPUT_BIN}
+    LIBRARY DESTINATION ${APP_OUTPUT_BIN}
+    ARCHIVE DESTINATION ${APP_OUTPUT_LIB}
 )
 
-INSTALL(DIRECTORY ../include/ DESTINATION ${DRONELIB_HOME}/app/include/${PROJECT_NAME}
+INSTALL(DIRECTORY ../include/ DESTINATION ${APP_OUTPUT_INC}/${PROJECT_NAME}
 	FILES_MATCHING PATTERN "*.h"
 )

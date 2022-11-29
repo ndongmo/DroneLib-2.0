@@ -11,11 +11,14 @@
 #include <utils/Constants.h>
 #include <utils/Config.h>
 #include <nlohmann/json.hpp>
+#include <PCHelper.h>
 
 using namespace utils;
 using namespace net;
 
 class PCControllerTest : public ::testing::Test {
+public:
+    PCController ctrl;
 protected:
     void SetUp() override {
         std::ofstream configFile(CONFIG_FILE);
@@ -25,6 +28,7 @@ protected:
     }
     void TearDown() override {
         remove(CONFIG_FILE);
+        ctrl.end();
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";
@@ -36,10 +40,6 @@ protected:
 
 void runCtrlDiscovery(PCController* ctrl) {
     EXPECT_EQ(ctrl->discovery(), 1);
-}
-
-void runCtrlBegin(PCController* ctrl) {
-    EXPECT_EQ(ctrl->begin(), 1);
 }
 
 void runCtrlStart(PCController* ctrl) {
@@ -87,9 +87,7 @@ void runDroneDiscovery(const char* discoveryAddr, int discoveryPort,
 }
 
 // Tests PCController discovery with default config
-TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
-    PCController ctrl;
-    
+TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {    
     std::thread droneProcess(runDroneDiscovery, VAR_DRONE_ADDRESS, 
         DRONE_PORT_DISCOVERY_DEFAULT, CTRL_PORT_RCV_DEFAULT, VAR_DRONE_ADDRESS, 
         VAR_DRONE_RCV_PORT, VAR_DRONE_SEND_PORT, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
@@ -107,33 +105,8 @@ TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
     ASSERT_EQ(MAX_FRAGMENT_NUMBER, ctrl.getMaxFragementNumber());
 }
 
-// Tests PCController begin with default config
-TEST_F(PCControllerTest, BeginWithDefaultConfigWorks) {
-    PCController ctrl;
-    
-    std::thread droneProcess(runDroneDiscovery, VAR_DRONE_ADDRESS, 
-        DRONE_PORT_DISCOVERY_DEFAULT, CTRL_PORT_RCV_DEFAULT, VAR_DRONE_ADDRESS, 
-        VAR_DRONE_RCV_PORT, VAR_DRONE_SEND_PORT, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
-
-    // sleep 100 milliseconds
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    std::thread clientProcess(runCtrlBegin, &ctrl);
-
-    droneProcess.join();
-    clientProcess.join();
-
-    ASSERT_EQ(VAR_DRONE_RCV_PORT, ctrl.getDroneRcvPort());
-    ASSERT_EQ(VAR_DRONE_SEND_PORT, ctrl.getDroneSendPort());
-    ASSERT_EQ(MAX_FRAGMENT_SIZE, ctrl.getMaxFragementSize());
-    ASSERT_EQ(MAX_FRAGMENT_NUMBER, ctrl.getMaxFragementNumber());
-
-    ASSERT_EQ(ctrl.end(), 1);
-}
-
 // Tests PCController start and end
-TEST_F(PCControllerTest, StartAndEndWork) {
-    PCController ctrl;
-    
+TEST_F(PCControllerTest, StartAndEndWork) {    
     std::thread droneProcess(runDroneDiscovery, VAR_DRONE_ADDRESS, 
         DRONE_PORT_DISCOVERY_DEFAULT, CTRL_PORT_RCV_DEFAULT, VAR_DRONE_ADDRESS, 
         VAR_DRONE_RCV_PORT, VAR_DRONE_SEND_PORT, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
@@ -149,7 +122,39 @@ TEST_F(PCControllerTest, StartAndEndWork) {
     sdlevent.type = SDL_QUIT;
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    ASSERT_FALSE(ctrl.isRunning());
+
+    droneProcess.join();
+    clientProcess.join();
+}
+
+// Tests PCController start with discovering error
+TEST_F(PCControllerTest, StartWithDiscoveryErrorWorks) {    
+    std::thread clientProcess(runCtrlStart, &ctrl);
+    ASSERT_EQ(ctrl.getState(), PC_INIT);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    ASSERT_TRUE(ctrl.isRunning());
+    ASSERT_EQ(ctrl.getState(), PC_ERROR);
+
+    std::thread droneProcess(runDroneDiscovery, VAR_DRONE_ADDRESS, 
+        DRONE_PORT_DISCOVERY_DEFAULT, CTRL_PORT_RCV_DEFAULT, VAR_DRONE_ADDRESS, 
+        VAR_DRONE_RCV_PORT, VAR_DRONE_SEND_PORT, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
+
+    // restart discovering
+    SDL_Event sdlevent = {};
+    sdlevent.type = SDL_KEYDOWN;
+    sdlevent.key.keysym.sym = SDLK_F1;
+    SDL_PushEvent(&sdlevent);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    ASSERT_EQ(ctrl.getState(), PC_RUNNING);
+
+    sdlevent.type = SDL_QUIT;
+    SDL_PushEvent(&sdlevent);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_FALSE(ctrl.isRunning());
 
     droneProcess.join();

@@ -60,5 +60,5 @@ gtest_discover_tests(${PROJECT_NAME} EXTRA_ARGS ARGS=-V)
 #-----------------------------------------------------
 
 INSTALL(TARGETS ${PROJECT_NAME}
-	RUNTIME DESTINATION ${DRONELIB_HOME}/app/bin
+	RUNTIME DESTINATION ${APP_OUTPUT_BIN}
 )

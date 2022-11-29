@@ -15,7 +15,7 @@ void Config::init() {
         std::ifstream input(CONFIG_FILE);
 
         if(input.fail()) {
-            perror("error while opening config file");
+            perror(CONFIG_FILE);
             m_config.m_init = false;
         } 
         else {

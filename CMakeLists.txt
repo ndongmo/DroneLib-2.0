@@ -8,6 +8,10 @@ set(DRONELIB_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/include)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
+set(APP_OUTPUT_BIN ${APP_OUTPUT_BIN})
+set(APP_OUTPUT_LIB ${DRONELIB_HOME}/app/lib)
+set(APP_OUTPUT_INC ${DRONELIB_HOME}/app/include)
+set(APP_OUTPUT_DOC ${DRONELIB_HOME}/app/docs)
 set(THIRD_PARTY_INC ${DRONELIB_HOME}/third-party/include)
 
 IF(UNIX) # for Linux, BSD, Solaris, Minix

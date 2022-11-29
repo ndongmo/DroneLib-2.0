@@ -51,3 +51,13 @@
 
 // NS_STREAM
 #define NS_STREAM_ACK 1 // ack stream data by default
+
+// Error codes
+#define ERROR_NET_SEND          1   // error sending data through network
+#define ERROR_NET_RECEIVE       2   // error reading received data through network
+#define ERROR_NET_DISCOVERY     3   // error discovering network
+#define ERROR_NET_INIT          4   // error initializing network
+
+// Controller commands
+#define CMD_CTRL_QUIT 1
+#define CMD_CTRL_DISCOVER 2

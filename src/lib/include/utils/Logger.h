@@ -17,11 +17,15 @@
 #include <chrono>
 #include <fstream>
 #include <iomanip>
+#include <string>
+#include <unordered_map>
 
 #ifndef logE
 #define logE utils::Logger::log() << " ERROR @ "
 #define logW utils::Logger::log() << " WARNING @ "
 #define logI utils::Logger::log() << " INFO @ "
+#define logX(x) utils::Logger::logx(x)
+#define logError(x) utils::Logger::log().getError(x)
 #endif
 
 #define LOG_FILE "log.txt"
@@ -60,6 +64,32 @@ public:
 	}
 
 	/*!
+	 * Obtains the error value regarding the given code.
+	 * @param code error code
+	 * \return the error string value if the code is valid, otherwise empty string.
+	 */
+	std::string getError(int code) const {
+		if(m_logger.m_os == nullptr) {
+			init(std::cout);
+		}
+		
+		if(m_errors.find(code) != m_errors.end()) {
+			return m_errors.at(code);
+		}
+		return m_errors.at(0);
+	}
+
+	/*!
+	 * Obtains the error value regarding the given code
+	 * and write it on the logger stream.
+	 * @param x error code
+	 * \return the current logger.
+	 */
+	static Logger& logx(int x) {
+		return log() << " ERROR @ " << m_logger.getError(x) << ": ";
+	}
+
+	/*!
 	 * Obtains the Logger singleton object.
 	 * \return the current logger.
 	 */
@@ -88,6 +118,10 @@ public:
 
 private:
 	/*!
+	 * Private logger constructor.
+	 */
+	Logger();
+	/*!
 	 * Private logger destructor to close the opened log file.
 	 */
 	~Logger() {
@@ -97,20 +131,17 @@ private:
 		}
 	}
 
-	/*!
-	 * Logger singleton object.
-	 */
+	/* Logger singleton object. */
 	static Logger m_logger;
 
-	/*!
-	 * Logger output stream pointer.
-	 */
+	/* Logger output stream pointer. */
 	std::ostream* m_os = nullptr;
 
-	/*!
-	 * Logger file stream.
-	 */
+	/* Logger file stream. */
 	std::ofstream m_fs;
+
+	/* Errors map. */
+	std::unordered_map<int, std::string> m_errors;
 };
 }
 

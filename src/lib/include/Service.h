@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <thread>
+#include "ErrorListener.h"
 
 /*!
  * Define service basic methods.
@@ -41,6 +41,14 @@ public:
         return m_running;
     }
 
+    /*!
+     * Set the error's listener.
+     * @param listener new error's listener
+     */
+    void setErrorListener(ErrorListener* listener) {
+        m_error_listener = listener;
+    }
+
 protected:
     /*!
      * Run the service.
@@ -48,7 +56,18 @@ protected:
     virtual void run() = 0;
 
     /*!
+     * Inform the error's listener of the given error.
+     * @param error error code
+     */
+    void sendError(int error);
+
+    /*!
      * Running state.
      */
     bool m_running = false;
+
+    /*!
+     * Pointer to error listener.
+     */
+    ErrorListener* m_error_listener = nullptr;
 };

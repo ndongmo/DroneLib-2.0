@@ -1,36 +1,65 @@
 #include "PCController.h"
 #include "Constants.h"
 
-#include <net/NetTcp.h>
 #include <utils/Logger.h>
 #include <utils/Config.h>
 #include <utils/Constants.h>
 
 using namespace utils;
 
+void PCController::init() {
+	if(m_initProcess.joinable()) {
+		m_initProcess.join();
+	}
+
+	m_sender.end();
+	m_receiver.end();
+	m_conSocket.close();
+
+	m_initProcess = std::thread([this]{ 
+		m_state = PC_DISCOVERING;
+		m_error = 0;
+		
+		if (discovery() == -1) {
+			m_conSocket.close();
+			logE << "Discovery error" << std::endl;
+			this->add(ERROR_NET_DISCOVERY);
+			return;
+		}
+
+		m_sender.init(m_droneRcvPort, m_maxFragmentSize, m_maxFragmentNumber);
+		if(m_sender.begin() == -1) {
+			logE << "Network sender begin failed!" << std::endl;
+			this->add(ERROR_NET_INIT);
+			return;
+		}
+
+		m_receiver.init(m_droneSendPort, m_maxFragmentSize, m_maxFragmentNumber);
+		if(m_receiver.begin() == -1) {
+			logE << "Network receiver begin failed!" << std::endl;
+			this->add(ERROR_NET_INIT);
+			return;
+		}
+
+		m_sender.start();
+		m_receiver.start();
+
+		m_state = PC_RUNNING;
+	});
+}
+
 int PCController::begin() {	
-	if (discovery() == -1) {
-		logE << "Discovery error" << std::endl;
-		return -1;
-	}
-
-	m_sender.init(m_droneRcvPort, m_maxFragmentSize, m_maxFragmentNumber);
-	if(m_sender.begin() == -1) {
-		logE << "Network sender begin failed!" << std::endl;
-		return -1;
-	}
-
-	m_receiver.init(m_droneSendPort, m_maxFragmentSize, m_maxFragmentNumber);
-	if(m_receiver.begin() == -1) {
-		logE << "Network receiver begin failed!" << std::endl;
-		return -1;
-	}
-
+	m_state = PC_INIT;
+	m_error = 0;
+	
 	if(m_window.begin() == -1) {
 		logE << "UI begin failed!" << std::endl;
 		return -1;
 	}
 
+	m_sender.setErrorListener(this);
+	m_receiver.setErrorListener(this);
+	
 	return 1;
 }
 
@@ -38,41 +67,46 @@ int PCController::end() {
     int result = 0;
 
 	m_running = false;
-	
+
+	m_conSocket.close();
+
 	result += m_sender.end();
 	result += m_receiver.end();
 	result += m_window.end();
+
+	if(m_initProcess.joinable()) {
+		m_initProcess.join();
+	}
 
 	if(result != 3) return -1;
 	else return 1;
 }
 
 void PCController::start() {
-	m_sender.start();
-	m_receiver.start();
 	m_window.start();
 
+	init();
 	run();
 }
 
 void PCController::run() {
 	m_running = true;
-
+	
 	while (m_running)
 	{
-		// run window in the main thread
 		m_window.run();
-		m_running = m_window.isRunning();
+		handleErrors();
+		handleCommands(m_window.getCmd());
+		m_window.updateState(m_state, m_error);
 	}
 	end();
 }
 
 int PCController::discovery() {
-	net::NetTcp conSocket;
     int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
     std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
 
-	if (conSocket.openClient(serverAddr.c_str(), serverPort) == -1) {
+	if (m_conSocket.openClient(serverAddr.c_str(), serverPort) == -1) {
 		logE << "Discovery: TCP open client error" << std::endl;
         return -1;
 	}
@@ -82,14 +116,14 @@ int PCController::discovery() {
     };
     std::string msg = json.dump();
 
-	if (conSocket.send(msg.c_str(), msg.length()) == -1) {
+	if (m_conSocket.send(msg.c_str(), msg.length()) == -1) {
 		logE << "Discovery: TCP send PC config failed" << std::endl;
 		return -1;
 	}
 
 	char buf[1024] = {0};
 
-	if (conSocket.receive(buf, 1024) == -1) {
+	if (m_conSocket.receive(buf, 1024) == -1) {
 		logE << "Discovery: TCP receive drone config failed" << std::endl;
 		return -1;
 	}
@@ -106,5 +140,25 @@ int PCController::discovery() {
 		return -1;
 	}
 
+	m_conSocket.close();
+
 	return 1;
+}
+
+void PCController::handleError(int error) {
+	m_error = error;
+	m_state = PC_ERROR;
+}
+
+void PCController::handleCommands(int cmd) {
+	if(cmd <= 0) return;
+	
+	if(cmd == CMD_CTRL_DISCOVER) {
+		if(m_state == PC_INIT || m_state == PC_ERROR) {
+			init();
+		}
+	} 
+	else if (cmd == CMD_CTRL_QUIT) {
+		m_running = false;
+	}
 }

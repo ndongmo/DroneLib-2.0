@@ -13,9 +13,14 @@ using namespace utils;
 namespace net {
 
 int NetSender::end() {
-	delete[] m_seqBuf;
-	delete[] m_buffer;
-
+	if(m_seqBuf != nullptr) {
+		delete[] m_seqBuf;
+		m_seqBuf = nullptr;
+	}
+	if(m_buffer != nullptr) {
+		delete[] m_buffer;
+		m_buffer = nullptr;
+	}
 	if(m_sendSocket.isOpen()) {
 		m_sendSocket.close();
 	}
@@ -74,8 +79,12 @@ void NetSender::sendFrame(int id, int type, const char* format, ...) {
 		}
 	} va_end(args);
 
-	m_sendSocket.send((char*)m_buffer, totalSize);
+	totalSize = m_sendSocket.send((char*)m_buffer, totalSize);
 	m_sendMtx.unlock();
+
+	if(totalSize == -1) {
+		sendError(ERROR_NET_SEND);
+	}
 }
 
 void NetSender::writeFrameHeader(int id, int type, int totalSize) {

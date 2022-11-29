@@ -16,3 +16,9 @@
 #define CTRL_FPS_DEFAULT	            60
 #define CTRL_SCREEN_WIDTH_DEFAULT	    640
 #define CTRL_SCREEN_HEIGHT_DEFAULT	    480
+
+/* PC application constants */
+#define PC_APP_NAME                     "PC controller for Drone"
+#define PC_FONT_SIZE_DEFAULT            16
+#define PC_FONT_TYPE_DEFAULT            "arial.ttf"
+

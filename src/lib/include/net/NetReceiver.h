@@ -36,6 +36,8 @@ protected:
 	 */
 	virtual void innerRun(NetFrame& netFrame) = 0;
 
+	/* Closing state */
+	bool is_closing = false;
 	/*! Max fragment size */
 	int m_maxFragmentSize;
 	/*! Max fragment number */
