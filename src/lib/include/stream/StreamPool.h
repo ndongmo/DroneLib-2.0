@@ -23,7 +23,7 @@ typedef uint8_t UINT8;
 namespace stream
 {
 
-/*!
+/**
  * Pool class for stream data.
  */
 class StreamPool
@@ -31,28 +31,28 @@ class StreamPool
 public:
 	~StreamPool();
 
-	/*!
+	/**
 	 * Add the given data in the pool.
 	 * \param data data to add
 	 * \param size data size
 	 */
 	void add(const UINT8* data, int size);
 
-	/*!
+	/**
 	 * Get the current read index and increament it afterwards.
 	 * \param data data to add
 	 * \param size data size
 	 */
 	int next();
 	
-	/*!
+	/**
 	* Retrieves the current stream data (relying on the readindex cursor).
 	* \param readIndex data index
 	* \return stream data at the given index
 	*/
 	const UINT8* getData(int readIndex) const;
 
-	/*!
+	/**
 	* Retrieves the current stream size (relying on the readindex cursor).
 	* \param readIndex size index
 	* \return stream size at the given index
@@ -60,13 +60,13 @@ public:
 	int getSize(int readIndex) const;
 
 private:
-	/*! Pool cursor for reading data */
+	/** Pool cursor for reading data */
 	int m_readIndex = 0;
-    /*! Pool cursor for adding data */
+    /** Pool cursor for adding data */
 	int m_writeIndex = 0;
-	/*! Pool size buffer */
+	/** Pool size buffer */
 	int m_size[POOL_SIZE] = {0};
-	/*! Pool data buffer */
+	/** Pool data buffer */
 	UINT8* m_data[POOL_SIZE] = {0};
 	
 };

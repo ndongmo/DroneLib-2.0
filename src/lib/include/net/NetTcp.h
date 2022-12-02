@@ -30,7 +30,7 @@ typedef int SOCKET;
 
 namespace net
 {
-/*!
+/**
  * Keep a socket and implement TCP open, send and receive methods.
  * It implements the TCP server which listen to only one client and 
  * close the listening socket once this client is connected.
@@ -41,7 +41,7 @@ public:
 	NetTcp(void);
 	~NetTcp(void);
 
-	/*!
+	/**
 	 * Initialize a client TCP connection using the given sever parameters.
 	 * \param addr : server address
 	 * \param port : server port number
@@ -49,7 +49,7 @@ public:
 	 */
 	int openClient(const char *addr, int port);
 
-	/*!
+	/**
 	 * Initialize a sever TCP connection using the given parameters.
 	 * If the given listened address is empty, the socket will listen to INADDR_ANY.
 	 * \param addr : listened address, if empty the socket will listen to INADDR_ANY
@@ -58,14 +58,14 @@ public:
 	 */
 	int openServer(const char *addr, int port);
 
-	/*!
+	/**
 	 * Listen the opened socket and accept the first incoming client connection.
 	 * \param client : client address struct
 	 * \return -1 when the connection failed, otherwise 1.
 	 */
 	int listen(struct sockaddr_in &client);
 
-	/*!
+	/**
 	* Send data to the server.
 	* \param buf : sending buffer
 	* \param size : buffer size
@@ -73,7 +73,7 @@ public:
 	*/
 	int send(const char *buf, int size);
 
-	/*!
+	/**
 	* Receive data from the server.
 	* \param buf : destination buffer
 	* \param size : destination buffer size
@@ -81,25 +81,25 @@ public:
 	*/
 	int receive(char *buf, int size);
 
-	/*!
+	/**
 	 * Close the current socket. If the socket was blocked in recvfrom function, 
 	 * the function will throw an error.
 	 */
 	void close();
 
-	/*!
+	/**
 	 *  Check if the current socket is opened.
 	 * \return true if the socket is opened, false otherwise. 
 	 */
 	bool isOpen();
 
 private:
-	/*!
+	/**
      * Current socket.
      */
 	SOCKET m_sock;
 
-	/*!
+	/**
      * server address.
      */
 	struct sockaddr_in m_server_addr;

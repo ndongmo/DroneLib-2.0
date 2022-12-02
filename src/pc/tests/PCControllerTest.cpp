@@ -3,6 +3,7 @@
 #include <fstream>
 #include <thread>
 #include <chrono>
+#include <nlohmann/json.hpp>
 
 #include <PCController.h>
 #include <Constants.h>
@@ -10,8 +11,7 @@
 #include <net/NetHelper.h>
 #include <utils/Constants.h>
 #include <utils/Config.h>
-#include <nlohmann/json.hpp>
-#include <PCHelper.h>
+#include <utils/Structs.h>
 
 using namespace utils;
 using namespace net;
@@ -92,8 +92,9 @@ TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
         DRONE_PORT_DISCOVERY_DEFAULT, CTRL_PORT_RCV_DEFAULT, VAR_DRONE_ADDRESS, 
         VAR_DRONE_RCV_PORT, VAR_DRONE_SEND_PORT, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
 
-     // sleep 100 milliseconds
-     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // sleep 100 milliseconds
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    
     std::thread clientProcess(runCtrlDiscovery, &ctrl);
 
     droneProcess.join();
@@ -132,11 +133,11 @@ TEST_F(PCControllerTest, StartAndEndWork) {
 // Tests PCController start with discovering error
 TEST_F(PCControllerTest, StartWithDiscoveryErrorWorks) {    
     std::thread clientProcess(runCtrlStart, &ctrl);
-    ASSERT_EQ(ctrl.getState(), PC_INIT);
+    ASSERT_EQ(ctrl.getState(), APP_INIT);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_TRUE(ctrl.isRunning());
-    ASSERT_EQ(ctrl.getState(), PC_ERROR);
+    ASSERT_EQ(ctrl.getState(), APP_ERROR);
 
     std::thread droneProcess(runDroneDiscovery, VAR_DRONE_ADDRESS, 
         DRONE_PORT_DISCOVERY_DEFAULT, CTRL_PORT_RCV_DEFAULT, VAR_DRONE_ADDRESS, 
@@ -149,7 +150,7 @@ TEST_F(PCControllerTest, StartWithDiscoveryErrorWorks) {
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_EQ(ctrl.getState(), PC_RUNNING);
+    ASSERT_EQ(ctrl.getState(), APP_RUNNING);
 
     sdlevent.type = SDL_QUIT;
     SDL_PushEvent(&sdlevent);

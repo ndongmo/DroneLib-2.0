@@ -15,10 +15,25 @@ using namespace utils;
 using namespace net;
 
 class DroneControllerTest : public ::testing::Test {
+public:
+    DroneController ctrl;
 protected:
+    void SetUp() override {
+        std::ofstream configFile(CONFIG_FILE);
+        configFile << "{\"" << DRONE_ADDRESS << "\":\"" << VAR_DRONE_ADDRESS << "\"}";
+        configFile.close();
+        Config::init();
+    }
     void TearDown() override {
         remove(CONFIG_FILE);
+        ctrl.end();
     }
+
+    const char* VAR_DRONE_ADDRESS = "127.0.0.1";
+    const int VAR_CLIENT_RCV_PORT = 1555;
+    const int VAR_DRONE_SEND_PORT = 1556;
+    const int MAX_FRAGMENT_SIZE = 800;
+    const int MAX_FRAGMENT_NUMBER = 256;
 };
 
 void runCtrlDiscovery(DroneController* ctrl) {
@@ -66,52 +81,38 @@ void runClientDiscovery(const char* droneAddr, int dronePort, int clientRcvPort,
 
 // Tests Network discovery with default config
 TEST_F(DroneControllerTest, DiscoveryWithDefaultConfigWorks) {
-    std::string droneAddr = "127.0.0.1";
-    int clientRcvPort = 1555;
-    DroneController ctrl;
-
-    std::ofstream configFile(CONFIG_FILE);
-    configFile << "{\"" << DRONE_ADDRESS << "\":\"" << droneAddr << "\"}";
-    configFile.close();
-    Config::init();
-    
     std::thread droneProcess(runCtrlDiscovery, &ctrl);
+
     // sleep 100 milliseconds
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    std::thread clientProcess(runClientDiscovery, droneAddr.c_str(), 
-        DRONE_PORT_DISCOVERY_DEFAULT, clientRcvPort, DRONE_PORT_RCV_DEFAULT, 
+    
+    std::thread clientProcess(runClientDiscovery, VAR_DRONE_ADDRESS, 
+        DRONE_PORT_DISCOVERY_DEFAULT, VAR_CLIENT_RCV_PORT, DRONE_PORT_RCV_DEFAULT, 
         DRONE_PORT_SEND_DEFAULT, NET_FRAGMENT_SIZE_DEFAULT, NET_FRAGMENT_NUMBER_DEFAULT);
 
     droneProcess.join();
     clientProcess.join();
 
-    ASSERT_EQ(droneAddr, ctrl.getClientAddr());
-    ASSERT_EQ(clientRcvPort, ctrl.getClientRcvPort());
+    ASSERT_EQ(VAR_DRONE_ADDRESS, ctrl.getClientAddr());
+    ASSERT_EQ(VAR_CLIENT_RCV_PORT, ctrl.getClientRcvPort());
     ASSERT_EQ(1, ctrl.end());
 }
 
 // Tests Network begin with default config
 TEST_F(DroneControllerTest, BeginWithDefaultConfigWorks) {
-    std::string droneAddr = "127.0.0.1";
-    int clientRcvPort = 1555;
-    DroneController ctrl;
-
-    std::ofstream configFile(CONFIG_FILE);
-    configFile << "{\"" << DRONE_ADDRESS << "\":\"" << droneAddr << "\"}";
-    configFile.close();
-    Config::init();
-    
     std::thread droneProcess(runCtrlBegin, &ctrl);
+
     // sleep 100 milliseconds
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    std::thread clientProcess(runClientDiscovery, droneAddr.c_str(), 
-        DRONE_PORT_DISCOVERY_DEFAULT, clientRcvPort, DRONE_PORT_RCV_DEFAULT, 
+    
+    std::thread clientProcess(runClientDiscovery, VAR_DRONE_ADDRESS, 
+        DRONE_PORT_DISCOVERY_DEFAULT, VAR_CLIENT_RCV_PORT, DRONE_PORT_RCV_DEFAULT, 
         DRONE_PORT_SEND_DEFAULT, NET_FRAGMENT_SIZE_DEFAULT, NET_FRAGMENT_NUMBER_DEFAULT);
 
     droneProcess.join();
     clientProcess.join();
 
-    ASSERT_EQ(droneAddr, ctrl.getClientAddr());
-    ASSERT_EQ(clientRcvPort, ctrl.getClientRcvPort());
+    ASSERT_EQ(VAR_DRONE_ADDRESS, ctrl.getClientAddr());
+    ASSERT_EQ(VAR_CLIENT_RCV_PORT, ctrl.getClientRcvPort());
     ASSERT_EQ(1, ctrl.end());
 }

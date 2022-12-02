@@ -9,6 +9,11 @@
 
 #include <algorithm>
 
+#define DISCOVERY_LEDS 2    // number of leds to blink on discovering mode
+#define DISCOVERY_LAPS 500  // time laps for led blinking on discovering mode
+
+using namespace utils;
+
 namespace controller {
 
     const unsigned int LedController::m_colors[COLOR_COUNT] = {
@@ -104,12 +109,41 @@ namespace controller {
 
     void LedController::playWheel(unsigned int laps) {
         std::vector<LedAction> actions;
-        for(unsigned int i = 0; i < LED_COUNT; i++) {
+        for(unsigned int i = DISCOVERY_LEDS; i < LED_COUNT; i++) {
             LedAction a; a.ledId = i; a.color = i; a.on = true; a.delay = laps; 
             a.alternate = true; a.repeat = -1;
             actions.push_back(a);
         }
         addActions(actions);
+    }
+
+    void LedController::play(utils::AppState state) {
+        if(state == APP_DISCOVERING) {
+            std::vector<LedAction> actions;
+            for(unsigned int i = 0; i < DISCOVERY_LEDS; i++) {
+                LedAction a; a.ledId = i; a.color = GREEN; a.delay = DISCOVERY_LAPS;
+                a.on = i % 2 == 0;  a.repeat = -1;
+                actions.push_back(a);
+            }
+        }
+        else if(state == APP_RUNNING) {
+            std::vector<LedAction> actions;
+            for(unsigned int i = 0; i < DISCOVERY_LEDS; i++) {
+                LedAction a; a.ledId = i; a.color = GREEN; a.on = true;
+                actions.push_back(a);
+            }
+        }
+        else if(state == APP_ERROR) {
+            std::vector<LedAction> actions;
+            for(unsigned int i = 0; i < DISCOVERY_LEDS; i++) {
+                LedAction a; a.ledId = i; a.color = RED; a.delay = DISCOVERY_LAPS;
+                a.on = i % 2 == 0;  a.repeat = -1;
+                actions.push_back(a);
+            }
+        }
+        else {
+            turnAll(false);
+        }
     }
 
     void LedController::addAction(const LedAction& action) {

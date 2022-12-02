@@ -1,17 +1,62 @@
 #include "DroneController.h"
 #include "Constants.h"
 
-#include <net/NetTcp.h>
 #include <net/NetHelper.h>
 #include <utils/Logger.h>
 #include <utils/Config.h>
 #include <utils/Constants.h>
+#include <utils/Structs.h>
 
 using namespace utils;
 
+void DroneController::init() {
+	if(m_initProcess.joinable()) {
+		m_initProcess.join();
+	}
+
+	m_sender.end();
+	m_receiver.end();
+	m_conSocket.close();
+
+	m_initProcess = std::thread([this]{ 	
+		updateState(APP_DISCOVERING);
+
+		if (discovery() == -1) {
+			m_conSocket.close();
+			logE << "Discovery error" << std::endl;
+			this->handleError(ERROR_NET_DISCOVERY);
+			return;
+		}
+
+		m_sender.init(m_clientRcvPort, m_clientAddr, m_maxFragmentSize, m_maxFragmentNumber);
+		if(m_sender.begin() == -1) {
+			logE << "Network sender begin failed!" << std::endl;
+			this->handleError(ERROR_NET_INIT);
+			return;
+		}
+
+		m_receiver.init(m_clientRcvPort, m_clientAddr, m_maxFragmentSize, m_maxFragmentNumber);
+		if(m_receiver.begin() == -1) {
+			logE << "Network receiver begin failed!" << std::endl;
+			this->handleError(ERROR_NET_INIT);
+			return;
+		}
+
+		m_sender.start();
+		m_receiver.start();
+
+		updateState(APP_RUNNING);
+	});
+}
+
 int DroneController::begin() {	
-	if (discovery() == -1) {
-		logE << "Discovery error" << std::endl;
+	m_oldState = m_state = APP_INIT;
+	
+	m_sender.setController(this);
+	m_receiver.setController(this);
+
+	if(m_ledCtrl.begin() == -1) {
+		logE << "Leds initialization failed!" << std::endl;
 		return -1;
 	}
 	
@@ -19,30 +64,87 @@ int DroneController::begin() {
 }
 
 int DroneController::end() {
-	return 1;
+	int result = 0;
+
+	m_running = false;
+
+	m_cv.notify_all();
+	m_conSocket.close();
+
+	result += m_sender.end();
+	result += m_receiver.end();
+	result += m_ledCtrl.end();
+
+	if(m_initProcess.joinable()) {
+		m_initProcess.join();
+	}
+
+	if(result != 3) return -1;
+	else return 1;
 }
 
 void DroneController::start() {
+	m_ledCtrl.start();
+
+	init();
 	run();
 }
 
 void DroneController::run() {
+	m_running = true;
 	
+	while (isRunning())
+	{
+		handleEvents();
+		waitNextEvent();
+	}
 	end();
 }
 
+bool DroneController::isRunning() {
+	std::lock_guard<std::mutex> guard(m_mutex);
+	return m_running;
+}
+
+void DroneController::waitNextEvent() {
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_oldState = m_state;
+	m_cv.wait(lock, [this] { return m_oldState != m_state || !m_running; });
+}
+
+void DroneController::handleEvents() {
+	if(m_oldState == m_state) return;
+
+	m_ledCtrl.play(m_state);
+
+	if(m_state == APP_INIT || m_state == APP_ERROR) {
+		init();
+	}
+}
+
+void DroneController::handleError(int error) {
+	if(error > m_error) {
+		m_mutex.lock();
+		{
+			m_error = error;
+			m_state = utils::APP_ERROR;
+		}
+		m_mutex.unlock();
+		m_cv.notify_all();
+	}
+}
+
 int DroneController::discovery() {
-	net::NetTcp conSocket;
     int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
     std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
 	struct sockaddr_in client;
 
-	if (conSocket.openServer(serverAddr.c_str(), serverPort) == -1) {
+	if (m_conSocket.openServer(serverAddr.c_str(), serverPort) == -1) {
 		logE << "Discovery: TCP open server error" << std::endl;
         return -1;
 	}
 
-	if (conSocket.listen(client) == -1) {
+	if (m_conSocket.listen(client) == -1) {
 		logE << "Discovery: TCP listen client error" << std::endl;
         return -1;
 	}
@@ -52,7 +154,7 @@ int DroneController::discovery() {
 	char buf[1024] = {0};
 	nlohmann::json json;
 
-	if (conSocket.receive(buf, 1024) == -1) {
+	if (m_conSocket.receive(buf, 1024) == -1) {
 		logE << "Discovery: TCP receive client config failed" << std::endl;
 		return -1;
 	}
@@ -77,10 +179,12 @@ int DroneController::discovery() {
     };
     std::string msg = json.dump();
 
-	if (conSocket.send(msg.c_str(), msg.length()) == -1) {
+	if (m_conSocket.send(msg.c_str(), msg.length()) == -1) {
 		logE << "Discovery: TCP send config failed" << std::endl;
 		return -1;
 	}
+
+	m_conSocket.close();
 
 	return 1;
 }

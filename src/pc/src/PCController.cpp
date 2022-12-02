@@ -17,39 +17,38 @@ void PCController::init() {
 	m_conSocket.close();
 
 	m_initProcess = std::thread([this]{ 
-		m_state = PC_DISCOVERING;
-		m_error = 0;
+		updateState(APP_DISCOVERING);
 		
 		if (discovery() == -1) {
 			m_conSocket.close();
 			logE << "Discovery error" << std::endl;
-			this->add(ERROR_NET_DISCOVERY);
+			this->handleError(ERROR_NET_DISCOVERY);
 			return;
 		}
 
 		m_sender.init(m_droneRcvPort, m_maxFragmentSize, m_maxFragmentNumber);
 		if(m_sender.begin() == -1) {
 			logE << "Network sender begin failed!" << std::endl;
-			this->add(ERROR_NET_INIT);
+			this->handleError(ERROR_NET_INIT);
 			return;
 		}
 
 		m_receiver.init(m_droneSendPort, m_maxFragmentSize, m_maxFragmentNumber);
 		if(m_receiver.begin() == -1) {
 			logE << "Network receiver begin failed!" << std::endl;
-			this->add(ERROR_NET_INIT);
+			this->handleError(ERROR_NET_INIT);
 			return;
 		}
 
 		m_sender.start();
 		m_receiver.start();
 
-		m_state = PC_RUNNING;
+		updateState(APP_RUNNING);
 	});
 }
 
 int PCController::begin() {	
-	m_state = PC_INIT;
+	m_state = APP_INIT;
 	m_error = 0;
 	
 	if(m_window.begin() == -1) {
@@ -57,8 +56,8 @@ int PCController::begin() {
 		return -1;
 	}
 
-	m_sender.setErrorListener(this);
-	m_receiver.setErrorListener(this);
+	m_sender.setController(this);
+	m_receiver.setController(this);
 	
 	return 1;
 }
@@ -95,7 +94,6 @@ void PCController::run() {
 	while (m_running)
 	{
 		m_window.run();
-		handleErrors();
 		handleCommands(m_window.getCmd());
 		m_window.updateState(m_state, m_error);
 	}
@@ -145,16 +143,11 @@ int PCController::discovery() {
 	return 1;
 }
 
-void PCController::handleError(int error) {
-	m_error = error;
-	m_state = PC_ERROR;
-}
-
 void PCController::handleCommands(int cmd) {
 	if(cmd <= 0) return;
 	
 	if(cmd == CMD_CTRL_DISCOVER) {
-		if(m_state == PC_INIT || m_state == PC_ERROR) {
+		if(m_state == APP_INIT || m_state == APP_ERROR) {
 			init();
 		}
 	} 

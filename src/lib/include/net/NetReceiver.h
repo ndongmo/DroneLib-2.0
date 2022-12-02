@@ -17,7 +17,7 @@
 namespace net
 {
 
-/*!
+/**
  * Network frame receiver service.
  * Listen and handle incoming udp frames.
  */
@@ -30,7 +30,7 @@ public:
 protected:
 	void run() override;
 
-	/*!
+	/**
 	 * Internal execution of a network service.
 	 * \param netFrame received frame
 	 */
@@ -38,13 +38,13 @@ protected:
 
 	/* Closing state */
 	bool is_closing = false;
-	/*! Max fragment size */
-	int m_maxFragmentSize;
-	/*! Max fragment number */
-	int m_maxFragmentNumber;
-	/*! Main process */
+	/** Max fragment size */
+	int m_maxFragmentSize = 0;
+	/** Max fragment number */
+	int m_maxFragmentNumber = 0;
+	/** Main process */
 	std::thread m_process;
-	/*! UDP reception socket */
+	/** UDP reception socket */
 	NetUdp m_rcvSocket;
 };
 } // namespace net

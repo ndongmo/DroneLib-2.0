@@ -1,7 +1,8 @@
 #include "Service.h"
+#include "IController.h"
 
 void Service::sendError(int error) {
-    if(m_error_listener != nullptr) {
-        m_error_listener->add(error);
+    if(m_controller != nullptr) {
+        m_controller->handleError(error);
     }
 }

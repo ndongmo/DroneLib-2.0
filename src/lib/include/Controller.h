@@ -9,20 +9,24 @@
 #pragma once
 
 #include "Service.h"
+#include "IController.h"
+#include "utils/Structs.h"
 
-/*!
+#include <mutex>
+
+/**
  * Controller main class in charge of starting and stoping all other services.
  */
-class Controller : public Service
+class Controller : public Service, public IController
 {
 public:
-    /*!
+    /**
 	 * Starts a handshake connection and initializes required variables.
 	 * \return -1 when the communication failed, otherwise 1.
 	 */
 	virtual int discovery() = 0;
 
-    /*!
+    /**
      * Get the max fragment size.
      * \return max fragment size
      */
@@ -30,7 +34,7 @@ public:
         return m_maxFragmentSize;
     }
 
-	/*!
+	/**
      * Get the max fragment number.
      * \return max fragment number
      */
@@ -39,8 +43,8 @@ public:
     }
 
 protected:
-    /*! Max fragment size */
+    /** Max fragment size */
 	int m_maxFragmentSize;
-	/*! Max fragment number */
+	/** Max fragment number */
 	int m_maxFragmentNumber;
 };

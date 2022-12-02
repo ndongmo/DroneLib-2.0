@@ -8,29 +8,29 @@
 
 #pragma once
 
-#include <net/NetTcp.h>
-#include <Controller.h>
-#include <ErrorListener.h>
-
 #include "PCSender.h"
 #include "PCReceiver.h"
 #include "PCWindow.h"
-#include "PCHelper.h"
 
-/*!
+#include <utils/Structs.h>
+#include <net/NetTcp.h>
+#include <Controller.h>
+
+#include <thread>
+
+/**
  * PC controller service class which starts and stops
  * all others services and handle the input events.
  */
-class PCController : public Controller, public ErrorListener
+class PCController : public Controller
 {
 public:
     int begin() override;
     void start() override;
     int end() override;
     int discovery() override;
-    void handleError(int error)override;
 
-    /*!
+    /**
      * Get the drone reception port.
      * \return drone reception port
      */
@@ -38,7 +38,7 @@ public:
         return m_droneRcvPort;
     }
 
-    /*!
+    /**
      * Get the drone sending port.
      * \return drone sending port
      */
@@ -46,7 +46,7 @@ public:
         return m_droneSendPort;
     }
 
-    /*!
+    /**
      * Get the current error.
      * \return error code
      */
@@ -54,46 +54,36 @@ public:
         return m_error;
     }
 
-    /*!
-     * Get the current state.
-     * \return current state
-     */
-    PCState getState() {
-        return m_state;
-    }
-
 private:
     void run() override;
 
-    /*!
+    /**
      * Discover, initialize and start sender and receiver components.
      */
     void init();
 
-    /*!
+    /**
      * Handle an incoming command.
      * @param cmd command to handle
      */
     void handleCommands(int cmd);
 
-    /*! Current state */
-    PCState m_state;
-    /*! Current error */
+    /** Current error */
     int m_error = 0;
-    /*! Discovering tcp socket */
+    /** Discovering tcp socket */
     net::NetTcp m_conSocket;
-    /*! Init process */
+    /** Init process */
 	std::thread m_initProcess;
 
-    /*! Drone reception port */
+    /** Drone reception port */
     int m_droneRcvPort;
-    /*! Drone sending port */
+    /** Drone sending port */
     int m_droneSendPort;
 
-    /*! Network sender object */
+    /** Network sender object */
     PCSender m_sender;
-    /*! Network receiver object */
+    /** Network receiver object */
     PCReceiver m_receiver;
-    /*! UI & event manager object */
+    /** UI & event manager object */
     PCWindow m_window;
 };

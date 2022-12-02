@@ -18,6 +18,7 @@
 #include <rpi_ws281x/ws2811.h>
 
 #include <Service.h>
+#include <utils/Structs.h>
 
 #include "component/Led.h"
 
@@ -56,6 +57,12 @@ public:
      * @param laps laps duration in ms
      */
     void playWheel(unsigned int laps);
+
+    /*!
+     * Play leds animation regarding the given state.
+     * @param state app curent state
+     */
+    void play(utils::AppState state);
 
     /*!
      * Get the led state.

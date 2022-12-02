@@ -39,7 +39,7 @@ int PCWindow::begin() {
     SDL_SetWindowTitle(m_window, PC_APP_NAME);
     
     m_cmd = 0;
-    m_state = PC_INIT;
+    m_state = APP_INIT;
     m_txt_color = { 0x00, 0x00, 0x00, 0xFF };
     m_back_color = { 0xFF, 0xFF, 0xFF, 0x80 };
 	m_fps = Config::getInt(CTRL_FPS, CTRL_FPS_DEFAULT);
@@ -188,17 +188,17 @@ int PCWindow::getCmd() {
     return tmp;
 }
 
-void PCWindow::updateState(PCState state, int error) {
+void PCWindow::updateState(utils::AppState state, int error) {
     if(state == m_state) return;
 
     std::string str;
     m_state = state;
 
-    if(m_state == PC_ERROR) {
+    if(m_state == APP_ERROR) {
         str = logError(error) + " Press [" + m_evHandler.getMapping(CtrlEvent::DISCOVER)
             + "] to restart discovering.";
     }
-    else if(m_state == PC_DISCOVERING) {
+    else if(m_state == APP_DISCOVERING) {
         int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
         std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
 

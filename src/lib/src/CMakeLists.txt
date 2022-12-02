@@ -12,7 +12,7 @@ SET(SOURCE_FILES
 	net/NetReceiver.cpp
 	stream/StreamPool.cpp
 	stream/StreamReceiver.cpp
-	ErrorListener.cpp
+	IController.cpp
 	Service.cpp
 )
 

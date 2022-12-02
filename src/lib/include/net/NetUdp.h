@@ -31,7 +31,7 @@ typedef int SOCKET;
 
 namespace net
 {
-/*!
+/**
  * Keep a socket and implement UDP open, send and receive methods.
  */
 class NetUdp
@@ -40,7 +40,7 @@ public:
 	NetUdp(void);
 	~NetUdp(void);
 	
-	/*!
+	/**
 	 * Initialize an UDP connection with the given parameters.
 	 * Make sure the server address exists in the local network.
 	 * If the given server address is empty, the server will listen to INADDR_ANY.
@@ -52,7 +52,7 @@ public:
 	 */
 	int open(const char *clientAddr, int clientPort, const char *serverAddr, int serverPort);
 
-	/*!
+	/**
 	 * Sends data to the client address.
 	 * \param buf : data buffer
 	 * \param size : buffer size
@@ -60,7 +60,7 @@ public:
 	 */
 	int send(const char *buf, int size);
 
-	/*!
+	/**
 	 * Receives data from the client address.
 	 * \param buf : data buffer
 	 * \param size : buffer size
@@ -74,22 +74,22 @@ public:
 	 */
 	void close();
 
-	/*!
+	/**
 	 *  Check if the current socket is opened.
 	 * \return true if the socket is opened, false otherwise. 
 	 */
 	bool isOpen();
 
 private:
-	/*!
+	/**
      * Current socket.
      */
 	SOCKET m_sock;
-	/*!
+	/**
      * Server socket address.
      */
 	struct sockaddr_in m_server_addr;
-	/*!
+	/**
      * Client socket address.
      */
 	struct sockaddr_in m_client_addr;

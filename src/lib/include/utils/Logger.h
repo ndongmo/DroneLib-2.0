@@ -32,13 +32,13 @@
 
 namespace utils
 {
-/*!
+/**
  * Write log in console and file at the same time.
  */
 class Logger
 {
 public:
-	/*!
+	/**
 	 * Reditect the given data to the file and std output.
 	 * \param data the data to write
 	 * \return the current logger.
@@ -51,7 +51,7 @@ public:
 		return *this;
 	}
 
-	/*!
+	/**
 	 * Reditect the given stream to the file and std output.
 	 * \param f the stream to write
 	 * \return the current logger.
@@ -63,7 +63,7 @@ public:
 		return *this;
 	}
 
-	/*!
+	/**
 	 * Obtains the error value regarding the given code.
 	 * @param code error code
 	 * \return the error string value if the code is valid, otherwise empty string.
@@ -79,7 +79,7 @@ public:
 		return m_errors.at(0);
 	}
 
-	/*!
+	/**
 	 * Obtains the error value regarding the given code
 	 * and write it on the logger stream.
 	 * @param x error code
@@ -89,7 +89,7 @@ public:
 		return log() << " ERROR @ " << m_logger.getError(x) << ": ";
 	}
 
-	/*!
+	/**
 	 * Obtains the Logger singleton object.
 	 * \return the current logger.
 	 */
@@ -107,7 +107,7 @@ public:
 		return m_logger;
 	}
 
-	/*!
+	/**
 	 * Initialize the log file and output stream.
 	 * \param os output stream refference to write into
 	 */
@@ -117,11 +117,11 @@ public:
 	}
 
 private:
-	/*!
+	/**
 	 * Private logger constructor.
 	 */
 	Logger();
-	/*!
+	/**
 	 * Private logger destructor to close the opened log file.
 	 */
 	~Logger() {

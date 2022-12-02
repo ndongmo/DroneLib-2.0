@@ -12,7 +12,7 @@
 
 using namespace net;
 
-/*!
+/**
  * PC receiver service class. Handle pc -> drone connection and received frames.
  */
 class PCReceiver : public NetReceiver
@@ -20,7 +20,7 @@ class PCReceiver : public NetReceiver
 public:
     int begin() override;
 
-    /*!
+    /**
      * Initialize receiver required variables.
      * @param droneSendPort drone sending port
      * @param maxFragmentSize max fragment size
@@ -31,6 +31,6 @@ public:
 private:
     void innerRun(NetFrame& netFrame) override;
 
-    /*! Drone sending port */
+    /** Drone sending port */
     int m_droneSendPort;
 };

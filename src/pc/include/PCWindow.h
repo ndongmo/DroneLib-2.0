@@ -9,13 +9,14 @@
 #pragma once
 
 #include "EventHandler.h"
-#include "PCHelper.h"
+
+#include <utils/Structs.h>
 
 #include <Service.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
 
-/*!
+/**
  * PC controller service class which starts and stops
  * all others services and handle the input events.
  */
@@ -27,7 +28,7 @@ public:
     int end() override;
     void run() override;
 
-    /*!
+    /**
      * Get the Event Handler object
      * 
      * @return const EventHandler& 
@@ -36,32 +37,32 @@ public:
         return m_evHandler;
     }
 
-    /*!
+    /**
      * Obtain the current command and reset it.
      * @return current command ID
      */
     int getCmd();
 
-    /*!
+    /**
      * Update the current state.
      * @param state the new state
      * @param error current error
      */
-    void updateState(PCState state, int error);
+    void updateState(utils::AppState state, int error);
 
 private:
 
-    /*!
+    /**
      * Initialize controller events.
      */
     void initEvents();
 
-    /*!
+    /**
      * Controller events handler method.
      */
 	void onEvent();
 
-    /*!
+    /**
      * Render the current frame.
      * @param elapsedTime time since the last call
      */
@@ -78,7 +79,7 @@ private:
     /* Window height */
     unsigned int m_height;
     /* Current state */
-    PCState m_state;
+    utils::AppState m_state;
 
     SDL_Color m_txt_color;
     SDL_Color m_back_color;

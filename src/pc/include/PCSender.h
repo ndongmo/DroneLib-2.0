@@ -12,7 +12,7 @@
 
 using namespace net;
 
-/*!
+/**
  * PC frame sender service.
  */
 class PCSender : public NetSender
@@ -21,7 +21,7 @@ public:
 	int begin() override;
 	void start() override;
 
-    /*!
+    /**
      * Initialize sender required variables.
      * @param droneRcvPort drone reception port
      * @param maxFragmentSize max fragment size
@@ -29,14 +29,14 @@ public:
      */
     void init(int droneRcvPort, int maxFragmentSize, int maxFragmentNumber);
     
-	/*!
+	/**
 	 * Sends a pong frame.
      * \param size data size
      * \param data pong data to send
 	 */
 	void sendPong(int size, UINT8* data);
 
-    /*!
+    /**
      * Get the drone reception port.
      * \return drone reception port
      */
@@ -47,6 +47,6 @@ public:
 private:
     void run() override;
 
-    /*! Drone reception port */
+    /** Drone reception port */
     int m_droneRcvPort;
 };

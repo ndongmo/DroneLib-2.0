@@ -23,7 +23,7 @@ using namespace net;
 namespace stream
 {
 
-/*!
+/**
  * Fragment data structure.
  */
 typedef struct Fragment {
@@ -31,24 +31,24 @@ typedef struct Fragment {
 		size = 0;
 		data = new UINT8[1];
 	}
-    /*! fragment data */
+    /** fragment data */
 	UINT8* data;
-    /*! fragment size */
+    /** fragment size */
 	int size;
 
 } Fragment;
 
-/*!
+/**
  * Acknowledgement frame data structure.
  */
 typedef struct AckFrame {
-    /*! frame number to ack */
+    /** frame number to ack */
 	UINT16 frameNumber;
-    /*! ack frame */
+    /** ack frame */
 	UINT8* frameACK;
 } AckFrame;
 
-/*!
+/**
  * Binary streams structure to transport live audio and video data
  */
 typedef struct AvStreamFrame {
@@ -60,24 +60,24 @@ typedef struct AvStreamFrame {
 		fragmentPerFrame = 1;
 		fragmentNumber = -1;
 	}
-    /*! rcv window and frame ack pointer */
-	/*! frameNumber (2bytes) + rcvWindow (16bytes) */
+    /** rcv window and frame ack pointer */
+	/** frameNumber (2bytes) + rcvWindow (16bytes) */
 	UINT8* rcvWindow;
-    /*! current frame */
+    /** current frame */
 	UINT8 *frame;
-    /*! frame flags */
+    /** frame flags */
 	UINT8 frameFlags;
-    /*! frame size */
+    /** frame size */
 	int frameSize;
-	/*! frame number */
+	/** frame number */
 	int frameNumber;
-    /*! total number of fragments within the frame */
+    /** total number of fragments within the frame */
 	int fragmentPerFrame;
-    /*! index of the current fragment within the frame */
+    /** index of the current fragment within the frame */
 	int fragmentNumber;
 } AvStreamFrame;
 
-/*!
+/**
  * Stream manager service.
  * Handle incoming udp stream frames.
  */
@@ -90,7 +90,7 @@ public:
 private:
     void run() override;
 
-	/*!
+	/**
 	* Handle an incoming frame.
 	* \param netFrame new incoming frame
 	* \return pointer to the ack data, otherwise NULL
@@ -99,11 +99,11 @@ private:
 	
 	/* send ack for each fragment */
 	bool m_ackStreamFragment;
-	/*! Receiver mutex */
+	/** Receiver mutex */
 	std::mutex m_rcvMtx;
-	/*! Stream pool */
+	/** Stream pool */
 	StreamPool m_pool;
-	/*! current live stream frame */
+	/** current live stream frame */
 	AvStreamFrame m_avFrame;
 };
 } // namespace stream

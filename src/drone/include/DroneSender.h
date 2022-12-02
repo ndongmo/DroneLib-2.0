@@ -12,7 +12,7 @@
 
 using namespace net;
 
-/*!
+/**
  * Drone frame sender service.
  */
 class DroneSender : public NetSender
@@ -21,7 +21,7 @@ public:
 	int begin() override;
 	void start() override;
 
-    /*!
+    /**
      * Initialize sender required variables.
      * @param clientRcvPort client reception port
      * @param maxFragmentSize max fragment size
@@ -30,7 +30,7 @@ public:
     void init(int clientRcvPort, const std::string& clientAddr, 
         int maxFragmentSize, int maxFragmentNumber);
     
-	/*!
+	/**
 	 * Sends a ping frame.
      * \param size data size
      * \param data pong data to send
@@ -40,8 +40,8 @@ public:
 private:
     void run() override;
 
-    /*! Client reception port */
+    /** Client reception port */
     int m_clientRcvPort;
-    /*! Client address */
+    /** Client address */
     std::string m_clientAddr;
 };

@@ -19,7 +19,7 @@
 
 namespace component {
 
-/*!
+/**
  * Led action structure.
  */
 struct LedAction {
@@ -43,7 +43,7 @@ struct LedAction {
     bool once = false;
 };
 
-/*!
+/**
  * Led color enum.
  */
 enum LedColor {
@@ -57,7 +57,7 @@ enum LedColor {
     PINK      = 0x00200010,  // pink
 };
 
-/*!
+/**
  * Led color indexes.
  */
 enum LedColorIndex {

@@ -8,11 +8,19 @@
 
 #pragma once
 
+#include "DroneSender.h"
+#include "DroneReceiver.h"
+#include "controller/LedController.h"
+
 #include <Controller.h>
+#include <net/NetTcp.h>
 
 #include <string>
+#include <thread>
 
-/*!
+using namespace controller;
+
+/**
  * Drone controller service class which starts and stops all others services.
  */
 class DroneController : public Controller
@@ -22,8 +30,10 @@ public:
     void start() override;
     int end() override;
     int discovery() override;
+    bool isRunning() override;
+    void handleError(int error) override;
 
-    /*!
+    /**
      * Get the client reception port.
      * \return client reception port
      */
@@ -31,7 +41,7 @@ public:
         return m_clientRcvPort;
     }
 
-    /*!
+    /**
      * Get the client address.
      * \return client address
      */
@@ -42,8 +52,31 @@ public:
 private:
     void run() override;
 
-    /*! Client reception port */
+    /**
+     * Discover, initialize and start sender and receiver components.
+     */
+    void init();
+
+    /* Handle action in the queue or/and in the list of events */
+    void handleEvents();
+
+    /* Wait for the next event */
+    void waitNextEvent();
+
+    /** Client reception port */
     int m_clientRcvPort;
-    /*! Client address */
+    /** Client address */
     std::string m_clientAddr;
+
+    /** Discovering tcp socket */
+    net::NetTcp m_conSocket;
+    /** Init process */
+	std::thread m_initProcess;
+
+    /** Network sender object */
+    DroneSender m_sender;
+    /** Network receiver object */
+    DroneReceiver m_receiver;
+    /** Led controller object */
+    LedController m_ledCtrl;
 };

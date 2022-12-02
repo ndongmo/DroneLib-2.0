@@ -12,7 +12,7 @@
 
 using namespace net;
 
-/*!
+/**
  * Drone receiver service class which handle network connection and frames sending.
  */
 class DroneReceiver : public NetReceiver
@@ -20,7 +20,7 @@ class DroneReceiver : public NetReceiver
 public:
     int begin() override;
 
-    /*!
+    /**
      * Initialize receiver required variables.
      * @param clientRcvPort client reception port
      * @param clientAddr client address
@@ -33,8 +33,8 @@ public:
 private:
     void innerRun(NetFrame& netFrame) override;
 
-    /*! Client reception port */
+    /** Client reception port */
     int m_clientRcvPort;
-    /*! Client address */
+    /** Client address */
     std::string m_clientAddr;
 };

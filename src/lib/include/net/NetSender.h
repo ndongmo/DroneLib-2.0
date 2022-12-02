@@ -18,7 +18,7 @@
 namespace net 
 {
 
-/*!
+/**
  * Network frame sender service.
  */
 class NetSender : public Service
@@ -26,14 +26,14 @@ class NetSender : public Service
 public:
 	int end() override;
 
-	/*!
+	/**
 	 * Sends an ack frame.
 	 * \param id frame id
      * \param seq sequence number
 	 */
 	void sendAck(UINT8 id, UINT8 seq);
 
-    /*!
+    /**
 	 * Send a frame with the given data.
 	 * \param id frame id
 	 * \param type frame type
@@ -42,7 +42,7 @@ public:
 	 */
 	void sendFrame(int id, int type, int dataSize, UINT8* data);
 
-	/*!
+	/**
 	 * Decode the given format and send a frame with the contained data.
 	 * \param id frame id
 	 * \param type frame type
@@ -51,7 +51,7 @@ public:
 	void sendFrame(int id, int type, const char* format, ...);
 
 protected:    
-	/*!
+	/**
 	 * Writes the given frame header parameters on the buffer.
 	 * \param id frame id
 	 * \param type frame type
@@ -59,14 +59,14 @@ protected:
 	 */
 	void writeFrameHeader(int id, int type, int totalSize);
 
-    /*!
+    /**
 	 * Returns the length of integers in the given string format.
 	 * \param format string format
      * \return length
 	 */
 	int getLength(const char* format);
 
-	/*!
+	/**
 	 * Returns the next sequence number at the given buffer id.
 	 * \param id buffer id
 	 * \param seqBuf buffer's sequence
@@ -74,18 +74,18 @@ protected:
 	 */
 	UINT8 getNextSeqID(int id);
 
-	/*! Max fragment size */
+	/** Max fragment size */
 	int m_maxFragmentSize;
-	/*! Max fragment number */
+	/** Max fragment number */
 	int m_maxFragmentNumber;
 
-    /*! Buffer's sequence */
-	int* m_seqBuf;
-    /*! Buffer */
-	UINT8* m_buffer;
-    /*! Mutex watcher for sending */
+    /** Buffer's sequence */
+	int* m_seqBuf = nullptr;
+    /** Buffer */
+	UINT8* m_buffer = nullptr;
+    /** Mutex watcher for sending */
 	std::mutex m_sendMtx;
-    /*! UDP sender socket */
+    /** UDP sender socket */
 	NetUdp m_sendSocket;
 };
 } // namespace net
