@@ -17,3 +17,5 @@
 /* Fragment default config */
 #define NET_FRAGMENT_SIZE_DEFAULT		1024
 #define NET_FRAGMENT_NUMBER_DEFAULT	    128
+
+#define MOTOR_MOVE_DELAY                100000 // Delay of a motor move in micro second 1000000 = 1s

@@ -11,6 +11,7 @@
 #include "DroneSender.h"
 #include "DroneReceiver.h"
 #include "controller/LedController.h"
+#include "controller/MotorController.h"
 
 #include <Controller.h>
 #include <net/NetTcp.h>
@@ -57,10 +58,10 @@ private:
      */
     void init();
 
-    /* Handle action in the queue or/and in the list of events */
+    /** Handle action in the queue or/and in the list of events */
     void handleEvents();
 
-    /* Wait for the next event */
+    /** Wait for the next event */
     void waitNextEvent();
 
     /** Client reception port */
@@ -79,4 +80,6 @@ private:
     DroneReceiver m_receiver;
     /** Led controller object */
     LedController m_ledCtrl;
+    /** Motors (wheels) controller object */
+    MotorController m_motorCtrl;
 };

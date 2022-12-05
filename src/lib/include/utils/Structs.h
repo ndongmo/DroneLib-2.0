@@ -20,4 +20,23 @@ enum AppState {
     APP_CLOSING      = 3,
     APP_ERROR        = 4,
 };
+
+/**
+ * Drone moving speeds.
+ */
+enum DroneSpeed {
+    SPEED_MIN       = 1024,
+    SPEED_MEDIUM    = 2048,
+    SPEED_MAX       = 4096,
+};
+
+/**
+ * Drone moving direction.
+ */
+enum DroneDir {
+    DIR_FORWARD     = 0,
+    DIR_BACKWARD    = 1,
+    DIR_LEFT        = 2,
+    DIR_RIGHT       = 3,
+};
 }

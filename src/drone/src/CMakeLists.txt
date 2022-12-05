@@ -8,6 +8,9 @@ SET(SOURCE_FILES
 	DroneReceiver.cpp
 	DroneSender.cpp
 	controller/LedController.cpp
+	controller/MotorController.cpp
+	controller/ComponentController.cpp
+	hardware/I2C.cpp
 )
 
 # Apple specific stuff
@@ -34,12 +37,14 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		debug ${DRONELIB_NAME}
 		debug ${LIB_WS2811}
+		debug i2c
 		debug Threads::Threads
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${DRONELIB_NAME}
 		optimized ${LIB_WS2811}
+		optimized i2c
 		optimized Threads::Threads
 	)
 ENDIF()

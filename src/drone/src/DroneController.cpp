@@ -59,6 +59,10 @@ int DroneController::begin() {
 		logE << "Leds initialization failed!" << std::endl;
 		return -1;
 	}
+	if(m_motorCtrl.begin() == -1) {
+		logE << "Motors (Wheels) initialization failed!" << std::endl;
+		return -1;
+	}
 	
 	return 1;
 }
@@ -74,17 +78,19 @@ int DroneController::end() {
 	result += m_sender.end();
 	result += m_receiver.end();
 	result += m_ledCtrl.end();
+	result += m_motorCtrl.end();
 
 	if(m_initProcess.joinable()) {
 		m_initProcess.join();
 	}
 
-	if(result != 3) return -1;
+	if(result != 4) return -1;
 	else return 1;
 }
 
 void DroneController::start() {
 	m_ledCtrl.start();
+	m_motorCtrl.start();
 
 	init();
 	run();

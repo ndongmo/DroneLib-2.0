@@ -8,6 +8,7 @@ SET(SOURCE_FILES
 	DroneSenderTest.cpp
 	DroneControllerTest.cpp
 	controller/LedControllerTest.cpp
+	controller/MotorControllerTest.cpp
 )
 
 # Apple specific stuff
@@ -43,6 +44,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		debug ${LIB_TEST}
 		debug ${LIB_MOCK}
 		debug ${LIB_WS2811}
+		debug i2c
 		debug Threads::Threads
 	)
 ELSE()
@@ -52,6 +54,7 @@ ELSE()
 		optimized ${LIB_TEST}
 		optimized ${LIB_MOCK}
 		optimized ${LIB_WS2811}
+		optimized i2c
 		optimized Threads::Threads
 	)
 ENDIF()
