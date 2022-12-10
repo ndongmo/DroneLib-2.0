@@ -11,6 +11,7 @@
 #include "NetUdp.h"
 #include "Service.h"
 #include "NetHelper.h"
+#include "NetSender.h"
 
 #include <thread>
 
@@ -24,6 +25,13 @@ namespace net
 class NetReceiver : public Service
 {
 public:
+	/**
+	 * @brief Construct a new Net Receiver object
+	 * 
+	 * @param sender network sender reference
+	 */
+	NetReceiver(NetSender& sender);
+
     void start() override;
     int end() override;
 
@@ -46,5 +54,7 @@ protected:
 	std::thread m_process;
 	/** UDP reception socket */
 	NetUdp m_rcvSocket;
+	/** Network sender reference */
+	NetSender& m_sender;
 };
 } // namespace net

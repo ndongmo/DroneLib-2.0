@@ -30,29 +30,29 @@ ELSE()
 ENDIF()
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
-ADD_LIBRARY(${DRONE_TEST_LIB} SHARED ${SOURCE_FILES})
+ADD_LIBRARY(${DRONE_LIB} SHARED ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-		debug ${DRONELIB_NAME}
+		debug ${LIB}
 		debug ${LIB_WS2811}
 		debug i2c
 		debug Threads::Threads
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-		optimized ${DRONELIB_NAME}
+		optimized ${LIB}
 		optimized ${LIB_WS2811}
 		optimized i2c
 		optimized Threads::Threads
 	)
 ENDIF()
 
-add_dependencies(${PROJECT_NAME} ${DRONELIB_NAME})
+add_dependencies(${PROJECT_NAME} ${LIB})
 
 #-----------------------------------------------------
-# DELIVERING binaries and header to ${DRONELIB_HOME}
+# DELIVERING binaries and header to ${APP_OUTPUT_BIN}
 #-----------------------------------------------------
 
 INSTALL(TARGETS ${PROJECT_NAME}

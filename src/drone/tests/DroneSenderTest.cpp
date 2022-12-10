@@ -9,6 +9,8 @@
 using namespace utils;
 
 class DroneSenderTest : public ::testing::Test {
+public:
+    DroneSender droneSender;
 protected:
     void SetUp() override {
         std::ofstream configFile(CONFIG_FILE);
@@ -18,17 +20,17 @@ protected:
     }
     void TearDown() override {
         remove(CONFIG_FILE);
+        droneSender.end();
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";
-    const int VAR_DRONE_PORT = 1555;
+    const int VAR_DRONE_PORT = 1355;
     const int MAX_FRAGMENT_SIZE = 800;
     const int MAX_FRAGMENT_NUMBER = 256;
 };
 
 // Tests DroneSender begin with default config
 TEST_F(DroneSenderTest, BeginWithDefaultConfigWorks) {
-    DroneSender droneSender;
     droneSender.init(VAR_DRONE_PORT, VAR_DRONE_ADDRESS, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
 
     EXPECT_EQ(droneSender.begin(), 1);

@@ -38,11 +38,8 @@ int PCWindow::begin() {
 
     SDL_SetWindowTitle(m_window, PC_APP_NAME);
     
-    m_cmd = 0;
-    m_state = APP_INIT;
     m_txt_color = { 0x00, 0x00, 0x00, 0xFF };
     m_back_color = { 0xFF, 0xFF, 0xFF, 0x80 };
-	m_fps = Config::getInt(CTRL_FPS, CTRL_FPS_DEFAULT);
 
     m_evHandler.init();
 	initEvents();
@@ -86,14 +83,13 @@ void PCWindow::start() {
 }
 
 void PCWindow::run() {
-	m_prevTicks = SDL_GetTicks();
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
         if (m_evHandler.getPlayWith() == PlayWith::KEYBOARD)
         {
             switch (ev.type) {
             case SDL_QUIT:
-                m_cmd = CMD_CTRL_QUIT;
+                m_evHandler.pressKey(SDLK_ESCAPE);
                 break;
             case SDL_KEYDOWN:
                 m_evHandler.pressKey(ev.key.keysym.sym);
@@ -113,7 +109,7 @@ void PCWindow::run() {
         {
             switch (ev.type) {
             case SDL_QUIT:
-                m_cmd = CMD_CTRL_QUIT;
+                m_evHandler.pressKey(Joystick::START);
                 break;
             case SDL_JOYBUTTONDOWN:
                 m_evHandler.pressKey(ev.jbutton.button + JOYSTICK_OFFSET);
@@ -130,37 +126,6 @@ void PCWindow::run() {
             }
         }
     }
-
-    onEvent();
-
-    float frameTicks = (float)(SDL_GetTicks() - m_prevTicks);
-
-    render(frameTicks);
-
-    if (1000.0f / m_fps > frameTicks) {
-        SDL_Delay((unsigned int)(1000.0f / (m_fps - frameTicks)));
-    }
-}
-
-void PCWindow::onEvent() {
-	if (m_evHandler.isEventPressed(CtrlEvent::QUIT)) {
-		m_cmd = CMD_CTRL_QUIT;
-	}
-    else if (m_evHandler.isEventPressed(CtrlEvent::DISCOVER)) {
-		m_cmd = CMD_CTRL_DISCOVER;
-	}
-	else if (m_evHandler.isEventDown(CtrlEvent::GO_UP)) {
-		
-	}
-	else if (m_evHandler.isEventDown(CtrlEvent::GO_DOWN)) {
-		
-	}
-	if (m_evHandler.isEventDown(CtrlEvent::GO_LEFT)) {
-		
-	}
-	else if (m_evHandler.isEventDown(CtrlEvent::GO_RIGHT)) {
-		
-	}
 }
 
 void PCWindow::initEvents() {
@@ -182,23 +147,14 @@ void PCWindow::render(int elapsedTime) {
     SDL_RenderPresent(m_renderer);
 }
 
-int PCWindow::getCmd() {
-    int tmp = m_cmd;
-    m_cmd = 0;
-    return tmp;
-}
-
 void PCWindow::updateState(utils::AppState state, int error) {
-    if(state == m_state) return;
-
     std::string str;
-    m_state = state;
 
-    if(m_state == APP_ERROR) {
+    if(state == APP_ERROR) {
         str = logError(error) + " Press [" + m_evHandler.getMapping(CtrlEvent::DISCOVER)
             + "] to restart discovering.";
     }
-    else if(m_state == APP_DISCOVERING) {
+    else if(state == APP_DISCOVERING) {
         int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
         std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
 
@@ -206,7 +162,7 @@ void PCWindow::updateState(utils::AppState state, int error) {
             + std::to_string(serverPort) + "] ...";
     }
     else {
-        str = "FPS: " + std::to_string(m_fps);
+        str = "FPS: " + std::to_string(Config::getInt(CTRL_FPS, CTRL_FPS_DEFAULT));
     }
 
     if(m_font_texture != nullptr) {

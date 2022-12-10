@@ -1,12 +1,20 @@
 #include "DroneReceiver.h"
 #include "Constants.h"
 
+#include <IController.h>
 #include <net/NetTcp.h>
+#include <net/NetHelper.h>
 #include <utils/Logger.h>
 #include <utils/Config.h>
+#include <utils/Structs.h>
 #include <utils/Constants.h>
 
 using namespace utils; 
+
+DroneReceiver::DroneReceiver(DroneSender& sender, MotorController& motorCtrl) : 
+	NetReceiver(sender), m_droneSender(sender), m_motorCtrl(motorCtrl) {
+
+}
 
 void DroneReceiver::init(int clientRcvPort, const std::string& clientAddr, 
 	int maxFragmentSize, int maxFragmentNumber) {
@@ -30,5 +38,18 @@ int DroneReceiver::begin() {
 }
 
 void DroneReceiver::innerRun(NetFrame& netFrame) {
-
+	logI << "DroneReceiver::Netframe type["<< (int)netFrame.type << "] id[" << (int)netFrame.id << "] seq[" << 
+		(int)netFrame.seq << "] data[" << netFrame.data << "] size[" << netFrame.size << "]" << std::endl;
+	if (netFrame.type == NS_FRAME_TYPE_QUIT) {
+		if(m_controller != nullptr) {
+			m_controller->updateState(APP_CLOSING);
+		}
+	} else if(netFrame.type == NS_FRAME_TYPE_DATA) {
+		if (netFrame.id == NS_ID_NAV) {
+			int dir = (int)netFrame.data[0];
+			int speed = NetHelper::readUInt32(netFrame.data, 1);
+			logI << "dir:" << dir << " speed:" << speed << std::endl;
+			m_motorCtrl.move((DroneDir)dir, (DroneSpeed)speed);
+		}
+	}
 }

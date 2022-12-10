@@ -11,6 +11,7 @@
 /* Drone config variables */
 #define DRONE_PORT_DISCOVERY_DEFAULT 	4444
 #define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.2.1"
+#define DRONE_WHEEL_MOVE_LAPS           100 // Time laps of wheel move in millisecond
 
 /* Drone config variables */
 #define DRONE_ADDRESS 		    "drone_address"
@@ -37,17 +38,23 @@
 #define STREAM_FRAGMENT_PER_FRAME   "stream_fragment_per_frame"
 
 // NS_FRAME_TYPE
-#define NS_FRAME_TYPE_UNINITIALIZED 0
-#define NS_FRAME_TYPE_ACK 1
-#define NS_FRAME_TYPE_DATA 2
-#define NS_FRAME_TYPE_DATA_LOW_LATENCY 3
-#define NS_FRAME_TYPE_DATA_WITH_ACK 4
-#define NS_FRAME_TYPE_MAX 5
+#define NS_FRAME_TYPE_QUIT              0
+#define NS_FRAME_TYPE_ACK               1
+#define NS_FRAME_TYPE_DATA              2
+#define NS_FRAME_TYPE_DATA_LOW_LATENCY  3
+#define NS_FRAME_TYPE_DATA_WITH_ACK     4
+#define NS_FRAME_TYPE_MAX               5
 
-// NS_MANAGER_INTERNAL_BUFFER_ID
-#define NS_MANAGER_INTERNAL_BUFFER_ID_PING 0
-#define NS_MANAGER_INTERNAL_BUFFER_ID_PONG 1
-#define NS_MANAGER_INTERNAL_BUFFER_ID_MAX 3
+// Command IDs
+#define NS_ID_EMPTY     0   // empty cmd id
+#define NS_ID_PING      1   // ping cmd id
+#define NS_ID_PONG      2   // pong cmd id
+#define NS_ID_MAX       3   // max cmd id
+#define NS_ID_NAV       4   // navigation cmd id
+
+// Command frequencies in millisecond
+#define NS_FREQ_PING  50                        // ping cmd frequency
+#define NS_FREQ_NAV   DRONE_WHEEL_MOVE_LAPS / 2 // navigation cmd frequency
 
 // NS_STREAM
 #define NS_STREAM_ACK 1 // ack stream data by default

@@ -7,6 +7,10 @@ using namespace utils;
 
 namespace net {
 
+NetReceiver::NetReceiver(NetSender& sender) : m_sender(sender) {
+
+}
+
 int NetReceiver::end() {
 	m_running = false;
 	is_closing = true;
@@ -34,17 +38,30 @@ void NetReceiver::run() {
 		memset(buf, 0, m_maxFragmentSize);
 
 		len = m_rcvSocket.receive(buf, m_maxFragmentSize);
-		if (len == -1) {
-			logE << "NetReceiver receive socket error" << std::endl;
+
+		if (len < 1) {
+			if(len == 0) {
+				logI << "NetReceiver: the other side closes the connection" << std::endl;
+			} else {
+				logE << "NetReceiver receives socket error" << std::endl;
+			}
 			m_running = false;
 			continue;
 		}
 
 		NetFrame netFrame;
 		NetHelper::readFrame(buf, netFrame);
-		innerRun(netFrame);
+
+		if (netFrame.type == NS_FRAME_TYPE_DATA_WITH_ACK) {
+			m_sender.sendAck(netFrame.seq, netFrame.id);
+		}
+		if (netFrame.id == NS_ID_PING) {
+			m_sender.sendPong(netFrame.seq);
+		} else {
+			innerRun(netFrame);
+		}
 	}
-	if(len == -1 and !is_closing) {
+	if(len < 1 and !is_closing) {
 		sendError(ERROR_NET_RECEIVE);
 	}
 }

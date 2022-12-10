@@ -38,7 +38,3 @@ void DroneSender::start() {
 void DroneSender::run() {
 	
 }
-
-void DroneSender::sendPing(int size, UINT8* data) {
-    sendFrame(NS_MANAGER_INTERNAL_BUFFER_ID_PING, NS_FRAME_TYPE_DATA, size, data);
-}

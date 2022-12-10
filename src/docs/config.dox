@@ -1,4 +1,4 @@
 PROJECT_NAME           = "DroneLib"
 OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/doc_doxygen/
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/ @CMAKE_SOURCE_DIR@/src/lib/include/ @CMAKE_SOURCE_DIR@/src/pc/include/ @CMAKE_SOURCE_DIR@/src/drone/include/
-PLANTUML_JAR_PATH      = @DRONELIB_HOME@/tools
+PLANTUML_JAR_PATH      = @LIB_HOME@/tools

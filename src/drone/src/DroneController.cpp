@@ -9,6 +9,10 @@
 
 using namespace utils;
 
+DroneController::DroneController() : m_receiver(m_sender, m_motorCtrl) {
+
+}
+
 void DroneController::init() {
 	if(m_initProcess.joinable()) {
 		m_initProcess.join();
@@ -104,7 +108,6 @@ void DroneController::run() {
 		handleEvents();
 		waitNextEvent();
 	}
-	end();
 }
 
 bool DroneController::isRunning() {
@@ -125,6 +128,12 @@ void DroneController::handleEvents() {
 
 	if(m_state == APP_INIT || m_state == APP_ERROR) {
 		init();
+	}
+	else if(m_state == APP_CLOSING) {
+		m_mutex.lock();
+		m_running = false;
+		m_mutex.unlock();
+		m_cv.notify_all();
 	}
 }
 

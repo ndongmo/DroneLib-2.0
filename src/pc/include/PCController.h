@@ -11,6 +11,7 @@
 #include "PCSender.h"
 #include "PCReceiver.h"
 #include "PCWindow.h"
+#include "EventHandler.h"
 
 #include <utils/Structs.h>
 #include <net/NetTcp.h>
@@ -25,6 +26,11 @@
 class PCController : public Controller
 {
 public:
+    /**
+     * Default constructor
+     */
+    PCController();
+
     int begin() override;
     void start() override;
     int end() override;
@@ -46,14 +52,6 @@ public:
         return m_droneSendPort;
     }
 
-    /**
-     * Get the current error.
-     * \return error code
-     */
-    int getError() {
-        return m_error;
-    }
-
 private:
     void run() override;
 
@@ -63,27 +61,32 @@ private:
     void init();
 
     /**
-     * Handle an incoming command.
-     * @param cmd command to handle
+     * Handle incoming controller events.
+     * @param elapsedTime time since the last call
      */
-    void handleCommands(int cmd);
+    void handleEvents(int elapsedTime);
 
-    /** Current error */
-    int m_error = 0;
-    /** Discovering tcp socket */
-    net::NetTcp m_conSocket;
-    /** Init process */
-	std::thread m_initProcess;
-
+    /** Keep the main process running state */
+    bool m_inMainProcess = false;
     /** Drone reception port */
     int m_droneRcvPort;
     /** Drone sending port */
     int m_droneSendPort;
+    /* Number of Frame per second */
+    unsigned int m_fps;
+    /* Previously registered timestamp */
+    unsigned int m_prevTicks;
 
+    /** Init process */
+	std::thread m_initProcess;
+    /** Discovering tcp socket */
+    net::NetTcp m_conSocket;
     /** Network sender object */
     PCSender m_sender;
     /** Network receiver object */
     PCReceiver m_receiver;
+    /** Keyboard/Joystick event handler */
+    EventHandler m_evHandler;
     /** UI & event manager object */
     PCWindow m_window;
 };

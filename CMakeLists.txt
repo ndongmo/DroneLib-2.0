@@ -2,41 +2,52 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
 
-set(DRONELIB_HOME ${CMAKE_CURRENT_SOURCE_DIR})
-set(DRONELIB_NAME Lib)
-set(DRONELIB_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/include)
+set(LIB_HOME ${CMAKE_CURRENT_SOURCE_DIR})
+
+set(LIB Lib)
+set(PCLIB PCLib)
+set(DRONE_LIB DroneLib)
+
+set(PC_RSC ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/res)
+set(PC_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/include)
+set(LIB_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/include)
+set(DRONE_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/drone/include)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 set(APP_OUTPUT_BIN ${APP_OUTPUT_BIN})
-set(APP_OUTPUT_LIB ${DRONELIB_HOME}/app/lib)
-set(APP_OUTPUT_INC ${DRONELIB_HOME}/app/include)
-set(APP_OUTPUT_DOC ${DRONELIB_HOME}/app/docs)
-set(THIRD_PARTY_INC ${DRONELIB_HOME}/third-party/include)
+set(APP_OUTPUT_LIB ${LIB_HOME}/app/lib)
+set(APP_OUTPUT_INC ${LIB_HOME}/app/include)
+set(APP_OUTPUT_DOC ${LIB_HOME}/app/docs)
+set(THIRD_PARTY_INC ${LIB_HOME}/third-party/include)
 
 IF(UNIX) # for Linux, BSD, Solaris, Minix
+  IF(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
+    set(RASPBERRY_PI_SYS 1)
+    add_definitions(-DRASPBERRY_PI_SYS)
+  ENDIF()
 	IF (CMAKE_SIZEOF_VOID_P EQUAL 8) 	#x64
-    set(THIRD_PARTY_BIN ${DRONELIB_HOME}/third-party/linux/x64/bin)
-    set(THIRD_PARTY_LIB ${DRONELIB_HOME}/third-party/linux/x64/lib)
+    set(THIRD_PARTY_BIN ${LIB_HOME}/third-party/linux/x64/bin)
+    set(THIRD_PARTY_LIB ${LIB_HOME}/third-party/linux/x64/lib)
 	ELSE() 	#x86
-    set(THIRD_PARTY_BIN ${DRONELIB_HOME}/third-party/linux/x86/bin)
-    set(THIRD_PARTY_LIB ${DRONELIB_HOME}/third-party/linux/x86/lib)
+    set(THIRD_PARTY_BIN ${LIB_HOME}/third-party/linux/x86/bin)
+    set(THIRD_PARTY_LIB ${LIB_HOME}/third-party/linux/x86/lib)
 	ENDIF()
 ELSEIF(APPLE)
   IF (CMAKE_SIZEOF_VOID_P EQUAL 8) 	#x64
-    set(THIRD_PARTY_BIN ${DRONELIB_HOME}/third-party/apple/x64/bin)
-    set(THIRD_PARTY_LIB ${DRONELIB_HOME}/third-party/apple/x64/lib)
+    set(THIRD_PARTY_BIN ${LIB_HOME}/third-party/apple/x64/bin)
+    set(THIRD_PARTY_LIB ${LIB_HOME}/third-party/apple/x64/lib)
   ELSE() 	#x86
-    set(THIRD_PARTY_BIN ${DRONELIB_HOME}/third-party/apple/x86/bin)
-    set(THIRD_PARTY_LIB ${DRONELIB_HOME}/third-party/apple/x86/lib)
+    set(THIRD_PARTY_BIN ${LIB_HOME}/third-party/apple/x86/bin)
+    set(THIRD_PARTY_LIB ${LIB_HOME}/third-party/apple/x86/lib)
   ENDIF()
 ELSE()
   IF (CMAKE_SIZEOF_VOID_P EQUAL 8) 	#x64
-    set(THIRD_PARTY_BIN ${DRONELIB_HOME}/third-party/win/x64/bin)
-    set(THIRD_PARTY_LIB ${DRONELIB_HOME}/third-party/win/x64/lib)
+    set(THIRD_PARTY_BIN ${LIB_HOME}/third-party/win/x64/bin)
+    set(THIRD_PARTY_LIB ${LIB_HOME}/third-party/win/x64/lib)
   ELSE() 	#x86
-    set(THIRD_PARTY_BIN ${DRONELIB_HOME}/third-party/win/x86/bin)
-    set(THIRD_PARTY_LIB ${DRONELIB_HOME}/third-party/win/x86/lib)
+    set(THIRD_PARTY_BIN ${LIB_HOME}/third-party/win/x86/bin)
+    set(THIRD_PARTY_LIB ${LIB_HOME}/third-party/win/x86/lib)
   ENDIF()
 ENDIF()
 
@@ -63,9 +74,19 @@ SET(CMAKE_CXX_FLAGS_DEBUG " -Og -ggdb ${ENABLED_DEBUG_MESSAGE}")
 SET(CMAKE_CXX_FLAGS_RELEASE " -O3  ${ENABLED_DEBUG_MESSAGE}")
 
 add_subdirectory(src/lib)
-add_subdirectory(src/drone)
-add_subdirectory(src/pc)
-#add_subdirectory(src/docs)
-#if (CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
-#    add_subdirectory(docs)
-#endif()
+
+IF(UNIX)
+  add_subdirectory(src/drone)
+ENDIF()
+
+IF(NOT RASPBERRY_PI_SYS)
+  add_subdirectory(src/pc)
+ENDIF()
+
+IF(UNIX AND NOT RASPBERRY_PI_SYS)
+  add_subdirectory(src/tests)
+ENDIF()
+
+IF(CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
+  add_subdirectory(src/docs)
+ENDIF()

@@ -31,7 +31,7 @@ ELSE()
 ENDIF()
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
-ADD_LIBRARY(${PCLIB_NAME} SHARED ${SOURCE_FILES})
+ADD_LIBRARY(${PCLIB} SHARED ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES 
 	DEBUG_POSTFIX "d"
 )
@@ -39,30 +39,30 @@ SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES
 ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
 	POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_CURRENT_SOURCE_DIR}/../res/arial.ttf
+		${PC_RSC}/arial.ttf
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-		debug ${DRONELIB_NAME}
+		debug ${LIB}
 		debug ${LIB_SDL}
 		debug ${LIB_TTF}
 		debug Threads::Threads
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-		optimized ${DRONELIB_NAME}
+		optimized ${LIB}
 		optimized ${LIB_SDL}
 		optimized ${LIB_TTF}
 		optimized Threads::Threads
 	)
 ENDIF()
 
-add_dependencies(${PROJECT_NAME} ${DRONELIB_NAME})
+add_dependencies(${PROJECT_NAME} ${LIB})
 
 #-----------------------------------------------------
-# DELIVERING binaries and header to ${DRONELIB_HOME}
+# DELIVERING binaries and header to ${LIB_HOME}
 #-----------------------------------------------------
 
 INSTALL(TARGETS ${PROJECT_NAME}

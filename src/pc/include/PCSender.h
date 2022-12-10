@@ -9,8 +9,10 @@
 #pragma once
 
 #include <net/NetSender.h>
+#include <utils/Structs.h>
 
 using namespace net;
+using namespace utils;
 
 /**
  * PC frame sender service.
@@ -18,6 +20,11 @@ using namespace net;
 class PCSender : public NetSender
 {
 public:
+    /**
+     * Construct a new PCSender object
+     */
+    PCSender();
+
 	int begin() override;
 	void start() override;
 
@@ -28,13 +35,6 @@ public:
      * @param maxFragmentNumber max number of fragment
      */
     void init(int droneRcvPort, int maxFragmentSize, int maxFragmentNumber);
-    
-	/**
-	 * Sends a pong frame.
-     * \param size data size
-     * \param data pong data to send
-	 */
-	void sendPong(int size, UINT8* data);
 
     /**
      * Get the drone reception port.
@@ -43,6 +43,18 @@ public:
     int getDroneRcvPort() const {
         return m_droneRcvPort;
     }
+
+    /**
+	 * Sends a quit command.
+	 */
+	void sendQuit();
+
+    /**
+	 * Sends navigation data.
+     * @param dir drone direction
+     * @param speed drone speed 
+	 */
+	void sendNav(int deltatime, DroneDir dir, DroneSpeed speed);
 
 private:
     void run() override;

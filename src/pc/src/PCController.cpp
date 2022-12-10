@@ -7,6 +7,10 @@
 
 using namespace utils;
 
+PCController::PCController() : m_receiver(m_sender), m_window(m_evHandler) {
+
+}
+
 void PCController::init() {
 	if(m_initProcess.joinable()) {
 		m_initProcess.join();
@@ -48,8 +52,9 @@ void PCController::init() {
 }
 
 int PCController::begin() {	
-	m_state = APP_INIT;
+	m_oldState = m_state = APP_INIT;
 	m_error = 0;
+	m_fps = Config::getInt(CTRL_FPS, CTRL_FPS_DEFAULT);
 	
 	if(m_window.begin() == -1) {
 		logE << "UI begin failed!" << std::endl;
@@ -64,8 +69,11 @@ int PCController::begin() {
 
 int PCController::end() {	
     int result = 0;
-
 	m_running = false;
+	
+	// wait the main process to exit
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_cv.wait(lock, [this] { return !m_inMainProcess; });
 
 	m_conSocket.close();
 
@@ -90,14 +98,24 @@ void PCController::start() {
 
 void PCController::run() {
 	m_running = true;
+	m_inMainProcess = true;
 	
 	while (m_running)
 	{
+		unsigned int newTicks = SDL_GetTicks();
+		unsigned int elapsedTime = newTicks - m_prevTicks;
+		m_prevTicks = newTicks;
+
 		m_window.run();
-		handleCommands(m_window.getCmd());
-		m_window.updateState(m_state, m_error);
+		handleEvents(elapsedTime);
+		m_window.render(elapsedTime);
+
+		if (1000.0f / m_fps > elapsedTime) { // fps limiter
+        	SDL_Delay((unsigned int)(1000.0f / (m_fps - elapsedTime)));
+		}
 	}
-	end();
+	m_inMainProcess = false;
+	m_cv.notify_all();
 }
 
 int PCController::discovery() {
@@ -143,15 +161,40 @@ int PCController::discovery() {
 	return 1;
 }
 
-void PCController::handleCommands(int cmd) {
-	if(cmd <= 0) return;
-	
-	if(cmd == CMD_CTRL_DISCOVER) {
-		if(m_state == APP_INIT || m_state == APP_ERROR) {
-			init();
+void PCController::handleEvents(int elapsedTime) {
+	if(m_state != APP_RUNNING) {
+		if (m_evHandler.isEventPressed(CtrlEvent::QUIT)) {
+			updateState(APP_CLOSING);
+			m_running = false;
 		}
-	} 
-	else if (cmd == CMD_CTRL_QUIT) {
-		m_running = false;
+		else if (m_evHandler.isEventPressed(CtrlEvent::DISCOVER)) {
+			if(m_state == APP_INIT || m_state == APP_ERROR) {
+				init();
+			}
+		}
+	}
+	else {
+		if (m_evHandler.isEventPressed(CtrlEvent::QUIT)) {
+			updateState(APP_CLOSING);
+			m_running = false;
+			m_sender.sendQuit();
+		}
+		else if (m_evHandler.isEventDown(CtrlEvent::GO_UP)) {
+			m_sender.sendNav(elapsedTime, DIR_FORWARD, SPEED_MIN);
+		}
+		else if (m_evHandler.isEventDown(CtrlEvent::GO_DOWN)) {
+			m_sender.sendNav(elapsedTime, DIR_BACKWARD, SPEED_MIN);
+		}
+		else if (m_evHandler.isEventDown(CtrlEvent::GO_LEFT)) {
+			m_sender.sendNav(elapsedTime, DIR_LEFT, SPEED_MIN);
+		}
+		else if (m_evHandler.isEventDown(CtrlEvent::GO_RIGHT)) {
+			m_sender.sendNav(elapsedTime, DIR_RIGHT, SPEED_MIN);
+		}
+	}
+
+	if(m_oldState != m_state) {
+		m_window.updateState(m_state, m_error);
+		m_oldState = m_state;
 	}
 }

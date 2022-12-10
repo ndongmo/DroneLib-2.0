@@ -27,6 +27,12 @@ using namespace controller;
 class DroneController : public Controller
 {
 public:
+    /**
+     * @brief Construct a new Drone Controller object
+     * 
+     */
+    DroneController();
+
     int begin() override;
     void start() override;
     int end() override;
@@ -36,7 +42,7 @@ public:
 
     /**
      * Get the client reception port.
-     * \return client reception port
+     * @return client reception port
      */
     int getClientRcvPort() const {
         return m_clientRcvPort;
@@ -44,13 +50,13 @@ public:
 
     /**
      * Get the client address.
-     * \return client address
+     * @return client address
      */
     const std::string& getClientAddr() const {
         return m_clientAddr;
     }
     
-private:
+protected:
     void run() override;
 
     /**

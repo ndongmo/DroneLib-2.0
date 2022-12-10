@@ -14,6 +14,7 @@
 
 #include <thread>
 #include <mutex>
+#include <unordered_map>
 
 namespace net 
 {
@@ -24,6 +25,11 @@ namespace net
 class NetSender : public Service
 {
 public:
+	/**
+	 * Construct a new NetSender object
+	 */
+	NetSender();
+
 	int end() override;
 
 	/**
@@ -50,6 +56,19 @@ public:
 	 */
 	void sendFrame(int id, int type, const char* format, ...);
 
+	/**
+	 * Sends a ping data.
+     * @param deltatime elapsed time
+     * @param seq sequence number
+	 */
+	void sendPing(int deltatime, UINT8 seq);
+
+    /**
+	 * Sends a pong data.
+     * \param seq sequence number
+	 */
+	void sendPong(UINT8 seq);
+
 protected:    
 	/**
 	 * Writes the given frame header parameters on the buffer.
@@ -74,6 +93,26 @@ protected:
 	 */
 	UINT8 getNextSeqID(int id);
 
+	/**
+     * Add the command with the given id for frequency handling.
+     * Should only be used for commands which need frequency for sending.
+     * 
+     * @param id command id
+     * @param frequency command frequency
+     */
+    void addCommand(int id, unsigned int frequency);
+
+    /**
+     * Check if the command with the given id can be sent.
+     * Should only be used for commands which need frequency for sending.
+     * 
+     * @param id command id
+     * @param deltatime elapsed time
+     * @return true if the deltatime is bigger than the command frequency,
+     * false otherwise
+     */
+    bool canSend(int id, int deltatime);
+
 	/** Max fragment size */
 	int m_maxFragmentSize;
 	/** Max fragment number */
@@ -85,6 +124,10 @@ protected:
 	UINT8* m_buffer = nullptr;
     /** Mutex watcher for sending */
 	std::mutex m_sendMtx;
+	/** Defined command frequencies */
+    std::unordered_map<int, int> m_freqs;
+    /** Current command frequencies */
+    std::unordered_map<int, int> m_currentFreqs;
     /** UDP sender socket */
 	NetUdp m_sendSocket;
 };

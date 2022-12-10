@@ -5,7 +5,9 @@
 #include <utils/Logger.h>
 #include <utils/Constants.h>
 
-using namespace utils;
+PCSender::PCSender() : NetSender() {
+	addCommand(NS_ID_NAV, NS_FREQ_NAV);
+}
 
 void PCSender::init(int droneRcvPort, int maxFragmentSize, int maxFragmentNumber) {
 	m_droneRcvPort = droneRcvPort;
@@ -36,6 +38,15 @@ void PCSender::run() {
 	
 }
 
-void PCSender::sendPong(int size, UINT8* data) {
-    sendFrame(NS_MANAGER_INTERNAL_BUFFER_ID_PONG, NS_FRAME_TYPE_DATA, size, data);
+void PCSender::sendQuit() {
+	sendFrame(NS_ID_EMPTY, NS_FRAME_TYPE_QUIT, "");
+}
+
+void PCSender::sendNav(int deltatime, DroneDir dir, DroneSpeed speed) {
+	if(canSend(NS_ID_NAV, deltatime)) {
+		sendFrame(NS_ID_NAV, NS_FRAME_TYPE_DATA, "14", dir, speed);
+		m_currentFreqs[NS_ID_NAV] = 0;
+	} else {
+		m_currentFreqs[NS_ID_NAV] += deltatime;
+	}
 }

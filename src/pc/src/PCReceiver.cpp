@@ -8,6 +8,10 @@
 
 using namespace utils; 
 
+PCReceiver::PCReceiver(PCSender& sender) : NetReceiver(sender), m_pcSender(sender) {
+
+}
+
 void PCReceiver::init(int droneSendPort, int maxFragmentSize, int maxFragmentNumber) {
 	m_droneSendPort = droneSendPort;
 	m_maxFragmentSize = maxFragmentSize;

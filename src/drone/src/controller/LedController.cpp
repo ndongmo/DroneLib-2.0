@@ -22,8 +22,6 @@ const unsigned int LedController::m_colors[COLOR_COUNT] = {
 };
 
 int LedController::begin() {
-    ws2811_return_t ret;
-
     m_ledBuffer.freq = TARGET_FREQ;
     m_ledBuffer.dmanum = DMA;
     m_ledBuffer.channel [0] = {
@@ -39,26 +37,31 @@ int LedController::begin() {
         .count = 0,
         .brightness = 0,
     };
-    
+
+#ifdef __arm__
+    ws2811_return_t ret;
     if((ret = ws2811_init(&m_ledBuffer)) != WS2811_SUCCESS) {
         logE << "Led ws2811_init failed: " << ws2811_get_return_t_str(ret) << std::endl;
         return -1;
     }
+#endif
     return 1;
 }
 
 int LedController::end() {
     if(ComponentController::end() != 1) return -1;
 
+#ifdef __arm__  
     for(unsigned int i = 0; i < LED_COUNT; i++) {
         m_ledBuffer.channel[0].leds[i] = 0;
     }
+    
     ws2811_return_t ret;
     if ((ret = ws2811_render(&m_ledBuffer)) != WS2811_SUCCESS) {
         logE << "Led ws2811_render failed when clearing: " << ws2811_get_return_t_str(ret) << std::endl;
     }
-
     ws2811_fini(&m_ledBuffer);
+#endif
 
     return 1;
 }
@@ -118,7 +121,9 @@ void LedController::play(utils::AppState state) {
 
 void LedController::updateLed(const LedAction& a) {
     m_components[a.ledId] = a.on ? m_colors[a.color] : 0;
+#ifdef __arm__
     m_ledBuffer.channel[0].leds[a.ledId] = m_components[a.ledId];
+#endif
 }
 
 void LedController::handleActions() {
@@ -191,10 +196,12 @@ void LedController::handleActions() {
         }
     }
 
+#ifdef __arm__ 
     ws2811_return_t ret;
     if ((ret = ws2811_render(&m_ledBuffer)) != WS2811_SUCCESS) {
         logE << "Led ws2811_render failed: " << ws2811_get_return_t_str(ret) << std::endl;
     }
+#endif
 
     m_previousClock = std::chrono::steady_clock::now();
 }

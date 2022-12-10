@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "PCSender.h"
+
 #include <net/NetReceiver.h>
 
 using namespace net;
@@ -18,6 +20,13 @@ using namespace net;
 class PCReceiver : public NetReceiver
 {
 public:
+    /**
+     * @brief Construct a new PC network receiver object
+     * 
+     * @param receiver network sender reference
+     */
+    PCReceiver(PCSender& sender);
+
     int begin() override;
 
     /**
@@ -33,4 +42,6 @@ private:
 
     /** Drone sending port */
     int m_droneSendPort;
+    /** PC network sender reference */
+    PCSender& m_pcSender;
 };

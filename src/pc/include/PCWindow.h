@@ -23,25 +23,21 @@
 class PCWindow : public Service
 {
 public:
+    /**
+     * Constructor for initializing the event handler
+     */
+    PCWindow(EventHandler& evHandler) : m_evHandler(evHandler) {}
+
     int begin() override;
     void start() override;
     int end() override;
     void run() override;
 
     /**
-     * Get the Event Handler object
-     * 
-     * @return const EventHandler& 
+     * Render the current frame.
+     * @param elapsedTime time since the last call
      */
-    const EventHandler& getEventHandler() const {
-        return m_evHandler;
-    }
-
-    /**
-     * Obtain the current command and reset it.
-     * @return current command ID
-     */
-    int getCmd();
+    void render(int elapsedTime);
 
     /**
      * Update the current state.
@@ -51,35 +47,15 @@ public:
     void updateState(utils::AppState state, int error);
 
 private:
-
     /**
      * Initialize controller events.
      */
     void initEvents();
 
-    /**
-     * Controller events handler method.
-     */
-	void onEvent();
-
-    /**
-     * Render the current frame.
-     * @param elapsedTime time since the last call
-     */
-    void render(int elapsedTime);
-
-    /* Number of Frame per second */
-    unsigned int m_fps;
-    /* Previously registered timestamp */
-    unsigned int m_prevTicks;
-    /* Current command */
-    unsigned int m_cmd;
     /* Window width */
     unsigned int m_width;
     /* Window height */
     unsigned int m_height;
-    /* Current state */
-    utils::AppState m_state;
 
     SDL_Color m_txt_color;
     SDL_Color m_back_color;
@@ -91,5 +67,5 @@ private:
     SDL_Texture* m_font_texture = nullptr;
 	SDL_Renderer* m_renderer = nullptr;
 
-    EventHandler m_evHandler;
+    EventHandler& m_evHandler;
 };

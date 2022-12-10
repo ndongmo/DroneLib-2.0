@@ -1,9 +1,7 @@
 #include "net/NetSender.h"
 #include "utils/Constants.h"
-
-#include <utils/Config.h>
-#include <utils/Logger.h>
-#include <utils/Constants.h>
+#include "utils/Config.h"
+#include "utils/Logger.h"
 
 #include <string.h>
 #include <stdarg.h>
@@ -11,6 +9,10 @@
 using namespace utils;
 
 namespace net {
+
+NetSender::NetSender() {
+	addCommand(NS_ID_PING, NS_FREQ_PING);
+}
 
 int NetSender::end() {
 	if(m_seqBuf != nullptr) {
@@ -26,10 +28,6 @@ int NetSender::end() {
 	}
 
 	return 1;
-}
-
-void NetSender::sendAck(UINT8 id, UINT8 seq) {
-    sendFrame(id, NS_FRAME_TYPE_ACK, "1", seq);
 }
 
 void NetSender::sendFrame(int id, int type, int length, UINT8* data) {
@@ -78,6 +76,9 @@ void NetSender::sendFrame(int id, int type, const char* format, ...) {
 			}
 		}
 	} va_end(args);
+	
+	logI << "NetSender::Netframe type["<< (int)m_buffer[0] << "] id[" << (int)m_buffer[1] << "] seq[" << 
+		(int)m_buffer[2] << "] size[" << totalSize << "]" << std::endl;
 
 	totalSize = m_sendSocket.send((char*)m_buffer, totalSize);
 	m_sendMtx.unlock();
@@ -112,4 +113,34 @@ UINT8 NetSender::getNextSeqID(int id) {
 	}
 	return m_seqBuf[id];
 }
+
+void NetSender::addCommand(int id, unsigned int frequency) {
+	m_freqs[id] = frequency;
+	m_currentFreqs[id] = 0;
+}
+
+bool NetSender::canSend(int id, int deltatime) {
+	if(m_freqs.find(id) != m_freqs.end()) {
+		return m_freqs[id] <= m_currentFreqs[id] + deltatime;
+	}
+	return true;
+}
+
+void NetSender::sendAck(UINT8 id, UINT8 seq) {
+    sendFrame(id, NS_FRAME_TYPE_ACK, "1", seq);
+}
+
+void NetSender::sendPing(int deltatime, UINT8 seq) {
+	if(canSend(NS_ID_PING, deltatime)) {
+		sendFrame(NS_ID_PING, NS_FRAME_TYPE_DATA, "1", seq);
+		m_currentFreqs[NS_ID_PING] = 0;
+	} else {
+		m_currentFreqs[NS_ID_PING] += deltatime;
+	}
+}
+
+void NetSender::sendPong(UINT8 seq) {
+    sendFrame(NS_ID_PONG, NS_FRAME_TYPE_DATA, "1", seq);
+}
+
 }

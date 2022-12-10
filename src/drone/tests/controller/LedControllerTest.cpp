@@ -10,9 +10,23 @@
 using namespace controller;
 using namespace component;
 
-// Tests LedController start method is working
-TEST(LedControllerTest, StartWorks) {
+class LedControllerTest : public ::testing::Test {
+public:
     LedController ctr;
+protected:
+    void TearDown() override {
+        ctr.end();
+    }
+
+    const char* VAR_DRONE_ADDRESS = "127.0.0.1";
+    const int VAR_DRONE_RCV_PORT = 1555;
+    const int VAR_DRONE_SEND_PORT = 1556;
+    const int MAX_FRAGMENT_SIZE = 800;
+    const int MAX_FRAGMENT_NUMBER = 256;
+};
+
+// Tests LedController start method is working
+TEST_F(LedControllerTest, StartWorks) {
     EXPECT_EQ(ctr.begin(), 1);
     ctr.start();
     EXPECT_TRUE(ctr.isRunning());
@@ -20,8 +34,7 @@ TEST(LedControllerTest, StartWorks) {
 }
 
 // Tests LedController turning on/off is working
-TEST(LedControllerTest, TurnOnOffWorks) {
-    LedController ctr;
+TEST_F(LedControllerTest, TurnOnOffWorks) {
     LedAction a;
 
     EXPECT_EQ(ctr.begin(), 1);
@@ -47,8 +60,7 @@ TEST(LedControllerTest, TurnOnOffWorks) {
 }
 
 // Tests LedController turning on/off with delay is working
-TEST(LedControllerTest, TurnOnOffWithDelayWorks) {
-    LedController ctr;
+TEST_F(LedControllerTest, TurnOnOffWithDelayWorks) {
     LedAction a;
 
     EXPECT_EQ(ctr.begin(), 1);
@@ -75,8 +87,7 @@ TEST(LedControllerTest, TurnOnOffWithDelayWorks) {
 }
 
 // Tests LedController turning on/off with delay and repeat is working
-TEST(LedControllerTest, TurnOnOffWithDelayRepeatWorks) {
-    LedController ctr;
+TEST_F(LedControllerTest, TurnOnOffWithDelayRepeatWorks) {
     LedAction a1, a2;
 
     EXPECT_EQ(ctr.begin(), 1);

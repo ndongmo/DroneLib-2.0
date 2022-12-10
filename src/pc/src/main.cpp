@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 	
 	if(ctrl.begin() != -1) {
 		ctrl.start();
+		ctrl.end();
 	} else {
 		logE << "The application cannot be started!" << std::endl;
 	}

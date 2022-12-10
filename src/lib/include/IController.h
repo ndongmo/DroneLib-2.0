@@ -2,7 +2,7 @@
 * \file IController.h
 * \brief Controller interface.
 * \author Ndongmo Silatsa
-* \date 25-14-2022
+* \date 25-11-2022
 * \version 2.0
 */
 
@@ -20,6 +20,12 @@ class IController
 {
 public:
     /**
+     * Update the current state.
+     * @param state new state
+     */
+    void updateState(utils::AppState state);
+
+    /**
      * Handle the given error.
      * @param error error code
      */
@@ -34,21 +40,15 @@ public:
     }
 
 protected:
-    /**
-     * Update the current state.
-     * @param state new state
-     */
-    void updateState(utils::AppState state);
-    
     /** Current state */
     utils::AppState m_state;
     /** Previous app state */
     utils::AppState m_oldState;
 
-    /* Mutex for variables synchronization */
+    /** Mutex for variables synchronization */
     std::mutex m_mutex;
     /** Condition variable for controlling access to the mutex */
     std::condition_variable m_cv;
-    /* Current error */
+    /** Current error */
     int m_error;
 };

@@ -17,7 +17,13 @@ void runReceive(NetTcp *tcp, char* recvBuffer, int rcv_len, int send_len) {
 }
 
 class NetTcpTest : public ::testing::Test {
+public:
+    NetTcp tcp1, tcp2;
 protected:
+    void TearDown() override {
+        tcp1.close();
+        tcp2.close();
+    }
     const char* FAKE_ADDRESS = "192.168..1";
     const char* CLIENT_ADDRESS = "127.0.0.1";
     const char* SERVER_ADDRESS = "127.0.0.1";
@@ -27,7 +33,6 @@ protected:
 
 // Tests Tcp open method is working
 TEST_F(NetTcpTest, OpenWorks) {
-    NetTcp tcp1, tcp2;
     struct sockaddr_in client;
     
     EXPECT_EQ(tcp1.openServer(SERVER_ADDRESS, SERVER_PORT), 1);
@@ -42,20 +47,17 @@ TEST_F(NetTcpTest, OpenWorks) {
 
 // Tests Tcp open method with empty server address is working
 TEST_F(NetTcpTest, OpenWorksWithEmptyServerAddrWorks) {
-    NetTcp tcp;
-    EXPECT_EQ(tcp.openServer("", SERVER_PORT), 1);
+    EXPECT_EQ(tcp1.openServer("", SERVER_PORT), 1);
 }
 
 // Tests Tcp open method is not working with fake address
 TEST_F(NetTcpTest, OpenFakeAddressNotWorks) {
-    NetTcp tcp;
-    EXPECT_EQ(tcp.openServer(FAKE_ADDRESS, SERVER_PORT), -1);
+    EXPECT_EQ(tcp1.openServer(FAKE_ADDRESS, SERVER_PORT), -1);
 }
 
 // Tests Tcp send and receive method work
 TEST_F(NetTcpTest, SendReceiveWork) {
     int rcv_len = 10, send_len;
-    NetTcp tcp1, tcp2;
     struct sockaddr_in client;
     const char* sendBuffer = "test";
     char recvBuffer[rcv_len];

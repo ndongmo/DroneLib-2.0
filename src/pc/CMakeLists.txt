@@ -2,11 +2,9 @@
 
 INCLUDE_DIRECTORIES(
 	include
-	${DRONELIB_INC}
+	${LIB_INC}
 	${THIRD_PARTY_INC}
 )
-
-SET(PCLIB_NAME PCLib)
 
 add_subdirectory(src)
 add_subdirectory(tests)

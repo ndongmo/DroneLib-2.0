@@ -3,7 +3,7 @@
 PROJECT(DroneLib-docs)
 
 #-----------------------------------------------------
-# DELIVERING binaries and header to ${DRONELIB_HOME}
+# DELIVERING binaries and header to ${LIB_HOME}
 #-----------------------------------------------------
 
 # check if Doxygen is installed

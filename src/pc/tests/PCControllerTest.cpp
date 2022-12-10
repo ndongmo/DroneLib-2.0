@@ -32,8 +32,8 @@ protected:
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";
-    const int VAR_DRONE_RCV_PORT = 1555;
-    const int VAR_DRONE_SEND_PORT = 1556;
+    const int VAR_DRONE_RCV_PORT = 1515;
+    const int VAR_DRONE_SEND_PORT = 1516;
     const int MAX_FRAGMENT_SIZE = 800;
     const int MAX_FRAGMENT_NUMBER = 256;
 };
@@ -104,6 +104,19 @@ TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
     ASSERT_EQ(VAR_DRONE_SEND_PORT, ctrl.getDroneSendPort());
     ASSERT_EQ(MAX_FRAGMENT_SIZE, ctrl.getMaxFragementSize());
     ASSERT_EQ(MAX_FRAGMENT_NUMBER, ctrl.getMaxFragementNumber());
+}
+
+// Tests PCController end
+TEST_F(PCControllerTest, EndWorks) {    
+    std::thread clientProcess(runCtrlStart, &ctrl); 
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    ASSERT_TRUE(ctrl.isRunning());
+
+    ASSERT_EQ(ctrl.end(), 1);
+    ASSERT_FALSE(ctrl.isRunning());
+
+    clientProcess.join();
 }
 
 // Tests PCController start and end

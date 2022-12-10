@@ -1,6 +1,6 @@
 # DroneLib 2.0 C++ project: Lib package source
 
-PROJECT(${DRONELIB_NAME})
+PROJECT(${LIB})
 
 SET(SOURCE_FILES
 	utils/Config.cpp
@@ -26,7 +26,7 @@ ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES PREFIX "")
 
 #-----------------------------------------------------
-# DELIVERING binaries and header to ${DRONELIB_HOME}
+# DELIVERING binaries and header to ${LIB_HOME}
 #-----------------------------------------------------
 
 INSTALL(TARGETS ${PROJECT_NAME}

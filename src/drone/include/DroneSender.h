@@ -29,13 +29,6 @@ public:
      */
     void init(int clientRcvPort, const std::string& clientAddr, 
         int maxFragmentSize, int maxFragmentNumber);
-    
-	/**
-	 * Sends a ping frame.
-     * \param size data size
-     * \param data pong data to send
-	 */
-	void sendPing(int size, UINT8* data);
 
 private:
     void run() override;
