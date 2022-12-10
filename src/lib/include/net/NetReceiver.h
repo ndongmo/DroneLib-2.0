@@ -35,6 +35,12 @@ public:
     void start() override;
     int end() override;
 
+	/**
+	 * Check if the sender socket is connected.
+	 * @return true if the socket is open, false otherwise
+	 */
+	bool isConnected();
+
 protected:
 	void run() override;
 

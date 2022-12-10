@@ -47,10 +47,10 @@ struct LedAction {
  * Led color enum.
  */
 enum LedColor {
-    RED       = 0x00200000,  // red
+    RED       = 0x00002000,  // red
     ORANGE    = 0x00201000,  // orange
     YELLOW    = 0x00202000,  // yellow
-    GREEN     = 0x00002000,  // green
+    GREEN     = 0x00200000,  // green
     LIGHTBLUE = 0x00002020,  // lightblue
     BLUE      = 0x00000020,  // blue
     PURPLE    = 0x00100010,  // purple

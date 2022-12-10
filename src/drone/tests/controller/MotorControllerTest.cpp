@@ -14,8 +14,13 @@ class MotorControllerTest : public ::testing::Test {
 public:
     MotorController ctr;
 protected:
+    void SetUp() override {
+        EXPECT_EQ(ctr.begin(), 1);
+        ctr.start();
+        EXPECT_TRUE(ctr.isRunning());
+    }
     void TearDown() override {
-        ctr.end();
+        EXPECT_EQ(ctr.end(), 1);
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";
@@ -25,21 +30,9 @@ protected:
     const int MAX_FRAGMENT_NUMBER = 256;
 };
 
-// Tests MotorController start method is working
-TEST_F(MotorControllerTest, StartWorks) {
-    EXPECT_EQ(ctr.begin(), 1);
-    ctr.start();
-    EXPECT_TRUE(ctr.isRunning());
-    EXPECT_EQ(ctr.end(), 1);
-}
-
 // Tests MotorController moving and stopping is working
 TEST_F(MotorControllerTest, MoveAndStopMotorWorks) {
-    MotorAction a {WHEEL_TL_FORWARD, SPEED_MIN, DRONE_WHEEL_MOVE_LAPS};
-
-    EXPECT_EQ(ctr.begin(), 1);
-    ctr.start();
-    EXPECT_TRUE(ctr.isRunning());
+    MotorAction a {WHEEL_TL_FORWARD, SPEED_LOW, DRONE_WHEEL_MOVE_LAPS};
 
     ctr.addAction(a);
     std::this_thread::sleep_for(std::chrono::milliseconds(DRONE_WHEEL_MOVE_LAPS / 3));
@@ -49,17 +42,11 @@ TEST_F(MotorControllerTest, MoveAndStopMotorWorks) {
     ctr.addAction(a);
     std::this_thread::sleep_for(std::chrono::milliseconds(DRONE_WHEEL_MOVE_LAPS / 3));
     EXPECT_FALSE(ctr.isOn(a.moveId));
-
-    EXPECT_EQ(ctr.end(), 1);
 }
 
 // Tests MotorController moving forward is working
 TEST_F(MotorControllerTest, MoveForwardWorks) {
-    EXPECT_EQ(ctr.begin(), 1);
-    ctr.start();
-    EXPECT_TRUE(ctr.isRunning());
-
-    ctr.move(DIR_FORWARD, SPEED_MIN);
+    ctr.move(DIR_FORWARD, SPEED_LOW);
     std::this_thread::sleep_for(std::chrono::milliseconds(DRONE_WHEEL_MOVE_LAPS / 3));
     EXPECT_TRUE(ctr.isOn(WHEEL_TR_FORWARD));
     EXPECT_TRUE(ctr.isOn(WHEEL_TL_FORWARD));
@@ -71,24 +58,18 @@ TEST_F(MotorControllerTest, MoveForwardWorks) {
     EXPECT_FALSE(ctr.isOn(WHEEL_TL_FORWARD));
     EXPECT_FALSE(ctr.isOn(WHEEL_BR_FORWARD));
     EXPECT_FALSE(ctr.isOn(WHEEL_BL_FORWARD));
-
-    EXPECT_EQ(ctr.end(), 1);
 }
 
 // Tests MotorController moving backward is overriden by moving forward
 TEST_F(MotorControllerTest, BackwardOverridenByForwardWorks) {
-    EXPECT_EQ(ctr.begin(), 1);
-    ctr.start();
-    EXPECT_TRUE(ctr.isRunning());
-
-    ctr.move(DIR_FORWARD, SPEED_MIN);
+    ctr.move(DIR_FORWARD, SPEED_LOW);
     std::this_thread::sleep_for(std::chrono::milliseconds(DRONE_WHEEL_MOVE_LAPS / 3));
     EXPECT_TRUE(ctr.isOn(WHEEL_TR_FORWARD));
     EXPECT_TRUE(ctr.isOn(WHEEL_TL_FORWARD));
     EXPECT_TRUE(ctr.isOn(WHEEL_BR_FORWARD));
     EXPECT_TRUE(ctr.isOn(WHEEL_BL_FORWARD));
 
-    ctr.move(DIR_BACKWARD, SPEED_MIN);
+    ctr.move(DIR_BACKWARD, SPEED_LOW);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(DRONE_WHEEL_MOVE_LAPS / 3));
     EXPECT_FALSE(ctr.isOn(WHEEL_TR_FORWARD));
@@ -106,6 +87,4 @@ TEST_F(MotorControllerTest, BackwardOverridenByForwardWorks) {
     EXPECT_FALSE(ctr.isOn(WHEEL_TL_BACKWARD));
     EXPECT_FALSE(ctr.isOn(WHEEL_BR_BACKWARD));
     EXPECT_FALSE(ctr.isOn(WHEEL_BL_BACKWARD));
-
-    EXPECT_EQ(ctr.end(), 1);
 }

@@ -38,13 +38,9 @@ void PCSender::run() {
 	
 }
 
-void PCSender::sendQuit() {
-	sendFrame(NS_ID_EMPTY, NS_FRAME_TYPE_QUIT, "");
-}
-
 void PCSender::sendNav(int deltatime, DroneDir dir, DroneSpeed speed) {
 	if(canSend(NS_ID_NAV, deltatime)) {
-		sendFrame(NS_ID_NAV, NS_FRAME_TYPE_DATA, "14", dir, speed);
+		sendFrame(NS_ID_NAV, NS_FRAME_TYPE_DATA, "12", dir, speed);
 		m_currentFreqs[NS_ID_NAV] = 0;
 	} else {
 		m_currentFreqs[NS_ID_NAV] += deltatime;

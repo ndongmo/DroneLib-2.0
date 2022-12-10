@@ -35,6 +35,7 @@ public:
 
     int begin() override;
     void start() override;
+    void stop() override;
     int end() override;
     int discovery() override;
     bool isRunning() override;

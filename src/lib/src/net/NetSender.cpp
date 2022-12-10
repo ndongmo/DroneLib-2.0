@@ -76,9 +76,6 @@ void NetSender::sendFrame(int id, int type, const char* format, ...) {
 			}
 		}
 	} va_end(args);
-	
-	logI << "NetSender::Netframe type["<< (int)m_buffer[0] << "] id[" << (int)m_buffer[1] << "] seq[" << 
-		(int)m_buffer[2] << "] size[" << totalSize << "]" << std::endl;
 
 	totalSize = m_sendSocket.send((char*)m_buffer, totalSize);
 	m_sendMtx.unlock();
@@ -126,6 +123,10 @@ bool NetSender::canSend(int id, int deltatime) {
 	return true;
 }
 
+bool NetSender::isConnected() {
+	return m_sendSocket.isOpen();
+}
+
 void NetSender::sendAck(UINT8 id, UINT8 seq) {
     sendFrame(id, NS_FRAME_TYPE_ACK, "1", seq);
 }
@@ -141,6 +142,10 @@ void NetSender::sendPing(int deltatime, UINT8 seq) {
 
 void NetSender::sendPong(UINT8 seq) {
     sendFrame(NS_ID_PONG, NS_FRAME_TYPE_DATA, "1", seq);
+}
+
+void NetSender::sendQuit() {
+	sendFrame(NS_ID_EMPTY, NS_FRAME_TYPE_QUIT, "");
 }
 
 }

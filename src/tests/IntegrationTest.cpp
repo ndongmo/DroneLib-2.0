@@ -13,6 +13,7 @@
 
 #include <PCController.h>
 #include <DroneController.h>
+#include <EventHandler.h>
 #include <controller/MotorController.h>
 
 using namespace utils;
@@ -60,6 +61,7 @@ protected:
     }
     void TearDown() override {
         remove(CONFIG_FILE);
+        remove(KEYS_CONFIG);
         
         ASSERT_EQ(pcCtrl.end(), 1);
         ASSERT_EQ(droneCtrl.end(), 1);
@@ -96,7 +98,7 @@ TEST_F(IntegrationTest, NavCmdsWork) {
     sdlevent.key.keysym.sym = SDLK_w;
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(DRONE_WHEEL_MOVE_LAPS / 2));
+    std::this_thread::sleep_for(std::chrono::milliseconds(DRONE_WHEEL_MOVE_LAPS));
     EXPECT_TRUE(motorCtrl.isOn(WHEEL_TR_FORWARD));
     EXPECT_TRUE(motorCtrl.isOn(WHEEL_TL_FORWARD));
     EXPECT_TRUE(motorCtrl.isOn(WHEEL_BR_FORWARD));

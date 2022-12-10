@@ -26,6 +26,13 @@ void Config::init() {
     }
 }
 
+bool Config::exists() {
+    std::ifstream file(CONFIG_FILE);
+    bool exist = !file.fail();
+    file.close();
+    return exist;
+}
+
 int Config::getInt(const char *key, int defaultValue) {
     if(m_config.m_json.contains(key)) {
         m_config.m_json[key].get_to(defaultValue);

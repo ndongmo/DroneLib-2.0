@@ -13,6 +13,10 @@
 using namespace utils;
 
 class PCWindowTest : public ::testing::Test {
+public:
+    PCWindowTest() : window(evHandler) {}
+    EventHandler evHandler;
+    PCWindow window;
 protected:
     void TearDown() override {
         remove(CONFIG_FILE);
@@ -21,9 +25,6 @@ protected:
 
 // Tests PCWindow begin with default config
 TEST_F(PCWindowTest, BeginWithDefaultConfigWorks) {
-    EventHandler evHandler;
-    PCWindow window(evHandler);
-
     ASSERT_EQ(window.begin(), 1);
     ASSERT_EQ(window.end(), 1);
     ASSERT_FALSE(window.isRunning());
@@ -31,9 +32,6 @@ TEST_F(PCWindowTest, BeginWithDefaultConfigWorks) {
 
 // Tests PCWindow start
 TEST_F(PCWindowTest, StartServiceWorks) {
-    EventHandler evHandler;
-    PCWindow window(evHandler);
-
     ASSERT_EQ(window.begin(), 1);
     window.start();
     ASSERT_TRUE(window.isRunning());
@@ -43,9 +41,6 @@ TEST_F(PCWindowTest, StartServiceWorks) {
 
 // Tests PCWindow run
 TEST_F(PCWindowTest, RunServiceWorks) {
-    EventHandler evHandler;
-    PCWindow window(evHandler);
-
     ASSERT_EQ(window.begin(), 1);
     window.start();
     ASSERT_TRUE(window.isRunning());

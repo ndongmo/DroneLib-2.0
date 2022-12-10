@@ -74,6 +74,10 @@ int DroneController::begin() {
 int DroneController::end() {
 	int result = 0;
 
+	if(m_sender.isConnected()) {
+		m_sender.sendQuit();
+	}
+	
 	m_running = false;
 
 	m_cv.notify_all();
@@ -98,6 +102,11 @@ void DroneController::start() {
 
 	init();
 	run();
+}
+
+void DroneController::stop() {
+	m_running = false;
+	m_cv.notify_all();
 }
 
 void DroneController::run() {

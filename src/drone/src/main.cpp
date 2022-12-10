@@ -8,10 +8,47 @@
 
 #include <DroneController.h>
 #include <utils/Logger.h>
+#include <utils/Config.h>
+#include <utils/Constants.h>
+
+#include <fstream>
+#include <signal.h>
+#include <unistd.h>
+
+/** The drone controller */
+static DroneController ctrl;
+
+/**
+ * @brief Handler method for ctrl_c event.
+ * 
+ * @param signum 
+ */
+static void ctrl_c_handler(int signum)
+{
+    ctrl.stop();
+}
+
+/**
+ * @brief Set the up handlers object
+ */
+static void setup_handlers(void)
+{
+    struct sigaction sa = {};
+    sa.sa_handler = ctrl_c_handler;
+
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+}
 
 int main(int argc, char *argv[])
 {
-	DroneController ctrl;
+	setup_handlers();
+
+	if(!Config::exists()) {
+		std::ofstream configFile(CONFIG_FILE);
+        configFile << "{\n\t\"" << DRONE_ADDRESS << "\":\"" << DRONE_IPV4_ADDRESS_DEFAULT << "\"\n}";
+        configFile.close();
+	}
 	
 	if(ctrl.begin() != -1) {
 		ctrl.start();

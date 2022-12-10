@@ -15,6 +15,8 @@
 
 #include <rpi_ws281x/ws2811.h>
 
+#define STATE_LEDS 2    // number of leds for state highlighting
+
 namespace controller {
 
 using namespace component;
@@ -66,6 +68,8 @@ protected:
 
     /** Leds buffer value */
     ws2811_t m_ledBuffer = {};
+    /** state leds */
+    static const unsigned int m_state_leds[STATE_LEDS];
     /** colors array */
     static const unsigned int m_colors[COLOR_COUNT];
 };

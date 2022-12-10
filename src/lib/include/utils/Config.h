@@ -25,6 +25,13 @@ public:
 	 * Initialize the json data by reading the config file.
 	 */
 	static void init();
+
+	/**
+	 * Check if the config file exists.
+	 * @return true if the config file exists, false otherwise
+	 */
+	static bool exists();
+
 	/**
 	 * Retrieve the requested int value.
 	 * \param key the requested attribute name

@@ -69,6 +69,17 @@ public:
 	 */
 	void sendPong(UINT8 seq);
 
+    /**
+	 * Sends a quit command.
+	 */
+	void sendQuit();
+
+	/**
+	 * Check if the sender socket is connected.
+	 * @return true if the socket is open, false otherwise
+	 */
+	bool isConnected();
+
 protected:    
 	/**
 	 * Writes the given frame header parameters on the buffer.

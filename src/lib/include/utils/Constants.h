@@ -10,7 +10,7 @@
 
 /* Drone config variables */
 #define DRONE_PORT_DISCOVERY_DEFAULT 	4444
-#define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.2.1"
+#define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.0.242"
 #define DRONE_WHEEL_MOVE_LAPS           100 // Time laps of wheel move in millisecond
 
 /* Drone config variables */

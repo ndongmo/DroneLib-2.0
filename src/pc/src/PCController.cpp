@@ -70,10 +70,12 @@ int PCController::begin() {
 int PCController::end() {	
     int result = 0;
 	m_running = false;
-	
-	// wait the main process to exit
-	std::unique_lock<std::mutex> lock(m_mutex);
-	m_cv.wait(lock, [this] { return !m_inMainProcess; });
+
+	{
+		// wait the main process to exit and destroy the lock
+		std::unique_lock<std::mutex> lock(m_mutex);
+		m_cv.wait(lock, [this] { return !m_inMainProcess; });
+	}
 
 	m_conSocket.close();
 
@@ -94,6 +96,15 @@ void PCController::start() {
 
 	init();
 	run();
+}
+
+void PCController::stop() {
+	if(m_sender.isConnected()) {
+		m_sender.sendQuit();
+	}
+	m_running = false;
+	m_inMainProcess = false;
+	m_cv.notify_all();
 }
 
 void PCController::run() {
@@ -162,13 +173,18 @@ int PCController::discovery() {
 }
 
 void PCController::handleEvents(int elapsedTime) {
-	if(m_state != APP_RUNNING) {
+	AppState copyState = m_state;
+
+	if(copyState == APP_CLOSING) {
+		m_running = false;
+	}
+	else if(copyState != APP_RUNNING) {
 		if (m_evHandler.isEventPressed(CtrlEvent::QUIT)) {
 			updateState(APP_CLOSING);
 			m_running = false;
 		}
 		else if (m_evHandler.isEventPressed(CtrlEvent::DISCOVER)) {
-			if(m_state == APP_INIT || m_state == APP_ERROR) {
+			if(copyState == APP_INIT || copyState == APP_ERROR) {
 				init();
 			}
 		}
@@ -180,21 +196,31 @@ void PCController::handleEvents(int elapsedTime) {
 			m_sender.sendQuit();
 		}
 		else if (m_evHandler.isEventDown(CtrlEvent::GO_UP)) {
-			m_sender.sendNav(elapsedTime, DIR_FORWARD, SPEED_MIN);
+			m_sender.sendNav(elapsedTime, DIR_FORWARD, getSpeed());
 		}
 		else if (m_evHandler.isEventDown(CtrlEvent::GO_DOWN)) {
-			m_sender.sendNav(elapsedTime, DIR_BACKWARD, SPEED_MIN);
+			m_sender.sendNav(elapsedTime, DIR_BACKWARD, getSpeed());
 		}
 		else if (m_evHandler.isEventDown(CtrlEvent::GO_LEFT)) {
-			m_sender.sendNav(elapsedTime, DIR_LEFT, SPEED_MIN);
+			m_sender.sendNav(elapsedTime, DIR_LEFT, getSpeed());
 		}
 		else if (m_evHandler.isEventDown(CtrlEvent::GO_RIGHT)) {
-			m_sender.sendNav(elapsedTime, DIR_RIGHT, SPEED_MIN);
+			m_sender.sendNav(elapsedTime, DIR_RIGHT, getSpeed());
 		}
 	}
 
-	if(m_oldState != m_state) {
-		m_window.updateState(m_state, m_error);
-		m_oldState = m_state;
+	if(m_oldState != copyState) {
+		m_window.updateState(copyState, m_error);
+		m_oldState = copyState;
 	}
+}
+
+DroneSpeed PCController::getSpeed() {
+	DroneSpeed speed = SPEED_LOW;
+	if (m_evHandler.isEventDown(CtrlEvent::GO_SPEED_1)) {
+		speed = SPEED_HIGH;
+	} else if (m_evHandler.isEventDown(CtrlEvent::GO_SPEED_2)) {
+		speed = SPEED_MAX;
+	}
+	return speed;
 }

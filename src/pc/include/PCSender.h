@@ -45,11 +45,6 @@ public:
     }
 
     /**
-	 * Sends a quit command.
-	 */
-	void sendQuit();
-
-    /**
 	 * Sends navigation data.
      * @param dir drone direction
      * @param speed drone speed 

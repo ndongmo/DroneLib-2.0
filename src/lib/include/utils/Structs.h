@@ -25,8 +25,8 @@ enum AppState {
  * Drone moving speeds.
  */
 enum DroneSpeed {
-    SPEED_MIN       = 1024,
-    SPEED_MEDIUM    = 2048,
+    SPEED_LOW       = 2048,
+    SPEED_HIGH      = 1024,
     SPEED_MAX       = 4096,
 };
 

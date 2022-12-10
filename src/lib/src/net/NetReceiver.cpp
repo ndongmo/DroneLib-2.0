@@ -2,6 +2,7 @@
 #include "utils/Logger.h"
 #include "utils/Config.h"
 #include "utils/Constants.h"
+#include "IController.h"
 
 using namespace utils;
 
@@ -52,6 +53,13 @@ void NetReceiver::run() {
 		NetFrame netFrame;
 		NetHelper::readFrame(buf, netFrame);
 
+		if (netFrame.type == NS_FRAME_TYPE_QUIT) {
+			if(m_controller != nullptr) {
+				m_controller->updateState(APP_CLOSING);
+			}
+			continue;
+		}
+
 		if (netFrame.type == NS_FRAME_TYPE_DATA_WITH_ACK) {
 			m_sender.sendAck(netFrame.seq, netFrame.id);
 		}
@@ -64,5 +72,9 @@ void NetReceiver::run() {
 	if(len < 1 and !is_closing) {
 		sendError(ERROR_NET_RECEIVE);
 	}
+}
+
+bool NetReceiver::isConnected() {
+	return m_rcvSocket.isOpen();
 }
 } // namespace net

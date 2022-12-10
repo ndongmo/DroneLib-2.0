@@ -21,6 +21,10 @@ class Controller : public Service, public IController
 {
 public:
     /**
+	 * Stop the controller from outside.
+	 */
+    virtual void stop() = 0;
+    /**
 	 * Starts a handshake connection and initializes required variables.
 	 * \return -1 when the communication failed, otherwise 1.
 	 */

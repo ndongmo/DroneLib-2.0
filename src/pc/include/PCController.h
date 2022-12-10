@@ -33,6 +33,7 @@ public:
 
     int begin() override;
     void start() override;
+    void stop() override;
     int end() override;
     int discovery() override;
 
@@ -65,6 +66,13 @@ private:
      * @param elapsedTime time since the last call
      */
     void handleEvents(int elapsedTime);
+
+    /**
+     * Retrieve the current speed according to the pressed 
+     * speed button.
+     * @return the current speed
+     */
+    DroneSpeed getSpeed();
 
     /** Keep the main process running state */
     bool m_inMainProcess = false;
