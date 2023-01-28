@@ -18,6 +18,12 @@ public:
     EventHandler evHandler;
     PCWindow window;
 protected:
+    void SetUp() override {
+        Config::setIntVar(VIDEO_DST_WIDTH, VIDEO_WIDTH_DEFAULT);
+        Config::setIntVar(VIDEO_DST_HEIGHT, VIDEO_HEIGHT_DEFAULT);
+        Config::setIntVar(VIDEO_FPS, VIDEO_FPS_DEFAULT);
+        Config::setIntVar(VIDEO_FORMAT, VIDEO_FORMAT_DEFAULT);
+    }
     void TearDown() override {
         remove(CONFIG_FILE);
     }

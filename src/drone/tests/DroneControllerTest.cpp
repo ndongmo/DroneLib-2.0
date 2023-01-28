@@ -66,6 +66,7 @@ protected:
         configFile << "{\"" << DRONE_ADDRESS << "\":\"" << VAR_DRONE_ADDRESS << "\"}";
         configFile.close();
         Config::init();
+        EXPECT_EQ(ctrl.begin(), 1);
     }
     void TearDown() override {
         remove(CONFIG_FILE);
@@ -92,14 +93,13 @@ TEST_F(DroneControllerTest, DiscoveryWithDefaultConfigWorks) {
     droneProcess.join();
     clientProcess.join();
 
-    ASSERT_EQ(VAR_DRONE_ADDRESS, ctrl.getClientAddr());
-    ASSERT_EQ(VAR_CLIENT_RCV_PORT, ctrl.getClientRcvPort());
+    ASSERT_EQ(VAR_DRONE_ADDRESS, Config::getStringVar(DRONE_ADDRESS));
+    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getIntVar(CTRL_PORT_RCV));
     ASSERT_EQ(ctrl.end(), 1);
 }
 
 // Tests DroneController running works
 TEST_F(DroneControllerTest, RunWorks) {
-    ASSERT_EQ(ctrl.begin(), 1);
     std::thread droneProcess([this] { ctrl.start(); });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -109,12 +109,12 @@ TEST_F(DroneControllerTest, RunWorks) {
     
     std::thread clientProcess([this] { discovery(); });
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
     clientProcess.join();
-
-    ASSERT_EQ(VAR_DRONE_ADDRESS, ctrl.getClientAddr());
-    ASSERT_EQ(VAR_CLIENT_RCV_PORT, ctrl.getClientRcvPort());
+    
+    ASSERT_EQ(VAR_DRONE_ADDRESS, Config::getStringVar(DRONE_ADDRESS));
+    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getIntVar(CTRL_PORT_RCV));
     ASSERT_EQ(ctrl.getState(), APP_RUNNING);
 
     ASSERT_EQ(ctrl.end(), 1);

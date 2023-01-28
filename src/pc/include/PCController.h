@@ -12,9 +12,11 @@
 #include "PCReceiver.h"
 #include "PCWindow.h"
 #include "EventHandler.h"
+#include "FPSLimiter.h"
 
 #include <utils/Structs.h>
 #include <net/NetTcp.h>
+#include <stream/StreamReceiver.h>
 #include <Controller.h>
 
 #include <thread>
@@ -37,22 +39,6 @@ public:
     int end() override;
     int discovery() override;
 
-    /**
-     * Get the drone reception port.
-     * \return drone reception port
-     */
-    int getDroneRcvPort() const {
-        return m_droneRcvPort;
-    }
-
-    /**
-     * Get the drone sending port.
-     * \return drone sending port
-     */
-    int getDroneSendPort() const {
-        return m_droneSendPort;
-    }
-
 private:
     void run() override;
 
@@ -60,6 +46,11 @@ private:
      * Discover, initialize and start sender and receiver components.
      */
     void init();
+
+    /**
+     * Initialize all required config variables.
+     */
+    void initConfigs();
 
     /**
      * Handle incoming controller events.
@@ -76,14 +67,6 @@ private:
 
     /** Keep the main process running state */
     bool m_inMainProcess = false;
-    /** Drone reception port */
-    int m_droneRcvPort;
-    /** Drone sending port */
-    int m_droneSendPort;
-    /* Number of Frame per second */
-    unsigned int m_fps;
-    /* Previously registered timestamp */
-    unsigned int m_prevTicks;
 
     /** Init process */
 	std::thread m_initProcess;
@@ -95,6 +78,10 @@ private:
     PCReceiver m_receiver;
     /** Keyboard/Joystick event handler */
     EventHandler m_evHandler;
+    /** FPS limiter object */
+    FPSLimiter m_fpsLimiter;
     /** UI & event manager object */
     PCWindow m_window;
+    /** Video stream receiver object */
+    StreamReceiver m_videoStream;
 };

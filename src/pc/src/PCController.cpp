@@ -7,7 +7,8 @@
 
 using namespace utils;
 
-PCController::PCController() : m_receiver(m_sender), m_window(m_evHandler) {
+PCController::PCController() : 
+	m_receiver(m_sender, m_videoStream), m_window(m_evHandler) {
 
 }
 
@@ -30,14 +31,12 @@ void PCController::init() {
 			return;
 		}
 
-		m_sender.init(m_droneRcvPort, m_maxFragmentSize, m_maxFragmentNumber);
 		if(m_sender.begin() == -1) {
 			logE << "Network sender begin failed!" << std::endl;
 			this->handleError(ERROR_NET_INIT);
 			return;
 		}
 
-		m_receiver.init(m_droneSendPort, m_maxFragmentSize, m_maxFragmentNumber);
 		if(m_receiver.begin() == -1) {
 			logE << "Network receiver begin failed!" << std::endl;
 			this->handleError(ERROR_NET_INIT);
@@ -51,11 +50,43 @@ void PCController::init() {
 	});
 }
 
+void PCController::initConfigs() {
+	int fps = Config::getInt(VIDEO_FPS, VIDEO_FPS_DEFAULT);
+	int codec = Config::getInt(VIDEO_CODEC, VIDEO_CODEC_DEFAULT);
+	int format = Config::getInt(VIDEO_FORMAT, VIDEO_FORMAT_DEFAULT);
+	int width = Config::getInt(VIDEO_WIDTH, VIDEO_WIDTH_DEFAULT);
+	int height = Config::getInt(VIDEO_HEIGHT, VIDEO_HEIGHT_DEFAULT);
+	int dst_width = Config::getInt(VIDEO_DST_WIDTH, VIDEO_DST_WIDTH_DEFAULT);
+	int dst_height = Config::getInt(VIDEO_DST_HEIGHT, VIDEO_DST_HEIGHT_DEFAULT);
+	int rcvPort = Config::getInt(CTRL_PORT_RCV, CTRL_PORT_RCV_DEFAULT);
+	int sendPort = Config::getInt(CTRL_PORT_SEND, CTRL_PORT_SEND_DEFAULT);
+	int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
+    std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
+
+	Config::setIntVar(VIDEO_FPS, fps);
+	Config::setIntVar(VIDEO_CODEC, codec);
+	Config::setIntVar(VIDEO_FORMAT, format);
+	Config::setIntVar(VIDEO_WIDTH, width);
+	Config::setIntVar(VIDEO_HEIGHT, height);
+	Config::setIntVar(VIDEO_DST_WIDTH, dst_width);
+	Config::setIntVar(VIDEO_DST_HEIGHT, dst_height);
+	Config::setIntVar(CTRL_PORT_RCV, rcvPort);
+	Config::setIntVar(CTRL_PORT_SEND, sendPort);
+	Config::setIntVar(DRONE_PORT_DISCOVERY, serverPort);
+	Config::setStringVar(DRONE_ADDRESS, serverAddr);
+}
+
 int PCController::begin() {	
 	m_oldState = m_state = APP_INIT;
 	m_error = 0;
-	m_fps = Config::getInt(CTRL_FPS, CTRL_FPS_DEFAULT);
 	
+	initConfigs();
+	
+	if(m_videoStream.begin() == -1) {
+		logE << "Video stream begin failed!" << std::endl;
+		return -1;
+	}
+
 	if(m_window.begin() == -1) {
 		logE << "UI begin failed!" << std::endl;
 		return -1;
@@ -79,6 +110,7 @@ int PCController::end() {
 
 	m_conSocket.close();
 
+	result += m_videoStream.end();
 	result += m_sender.end();
 	result += m_receiver.end();
 	result += m_window.end();
@@ -87,11 +119,12 @@ int PCController::end() {
 		m_initProcess.join();
 	}
 
-	if(result != 3) return -1;
+	if(result != 4) return -1;
 	else return 1;
 }
 
 void PCController::start() {
+	m_videoStream.start();
 	m_window.start();
 
 	init();
@@ -113,25 +146,23 @@ void PCController::run() {
 	
 	while (m_running)
 	{
-		unsigned int newTicks = SDL_GetTicks();
-		unsigned int elapsedTime = newTicks - m_prevTicks;
-		m_prevTicks = newTicks;
-
-		m_window.run();
-		handleEvents(elapsedTime);
-		m_window.render(elapsedTime);
-
-		if (1000.0f / m_fps > elapsedTime) { // fps limiter
-        	SDL_Delay((unsigned int)(1000.0f / (m_fps - elapsedTime)));
+		m_fpsLimiter.begin();
+		{
+			m_window.run();
+			handleEvents(m_fpsLimiter.getFPS());
+			m_videoStream.updateFrame();
+			m_window.render(m_videoStream);
+			m_videoStream.frameHandled();
 		}
+		m_fpsLimiter.end();
 	}
 	m_inMainProcess = false;
 	m_cv.notify_all();
 }
 
 int PCController::discovery() {
-    int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
-    std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
+    int serverPort = Config::getIntVar(DRONE_PORT_DISCOVERY);
+    std::string serverAddr = Config::getStringVar(DRONE_ADDRESS);
 
 	if (m_conSocket.openClient(serverAddr.c_str(), serverPort) == -1) {
 		logE << "Discovery: TCP open client error" << std::endl;
@@ -139,7 +170,7 @@ int PCController::discovery() {
 	}
 	
     nlohmann::json json = {
-        {CTRL_PORT_RCV, Config::getInt(CTRL_PORT_RCV, CTRL_PORT_RCV_DEFAULT)}
+        {CTRL_PORT_RCV, Config::getIntVar(CTRL_PORT_RCV)}
     };
     std::string msg = json.dump();
 
@@ -149,6 +180,8 @@ int PCController::discovery() {
 	}
 
 	char buf[1024] = {0};
+	int droneRcvPort, droneSendPort, maxFragmentSize, maxFragmentNumber,
+		fps, width, height, codec, format;
 
 	if (m_conSocket.receive(buf, 1024) == -1) {
 		logE << "Discovery: TCP receive drone config failed" << std::endl;
@@ -157,15 +190,30 @@ int PCController::discovery() {
 
 	try {
         json = nlohmann::json::parse(buf);
-		json[DRONE_PORT_RCV].get_to(m_droneRcvPort);
-		json[DRONE_PORT_SEND].get_to(m_droneSendPort);
-		json[NET_FRAGMENT_SIZE].get_to(m_maxFragmentSize);
-        json[NET_FRAGMENT_NUMBER].get_to(m_maxFragmentNumber);
+		json[DRONE_PORT_RCV].get_to(droneRcvPort);
+		json[DRONE_PORT_SEND].get_to(droneSendPort);
+		json[NET_FRAGMENT_SIZE].get_to(maxFragmentSize);
+        json[NET_FRAGMENT_NUMBER].get_to(maxFragmentNumber);
+		json[VIDEO_FPS].get_to(fps);
+		json[VIDEO_CODEC].get_to(codec);
+		json[VIDEO_FORMAT].get_to(format);
+		json[VIDEO_WIDTH].get_to(width);
+		json[VIDEO_HEIGHT].get_to(height);
 	}
 	catch (...) {
 		logE << "Json parser error: " << json.dump() << std::endl;
 		return -1;
 	}
+
+	Config::setIntVar(DRONE_PORT_RCV, droneRcvPort);
+	Config::setIntVar(DRONE_PORT_SEND, droneSendPort);
+	Config::setIntVar(NET_FRAGMENT_SIZE, maxFragmentSize);
+	Config::setIntVar(NET_FRAGMENT_NUMBER, maxFragmentNumber);
+	Config::setIntVar(VIDEO_FPS, fps);
+	Config::setIntVar(VIDEO_CODEC, codec);
+	Config::setIntVar(VIDEO_FORMAT, format);
+	Config::setIntVar(VIDEO_WIDTH, width);
+	Config::setIntVar(VIDEO_HEIGHT, height);
 
 	m_conSocket.close();
 

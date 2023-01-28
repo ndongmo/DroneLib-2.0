@@ -1,28 +1,24 @@
 #include "PCReceiver.h"
 #include "Constants.h"
 
-#include <net/NetTcp.h>
+#include <net/NetHelper.h>
 #include <utils/Logger.h>
 #include <utils/Config.h>
 #include <utils/Constants.h>
 
 using namespace utils; 
 
-PCReceiver::PCReceiver(PCSender& sender) : NetReceiver(sender), m_pcSender(sender) {
+PCReceiver::PCReceiver(PCSender &sender, StreamReceiver &videoReceiver) : 
+	NetReceiver(sender), m_pcSender(sender), m_videoReceiver(videoReceiver) {
 
-}
-
-void PCReceiver::init(int droneSendPort, int maxFragmentSize, int maxFragmentNumber) {
-	m_droneSendPort = droneSendPort;
-	m_maxFragmentSize = maxFragmentSize;
-	m_maxFragmentNumber = maxFragmentNumber;
 }
 
 int PCReceiver::begin() {
-    int myRcvPort = Config::getInt(CTRL_PORT_RCV, CTRL_PORT_RCV_DEFAULT);
-    std::string droneAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
+    int rcvPort = Config::getIntVar(CTRL_PORT_RCV);
+	int droneSendPort = Config::getIntVar(DRONE_PORT_SEND);
+    std::string droneAddr = Config::getStringVar(DRONE_ADDRESS);
 
-	if (m_rcvSocket.open(droneAddr.c_str(), m_droneSendPort, "", myRcvPort) == -1) {
+	if (m_rcvSocket.open(droneAddr.c_str(), droneSendPort, "", rcvPort) == -1) {
 		logE << "UDP open error" << std::endl;
         return -1;
 	}
@@ -30,6 +26,13 @@ int PCReceiver::begin() {
 	return 1;
 }
 
-void PCReceiver::innerRun(NetFrame& netFrame) {
+void PCReceiver::innerRun(NetFrame &netFrame) {
+	if(netFrame.type == NS_FRAME_TYPE_DATA) {
+		if (netFrame.id == NS_ID_STREAM_VIDEO) {
+			StreamFragment streamFragment;
+			net::NetHelper::readFrame(netFrame, streamFragment);
 
+			m_videoReceiver.newFragment(streamFragment);
+		}
+	}
 }

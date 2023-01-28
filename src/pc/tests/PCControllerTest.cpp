@@ -44,7 +44,12 @@ public:
             {DRONE_PORT_RCV, Config::getInt(DRONE_PORT_RCV, VAR_DRONE_RCV_PORT)},
             {DRONE_PORT_SEND, Config::getInt(DRONE_PORT_SEND, VAR_DRONE_SEND_PORT)},
             {NET_FRAGMENT_SIZE, Config::getInt(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE)},
-            {NET_FRAGMENT_NUMBER, Config::getInt(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER)}
+            {NET_FRAGMENT_NUMBER, Config::getInt(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER)},
+            {VIDEO_FPS, Config::getInt(VIDEO_FPS, VIDEO_FPS_VALUE)},
+            {VIDEO_WIDTH, Config::getInt(VIDEO_WIDTH, VIDEO_WIDTH_VALUE)},
+            {VIDEO_HEIGHT, Config::getInt(VIDEO_HEIGHT, VIDEO_HEIGHT_VALUE)},
+            {VIDEO_FORMAT, Config::getInt(VIDEO_FORMAT, VIDEO_FORMAT_VALUE)},
+            {VIDEO_CODEC, Config::getInt(VIDEO_CODEC, VIDEO_CODEC_VALUE)}
         };
         std::string msg = json.dump();
         EXPECT_GT(tcpDrone.send(msg.c_str(), msg.length()), 0);
@@ -71,6 +76,11 @@ protected:
     const int VAR_DRONE_SEND_PORT = 1516;
     const int MAX_FRAGMENT_SIZE = 800;
     const int MAX_FRAGMENT_NUMBER = 256;
+    const int VIDEO_FPS_VALUE = 30;
+    const int VIDEO_WIDTH_VALUE = 200;
+    const int VIDEO_HEIGHT_VALUE = 120;
+    const int VIDEO_FORMAT_VALUE = 2;
+    const int VIDEO_CODEC_VALUE = 13;
 };
 
 // Tests PCController discovery with default config
@@ -85,10 +95,14 @@ TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
     droneProcess.join();
     clientProcess.join();
 
-    ASSERT_EQ(VAR_DRONE_RCV_PORT, ctrl.getDroneRcvPort());
-    ASSERT_EQ(VAR_DRONE_SEND_PORT, ctrl.getDroneSendPort());
-    ASSERT_EQ(MAX_FRAGMENT_SIZE, ctrl.getMaxFragementSize());
-    ASSERT_EQ(MAX_FRAGMENT_NUMBER, ctrl.getMaxFragementNumber());
+    ASSERT_EQ(VAR_DRONE_RCV_PORT, Config::getIntVar(DRONE_PORT_RCV));
+    ASSERT_EQ(VAR_DRONE_SEND_PORT, Config::getIntVar(DRONE_PORT_SEND));
+    ASSERT_EQ(MAX_FRAGMENT_SIZE, Config::getIntVar(NET_FRAGMENT_SIZE));
+    ASSERT_EQ(MAX_FRAGMENT_NUMBER, Config::getIntVar(NET_FRAGMENT_NUMBER));
+    ASSERT_EQ(VIDEO_FPS_VALUE, Config::getIntVar(VIDEO_FPS));
+    ASSERT_EQ(VIDEO_WIDTH_VALUE, Config::getIntVar(VIDEO_WIDTH));
+    ASSERT_EQ(VIDEO_HEIGHT_VALUE, Config::getIntVar(VIDEO_HEIGHT));
+    ASSERT_EQ(VIDEO_FORMAT_VALUE, Config::getIntVar(VIDEO_FORMAT));
 }
 
 // Tests PCController end

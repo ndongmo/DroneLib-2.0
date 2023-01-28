@@ -9,6 +9,9 @@ SET(SOURCE_FILES
 	net/NetUdpTest.cpp
 	net/NetTcpTest.cpp
 	net/NetHelperTest.cpp
+	stream/StreamPoolTest.cpp
+	stream/StreamSenderTest.cpp
+	stream/StreamReceiverTest.cpp
 )
 
 # Apple specific stuff

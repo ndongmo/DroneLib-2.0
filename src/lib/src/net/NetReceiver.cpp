@@ -33,12 +33,13 @@ void NetReceiver::start() {
 
 void NetReceiver::run() {
 	int len = 0;
-	char buf[m_maxFragmentSize];
+	int maxFragmentSize = Config::getIntVar(NET_FRAGMENT_SIZE);
+	char buf[maxFragmentSize];
 
 	while (m_running) {
-		memset(buf, 0, m_maxFragmentSize);
+		memset(buf, 0, maxFragmentSize);
 
-		len = m_rcvSocket.receive(buf, m_maxFragmentSize);
+		len = m_rcvSocket.receive(buf, maxFragmentSize);
 
 		if (len < 1) {
 			if(len == 0) {

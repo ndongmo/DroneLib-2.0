@@ -52,10 +52,6 @@ protected:
 
 	/* Closing state */
 	bool is_closing = false;
-	/** Max fragment size */
-	int m_maxFragmentSize = 0;
-	/** Max fragment number */
-	int m_maxFragmentNumber = 0;
 	/** Main process */
 	std::thread m_process;
 	/** UDP reception socket */

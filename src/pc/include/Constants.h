@@ -13,9 +13,6 @@
 #define CTRL_PORT_SEND_DEFAULT 		    4451
 #define CTRL_PORT_VIDEO_DEFAULT 	    4452
 #define CTRL_PORT_AUDIO_DEFAULT		    4453
-#define CTRL_FPS_DEFAULT	            60
-#define CTRL_SCREEN_WIDTH_DEFAULT	    640
-#define CTRL_SCREEN_HEIGHT_DEFAULT	    480
 
 /* PC application constants */
 #define PC_APP_NAME                     "PC controller for Drone"

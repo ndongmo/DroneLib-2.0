@@ -11,10 +11,13 @@
 #include "EventHandler.h"
 
 #include <utils/Structs.h>
+#include <stream/Stream.h>
 
 #include <Service.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
+
+using namespace stream;
 
 /**
  * PC controller service class which starts and stops
@@ -35,9 +38,9 @@ public:
 
     /**
      * Render the current frame.
-     * @param elapsedTime time since the last call
+     * @param stream stream frame provider
      */
-    void render(int elapsedTime);
+    void render(const IStreamListener& stream);
 
     /**
      * Update the current state.
@@ -52,10 +55,24 @@ private:
      */
     void initEvents();
 
+    /**
+     * Clean the SDL object instances.
+     */
+    int clean();
+
+    /**
+     * @brief Get the Pixel Format value for the current video format.
+     * 
+     * @return an SDL_PixelFormatEnum 
+     */
+    SDL_PixelFormatEnum getPixelFormat();
+
     /* Window width */
-    unsigned int m_width;
+    int m_width;
     /* Window height */
-    unsigned int m_height;
+    int m_height;
+    /** Stream video format */
+    int m_format;
 
     SDL_Color m_txt_color;
     SDL_Color m_back_color;

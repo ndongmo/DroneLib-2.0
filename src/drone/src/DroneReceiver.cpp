@@ -16,21 +16,14 @@ DroneReceiver::DroneReceiver(DroneSender& sender, MotorController& motorCtrl) :
 
 }
 
-void DroneReceiver::init(int clientRcvPort, const std::string& clientAddr, 
-	int maxFragmentSize, int maxFragmentNumber) {
-	
-	m_clientRcvPort = clientRcvPort;
-	m_clientAddr = clientAddr;
-	m_maxFragmentSize = maxFragmentSize;
-	m_maxFragmentNumber = maxFragmentNumber;
-}
-
 int DroneReceiver::begin() {
-    int myRcvPort = Config::getInt(DRONE_PORT_RCV, DRONE_PORT_RCV_DEFAULT);
-    std::string myAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
+	int dronePort = Config::getIntVar(DRONE_PORT_RCV);
+	int clienRcvPort = Config::getIntVar(CTRL_PORT_RCV);
+    std::string droneAddr = Config::getStringVar(DRONE_ADDRESS);
+	std::string clientAddr = Config::getStringVar(CTRL_ADDRESS);
 
-	if (m_rcvSocket.open(m_clientAddr.c_str(), m_clientRcvPort, myAddr.c_str(), myRcvPort) == -1) {
-		logE << "UDP open error" << std::endl;
+	if (m_rcvSocket.open(clientAddr.c_str(), clienRcvPort, droneAddr.c_str(), dronePort) == -1) {
+		logE << "DroneReceiver: UDP open error" << std::endl;
         return -1;
 	}
 
@@ -38,7 +31,12 @@ int DroneReceiver::begin() {
 }
 
 void DroneReceiver::innerRun(NetFrame& netFrame) {
-	if(netFrame.type == NS_FRAME_TYPE_DATA) {
+	if(netFrame.type == NS_FRAME_TYPE_ACK) {
+		if (netFrame.id == NS_ID_STREAM_VIDEO) {
+			
+		}
+	}
+	else if(netFrame.type == NS_FRAME_TYPE_DATA) {
 		if (netFrame.id == NS_ID_NAV) {
 			int dir = (int)netFrame.data[0];
 			int speed = NetHelper::readUInt16(netFrame.data, 1);

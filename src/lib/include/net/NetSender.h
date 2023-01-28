@@ -30,6 +30,8 @@ public:
 	 */
 	NetSender();
 
+	int begin() override;
+	void start() override;
 	int end() override;
 
 	/**
@@ -57,6 +59,14 @@ public:
 	void sendFrame(int id, int type, const char* format, ...);
 
 	/**
+	 * Send a frame with the given stream fragment.
+	 * \param id frame id
+	 * \param type frame type
+	 * \param fragment stream fragment
+	 */
+	void sendFrame(int id, int type, const StreamFragment &fragment);
+
+	/**
 	 * Sends a ping data.
      * @param deltatime elapsed time
      * @param seq sequence number
@@ -81,6 +91,8 @@ public:
 	bool isConnected();
 
 protected:    
+	void run() override;
+	
 	/**
 	 * Writes the given frame header parameters on the buffer.
 	 * \param id frame id
@@ -123,11 +135,6 @@ protected:
      * false otherwise
      */
     bool canSend(int id, int deltatime);
-
-	/** Max fragment size */
-	int m_maxFragmentSize;
-	/** Max fragment number */
-	int m_maxFragmentNumber;
 
     /** Buffer's sequence */
 	int* m_seqBuf = nullptr;

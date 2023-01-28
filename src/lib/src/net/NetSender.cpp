@@ -14,6 +14,13 @@ NetSender::NetSender() {
 	addCommand(NS_ID_PING, NS_FREQ_PING);
 }
 
+int NetSender::begin() {
+	m_seqBuf = new int[Config::getIntVar(NET_FRAGMENT_NUMBER)]();
+	m_buffer = new UINT8[Config::getIntVar(NET_FRAGMENT_SIZE)]();
+
+	return 1;
+}
+
 int NetSender::end() {
 	if(m_seqBuf != nullptr) {
 		delete[] m_seqBuf;
@@ -28,6 +35,14 @@ int NetSender::end() {
 	}
 
 	return 1;
+}
+
+void NetSender::start() {
+	
+}
+
+void NetSender::run() {
+	
 }
 
 void NetSender::sendFrame(int id, int type, int length, UINT8* data) {
@@ -85,6 +100,34 @@ void NetSender::sendFrame(int id, int type, const char* format, ...) {
 	}
 }
 
+void NetSender::sendFrame(int id, int type, const StreamFragment &fragment) {
+	int totalSize = NET_FRAME_HEADER + STREAM_FRAME_HEADER + fragment.fragmentSize;
+	if(totalSize > Config::getIntVar(NET_FRAGMENT_SIZE)) {
+		logE << "NetSender: data size is bigger than the buffer size" << std::endl;
+		return;
+	}
+
+	m_sendMtx.lock();
+	writeFrameHeader(id, type, totalSize);
+	
+	UINT8 count = NET_FRAME_HEADER;
+	m_buffer[count++] = fragment.frameFlags;
+	NetHelper::writeUInt16(fragment.frameNumber, m_buffer, count);
+	count += 2;
+	NetHelper::writeUInt16(fragment.fragmentNumber, m_buffer, count);
+	count += 2;
+	NetHelper::writeUInt16(fragment.fragmentPerFrame, m_buffer, count);
+	count += 2;
+	memcpy(&m_buffer[count], fragment.fragmentData, fragment.fragmentSize);
+
+	totalSize = m_sendSocket.send((char*)m_buffer, totalSize);
+	m_sendMtx.unlock();
+
+	if(totalSize == -1) {
+		sendError(ERROR_NET_SEND);
+	}
+}
+
 void NetSender::writeFrameHeader(int id, int type, int totalSize) {
 	m_buffer[0] = type;
 	m_buffer[1] = id;
@@ -105,7 +148,7 @@ int NetSender::getLength(const char* format) {
 
 UINT8 NetSender::getNextSeqID(int id) {
 	m_seqBuf[id]++;
-	if (m_seqBuf[id] >= m_maxFragmentNumber) {
+	if (m_seqBuf[id] >= Config::getIntVar(NET_FRAGMENT_NUMBER)) {
 		 m_seqBuf[id] = 0;
 	}
 	return m_seqBuf[id];

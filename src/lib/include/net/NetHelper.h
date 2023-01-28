@@ -23,7 +23,7 @@ typedef uint8_t UINT8;
 #endif
 
 #define NET_FRAME_HEADER 7
-#define STREAM_FRAME_HEADER 5
+#define STREAM_FRAME_HEADER 7
 
 namespace net
 {
@@ -48,21 +48,21 @@ typedef struct NetFrame {
 /**
  * Stream fragment data structure.
  */
-typedef struct StreamFragment {
+struct StreamFragment {
+	/** Frame flags (1 byte) */
+	UINT8 frameFlags;
     /** Frame number */
 	UINT16 frameNumber;
-    /** Frame flags (1 byte) */
-	UINT8 frameFlags;
     /** Current fragment number within the frame */
-	UINT8 fragmentNumber;
+	UINT16 fragmentNumber;
     /** Total number of fragments within the frame */
-	UINT8 fragmentPerFrame;
+	UINT16 fragmentPerFrame;
     /** Fragment size */
 	UINT32 fragmentSize;
     /** Fragment data buffer */
 	UINT8* fragmentData;
 
-} StreamFragment;
+};
 
 /**
  * Implement utility methods for writing and reading values on a buffer.
@@ -145,10 +145,10 @@ public:
 
 	/**
 	 * Builds the given stream frame from the given raw data buffer.
-	 * \param netFrame container net frame
-	 * \param streamFrament stream frame to build
+	 * \param frame container net frame
+	 * \param fragment stream fragment to build
 	 */
-	static void readFrame(const NetFrame& netFrame, StreamFragment& streamFrament);
+	static void readFrame(const NetFrame& frame, StreamFragment& fragment);
 
 	/**
 	 * Reads the data frame and updates the given argument's pointer.

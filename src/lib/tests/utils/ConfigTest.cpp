@@ -48,6 +48,15 @@ TEST_F(ConfigTest, GetIntReturnExpectedValue) {
     EXPECT_EQ(var4, STRING_VALUE);
 }
 
+// Tests Config get/set returning expected value
+TEST_F(ConfigTest, GetIntVarReturnExpectedValue) {
+    Config::setIntVar(INT_NAME, INT_VALUE);
+    Config::setStringVar(STRING_NAME, STRING_VALUE);
+
+    EXPECT_EQ(Config::getIntVar(INT_NAME), INT_VALUE);
+    EXPECT_EQ(Config::getStringVar(STRING_NAME), STRING_VALUE);
+}
+
 // Tests Config get/set returning unexpected value
 TEST_F(ConfigTest, GetIntReturnUnexpectedValue) {
     int var1, var2;

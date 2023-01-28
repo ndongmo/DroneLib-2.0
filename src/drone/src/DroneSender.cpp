@@ -7,34 +7,20 @@
 
 using namespace utils;
 
-void DroneSender::init(int clientRcvPort, const std::string& clientAddr, 
-	int maxFragmentSize, int maxFragmentNumber) {
-	
-	m_clientRcvPort = clientRcvPort;
-	m_clientAddr = clientAddr;
-	m_maxFragmentSize = maxFragmentSize;
-	m_maxFragmentNumber = maxFragmentNumber;
-}
-
 int DroneSender::begin() {
-	int mySendPort = Config::getInt(DRONE_PORT_SEND, DRONE_PORT_SEND_DEFAULT);
-    std::string myAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
+	if(NetSender::begin() == -1) {
+		return -1;
+	}
 
-	if (m_sendSocket.open(m_clientAddr.c_str(), m_clientRcvPort, myAddr.c_str(), mySendPort) == -1) {
+	int dronePort = Config::getIntVar(DRONE_PORT_SEND);
+	int clienRcvPort = Config::getIntVar(CTRL_PORT_RCV);
+    std::string droneAddr = Config::getStringVar(DRONE_ADDRESS);
+	std::string clientAddr = Config::getStringVar(CTRL_ADDRESS);
+
+	if (m_sendSocket.open(clientAddr.c_str(), clienRcvPort, droneAddr.c_str(), dronePort) == -1) {
 		logE << "UDP send socket open error" << std::endl;
         return -1;
 	}
 
-	m_seqBuf = new int[m_maxFragmentNumber]();
-	m_buffer = new UINT8[m_maxFragmentSize]();
-
 	return 1;
-}
-
-void DroneSender::start() {
-	
-}
-
-void DroneSender::run() {
-	
 }

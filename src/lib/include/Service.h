@@ -28,6 +28,11 @@ public:
 	virtual void start() = 0;
 
     /**
+	 * Stop the controller from outside.
+	 */
+    virtual void stop() {}
+
+    /**
      * Stop the service and clean initialized components.
      * \return 1 if the component has been correctly started, otherwise -1.
      */

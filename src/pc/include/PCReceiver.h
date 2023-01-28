@@ -11,8 +11,10 @@
 #include "PCSender.h"
 
 #include <net/NetReceiver.h>
+#include <stream/StreamReceiver.h>
 
 using namespace net;
+using namespace stream;
 
 /**
  * PC receiver service class. Handle pc -> drone connection and received frames.
@@ -24,24 +26,17 @@ public:
      * @brief Construct a new PC network receiver object
      * 
      * @param receiver network sender reference
+     * @param videoReceiver video stream receiver reference
      */
-    PCReceiver(PCSender& sender);
+    PCReceiver(PCSender &sender, StreamReceiver &videoReceiver);
 
     int begin() override;
 
-    /**
-     * Initialize receiver required variables.
-     * @param droneSendPort drone sending port
-     * @param maxFragmentSize max fragment size
-     * @param maxFragmentNumber max number of fragment
-     */
-    void init(int droneSendPort, int maxFragmentSize, int maxFragmentNumber);
-
 private:
-    void innerRun(NetFrame& netFrame) override;
+    void innerRun(NetFrame &netFrame) override;
 
-    /** Drone sending port */
-    int m_droneSendPort;
     /** PC network sender reference */
-    PCSender& m_pcSender;
+    PCSender &m_pcSender;
+    /** Video stream receiver reference */
+    StreamReceiver &m_videoReceiver;
 };

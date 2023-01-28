@@ -10,8 +10,9 @@ using namespace utils;
 #define TEXT_MARGIN 5
 
 int PCWindow::begin() {	
-	m_width = Config::getInt(CTRL_SCREEN_WIDTH, CTRL_SCREEN_WIDTH_DEFAULT);
-    m_height = Config::getInt(CTRL_SCREEN_HEIGHT, CTRL_SCREEN_HEIGHT_DEFAULT);
+	m_width = Config::getIntVar(VIDEO_DST_WIDTH);
+    m_height = Config::getIntVar(VIDEO_DST_HEIGHT);
+    m_format = Config::getIntVar(VIDEO_FORMAT);
     
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		logE << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
@@ -21,7 +22,7 @@ int PCWindow::begin() {
 		logE << "Error creating window or renderer: " << SDL_GetError() << std::endl;
 		return -1;
 	}
-    if((m_basic_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_BGR24, 
+    if((m_basic_texture = SDL_CreateTexture(m_renderer, getPixelFormat(), 
 		SDL_TEXTUREACCESS_STREAMING, m_width, m_height)) == nullptr) {
         logE << "Error creating streaming texture: " << SDL_GetError() << std::endl;
 		return -1;
@@ -37,6 +38,7 @@ int PCWindow::begin() {
     }
 
     SDL_SetWindowTitle(m_window, PC_APP_NAME);
+    SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     
     m_txt_color = { 0x00, 0x00, 0x00, 0xFF };
     m_back_color = { 0xFF, 0xFF, 0xFF, 0x80 };
@@ -47,21 +49,21 @@ int PCWindow::begin() {
 	return 1;
 }
 
-int PCWindow::end() {	
+int PCWindow::clean() {	
     m_running = false;
     m_evHandler.destroy();
-
-    if(m_font_texture != nullptr) {
-        SDL_DestroyTexture(m_font_texture);
-        m_font_texture = nullptr;
-    }
+    
     if(m_font != nullptr) {
         TTF_CloseFont(m_font);
         m_font = nullptr;
     }
-    if(m_basic_texture != nullptr) {
+    if(m_basic_texture != NULL) {
         SDL_DestroyTexture(m_basic_texture);
-        m_basic_texture = nullptr;
+        m_basic_texture = NULL;
+    }
+    if(m_font_texture != nullptr) {
+        SDL_DestroyTexture(m_font_texture);
+        m_font_texture = nullptr;
     }
 	if(m_renderer != nullptr) {
         SDL_DestroyRenderer(m_renderer);
@@ -71,7 +73,15 @@ int PCWindow::end() {
         SDL_DestroyWindow(m_window);
         m_window = nullptr;
     }
-	
+
+	return 1;
+}
+
+int PCWindow::end() {	
+    if(clean() == -1) {
+        return -1;
+    }
+
     TTF_Quit();
 	SDL_Quit();
 
@@ -142,9 +152,18 @@ void PCWindow::initEvents() {
     }
 }
 
-void PCWindow::render(int elapsedTime) {
-    SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+void PCWindow::render(const IStreamListener& stream) {
+    if(stream.hasNewFrame()) {
+        unsigned char * texture_data = NULL;
+	    int texture_pitch = 0;
+
+        SDL_LockTexture(m_basic_texture, 0, (void **)&texture_data, &texture_pitch);
+        memcpy(texture_data, stream.getData(), stream.getSize());
+        SDL_UnlockTexture(m_basic_texture);
+    }
+
     SDL_RenderClear(m_renderer);
+    SDL_RenderCopy(m_renderer, m_basic_texture, NULL, NULL);
     SDL_RenderCopy(m_renderer, m_font_texture, NULL, &m_font_rect);
     SDL_RenderPresent(m_renderer);
 }
@@ -157,18 +176,29 @@ void PCWindow::updateState(utils::AppState state, int error) {
             + "] to restart discovering.";
     }
     else if(state == APP_DISCOVERING) {
-        int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
-        std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
-
-        str = "Drone discovering ongoing on ip [" + serverAddr + "] and port ["
-            + std::to_string(serverPort) + "] ...";
+        str = "Drone discovering ongoing on ip [" + 
+            Config::getStringVar(DRONE_ADDRESS) + "] and port [" +
+            std::to_string(Config::getIntVar(DRONE_PORT_DISCOVERY)) + "] ...";
     }
-    else {
-        str = "FPS: " + std::to_string(Config::getInt(CTRL_FPS, CTRL_FPS_DEFAULT));
+    else if(state == APP_RUNNING) {
+        str = "FPS: " + std::to_string(Config::getIntVar(VIDEO_FPS));
+
+        if(Config::getIntVar(VIDEO_WIDTH) != m_width || 
+            Config::getIntVar(VIDEO_HEIGHT) != m_height || 
+            Config::getIntVar(VIDEO_FORMAT) != m_format) {
+
+            Config::setIntVar(VIDEO_DST_WIDTH, Config::getIntVar(VIDEO_WIDTH));
+            Config::setIntVar(VIDEO_DST_HEIGHT, Config::getIntVar(VIDEO_HEIGHT));
+
+            clean();
+            begin();
+            start();
+        }
     }
 
     if(m_font_texture != nullptr) {
         SDL_DestroyTexture(m_font_texture);
+        m_font_texture = nullptr;
     }
 
     SDL_Surface* text_surf = TTF_RenderText_Shaded_Wrapped(m_font, str.c_str(), 
@@ -176,4 +206,12 @@ void PCWindow::updateState(utils::AppState state, int error) {
     m_font_texture = SDL_CreateTextureFromSurface(m_renderer, text_surf);
     m_font_rect = {10, 10, text_surf->w, text_surf->h};
     SDL_FreeSurface(text_surf);
+}
+
+SDL_PixelFormatEnum PCWindow::getPixelFormat() {
+    if(m_format == AV_PIX_FMT_YUV420P) {
+        return SDL_PIXELFORMAT_YVYU;
+    } else  {
+        return SDL_PIXELFORMAT_YUY2;
+    }
 }

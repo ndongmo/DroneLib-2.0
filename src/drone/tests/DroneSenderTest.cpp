@@ -17,6 +17,13 @@ protected:
         configFile << "{\"" << DRONE_ADDRESS << "\":\"" << VAR_DRONE_ADDRESS << "\"}";
         configFile.close();
         Config::init();
+
+        Config::setStringVar(DRONE_ADDRESS, VAR_DRONE_ADDRESS);
+        Config::setStringVar(CTRL_ADDRESS, VAR_DRONE_ADDRESS);
+        Config::setIntVar(DRONE_PORT_SEND, VAR_DRONE_PORT);
+        Config::setIntVar(CTRL_PORT_RCV, VAR_RCV_PORT);
+        Config::setIntVar(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE);
+        Config::setIntVar(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER);
     }
     void TearDown() override {
         remove(CONFIG_FILE);
@@ -25,14 +32,13 @@ protected:
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";
     const int VAR_DRONE_PORT = 1355;
+    const int VAR_RCV_PORT = 1526;
     const int MAX_FRAGMENT_SIZE = 800;
     const int MAX_FRAGMENT_NUMBER = 256;
 };
 
 // Tests DroneSender begin with default config
 TEST_F(DroneSenderTest, BeginWithDefaultConfigWorks) {
-    droneSender.init(VAR_DRONE_PORT, VAR_DRONE_ADDRESS, MAX_FRAGMENT_SIZE, MAX_FRAGMENT_NUMBER);
-
     EXPECT_EQ(droneSender.begin(), 1);
     EXPECT_EQ(droneSender.end(), 1);
 }

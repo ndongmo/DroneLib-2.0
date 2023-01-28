@@ -9,33 +9,21 @@ PCSender::PCSender() : NetSender() {
 	addCommand(NS_ID_NAV, NS_FREQ_NAV);
 }
 
-void PCSender::init(int droneRcvPort, int maxFragmentSize, int maxFragmentNumber) {
-	m_droneRcvPort = droneRcvPort;
-	m_maxFragmentSize = maxFragmentSize;
-	m_maxFragmentNumber = maxFragmentNumber;
-}
-
 int PCSender::begin() {
-	int mySendPort = Config::getInt(CTRL_PORT_SEND, CTRL_PORT_SEND_DEFAULT);
-    std::string droneAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
+	if(NetSender::begin() == -1) {
+		return -1;
+	}
 
-	if (m_sendSocket.open(droneAddr.c_str(), m_droneRcvPort, "", mySendPort) == -1) {
+	int sendPort = Config::getIntVar(CTRL_PORT_SEND);
+	int droneRcvPort = Config::getIntVar(DRONE_PORT_RCV);
+    std::string droneAddr = Config::getStringVar(DRONE_ADDRESS);
+
+	if (m_sendSocket.open(droneAddr.c_str(), droneRcvPort, "", sendPort) == -1) {
 		logE << "UDP send socket open error" << std::endl;
         return -1;
 	}
 
-	m_seqBuf = new int[m_maxFragmentNumber]();
-	m_buffer = new UINT8[m_maxFragmentSize]();
-
 	return 1;
-}
-
-void PCSender::start() {
-	
-}
-
-void PCSender::run() {
-	
 }
 
 void PCSender::sendNav(int deltatime, DroneDir dir, DroneSpeed speed) {

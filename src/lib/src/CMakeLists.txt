@@ -11,7 +11,9 @@ SET(SOURCE_FILES
 	net/NetSender.cpp
 	net/NetReceiver.cpp
 	stream/StreamPool.cpp
+	stream/StreamSender.cpp
 	stream/StreamReceiver.cpp
+	stream/VideoReceiver.cpp
 	IController.cpp
 	Service.cpp
 )
@@ -22,8 +24,49 @@ if(APPLE)
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
 endif(APPLE)
 
+IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
+	FIND_LIBRARY(LIB_AV_UTIL libavutil.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_AV_CODEC libavcodec.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_AV_FILTER libavfilter.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_AV_FORMAT libavformat.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_AV_DEVICE libavdevice.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_SW_SCALE libswscale.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_SW_RESAMPLE libswresample.so ${THIRD_PARTY_BIN})
+ELSEIF(APPLE)
+	FIND_LIBRARY(LIB_AV_CODEC libavcodec.dylib ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_AV_FORMAT libavformat.dylib ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_SW_SCALE libswscale.dylib ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_SW_RESAMPLE libswresample.dylib ${THIRD_PARTY_BIN})
+ELSE()
+FIND_LIBRARY(LIB_AV_CODEC libavcodec ${THIRD_PARTY_BIN})
+FIND_LIBRARY(LIB_AV_FORMAT libavformat ${THIRD_PARTY_BIN})
+FIND_LIBRARY(LIB_SW_SCALE libswscale ${THIRD_PARTY_BIN})
+FIND_LIBRARY(LIB_SW_RESAMPLE libswresample ${THIRD_PARTY_BIN})
+ENDIF()
+
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES PREFIX "")
+
+IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+		debug ${LIB_AV_UTIL}
+		debug ${LIB_AV_CODEC}
+		debug ${LIB_AV_FILTER}
+		debug ${LIB_AV_FORMAT}
+		debug ${LIB_AV_DEVICE}
+		debug ${LIB_SW_SCALE}
+		debug ${LIB_SW_RESAMPLE}
+	)
+ELSE()
+	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+		optimized ${LIB_AV_UTIL}
+		optimized ${LIB_AV_CODEC}
+		optimized ${LIB_AV_FORMAT}
+		optimized ${LIB_AV_DEVICE}
+		optimized ${LIB_SW_SCALE}
+		optimized ${LIB_SW_RESAMPLE}
+	)
+ENDIF()
 
 #-----------------------------------------------------
 # DELIVERING binaries and header to ${LIB_HOME}

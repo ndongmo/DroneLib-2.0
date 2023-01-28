@@ -51,7 +51,7 @@ protected:
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         pcProcess = std::thread([this]{ pcCtrl.start(); });
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
         ASSERT_TRUE(droneCtrl.isRunning());
         ASSERT_TRUE(pcCtrl.isRunning());
@@ -71,11 +71,6 @@ protected:
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";
-    const int VAR_CLIENT_RCV_PORT = 2554;
-    const int VAR_DRONE_RCV_PORT = 2555;
-    const int VAR_DRONE_SEND_PORT = 2556;
-    const int MAX_FRAGMENT_SIZE = 800;
-    const int MAX_FRAGMENT_NUMBER = 256;
 };
 
 // Integration test for quit command

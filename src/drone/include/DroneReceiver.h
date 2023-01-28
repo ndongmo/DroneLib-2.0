@@ -32,24 +32,9 @@ public:
 
     int begin() override;
 
-    /**
-     * Initialize receiver required variables.
-     * 
-     * @param clientRcvPort client reception port
-     * @param clientAddr client address
-     * @param maxFragmentSize max fragment size
-     * @param maxFragmentNumber max number of fragment
-     */
-    void init(int clientRcvPort, const std::string& clientAddr, 
-        int maxFragmentSize, int maxFragmentNumber);
-
 private:
     void innerRun(NetFrame& netFrame) override;
 
-    /** Client reception port */
-    int m_clientRcvPort;
-    /** Client address */
-    std::string m_clientAddr;
     /** Drone network sender reference */
     DroneSender& m_droneSender;
     /** Motor controller reference */

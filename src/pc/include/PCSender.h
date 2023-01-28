@@ -26,23 +26,6 @@ public:
     PCSender();
 
 	int begin() override;
-	void start() override;
-
-    /**
-     * Initialize sender required variables.
-     * @param droneRcvPort drone reception port
-     * @param maxFragmentSize max fragment size
-     * @param maxFragmentNumber max number of fragment
-     */
-    void init(int droneRcvPort, int maxFragmentSize, int maxFragmentNumber);
-
-    /**
-     * Get the drone reception port.
-     * \return drone reception port
-     */
-    int getDroneRcvPort() const {
-        return m_droneRcvPort;
-    }
 
     /**
 	 * Sends navigation data.
@@ -50,10 +33,4 @@ public:
      * @param speed drone speed 
 	 */
 	void sendNav(int deltatime, DroneDir dir, DroneSpeed speed);
-
-private:
-    void run() override;
-
-    /** Drone reception port */
-    int m_droneRcvPort;
 };

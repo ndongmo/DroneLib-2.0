@@ -15,11 +15,13 @@
 
 #include <Controller.h>
 #include <net/NetTcp.h>
+#include <stream/StreamSender.h>
 
 #include <string>
 #include <thread>
 
 using namespace controller;
+using namespace stream;
 
 /**
  * Drone controller service class which starts and stops all others services.
@@ -40,22 +42,6 @@ public:
     int discovery() override;
     bool isRunning() override;
     void handleError(int error) override;
-
-    /**
-     * Get the client reception port.
-     * @return client reception port
-     */
-    int getClientRcvPort() const {
-        return m_clientRcvPort;
-    }
-
-    /**
-     * Get the client address.
-     * @return client address
-     */
-    const std::string& getClientAddr() const {
-        return m_clientAddr;
-    }
     
 protected:
     void run() override;
@@ -65,16 +51,16 @@ protected:
      */
     void init();
 
+    /**
+     * Initialize all required config variables.
+     */
+    void initConfigs();
+
     /** Handle action in the queue or/and in the list of events */
     void handleEvents();
 
     /** Wait for the next event */
     void waitNextEvent();
-
-    /** Client reception port */
-    int m_clientRcvPort;
-    /** Client address */
-    std::string m_clientAddr;
 
     /** Discovering tcp socket */
     net::NetTcp m_conSocket;
@@ -85,6 +71,8 @@ protected:
     DroneSender m_sender;
     /** Network receiver object */
     DroneReceiver m_receiver;
+    /** Video stream sender object */
+    StreamSender m_videoSender;
     /** Led controller object */
     LedController m_ledCtrl;
     /** Motors (wheels) controller object */

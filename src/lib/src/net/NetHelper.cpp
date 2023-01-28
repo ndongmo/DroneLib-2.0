@@ -57,13 +57,13 @@ void NetHelper::readFrame(const char* buffer, NetFrame& frame) {
 	frame.data = (UINT8*) (buffer + NET_FRAME_HEADER);
 }
 
-void NetHelper::readFrame(const NetFrame& netFrame, StreamFragment& frame) {
-	frame.frameNumber = readUInt16(netFrame.data, 0);
-	frame.frameFlags = netFrame.data[2];
-	frame.fragmentNumber = netFrame.data[3];
-	frame.fragmentPerFrame = netFrame.data[4];
-	frame.fragmentSize = netFrame.size - NET_FRAME_HEADER - STREAM_FRAME_HEADER;
-	frame.fragmentData = netFrame.data + STREAM_FRAME_HEADER;
+void NetHelper::readFrame(const NetFrame& frame, StreamFragment& fragment) {
+	fragment.frameFlags = frame.data[0];
+	fragment.frameNumber = readUInt16(frame.data, 1);
+	fragment.fragmentNumber = readUInt16(frame.data, 3);
+	fragment.fragmentPerFrame = readUInt16(frame.data, 5);
+	fragment.fragmentSize = frame.size - NET_FRAME_HEADER - STREAM_FRAME_HEADER;
+	fragment.fragmentData = frame.data + STREAM_FRAME_HEADER;
 }
 
 void NetHelper::readArgs(const NetFrame& frame, const char* format, ...) {

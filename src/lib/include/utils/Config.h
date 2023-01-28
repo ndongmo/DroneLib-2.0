@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <nlohmann/json.hpp>
 
 #define CONFIG_FILE "config.json"
@@ -41,12 +42,26 @@ public:
 	static int getInt(const char *key, int defaultValue);
 
 	/**
+	 * Retrieve the requested int variable from the global buffer.
+	 * \param key the requested attribute name
+	 * \return the int value if the key is found, otherwise raise a warning and return 0
+	 */
+	static int getIntVar(const char *key);
+
+	/**
 	 * Retrieve the requested int value and set the given reference.
 	 * \param key the requested attribute name
 	 * \param value reference of the value to set
 	 * \return true if the value has been set, false otherwise
 	 */
 	static bool setInt(const char *key, int &value);
+
+	/**
+	 * Set the value of the given int variable in the global buffer.
+	 * \param key the requested attribute name
+	 * \param value the new value of the variable
+	 */
+	static void setIntVar(const char *key, int value);
 
 	/**
 	 * Retrieve the requested string value.
@@ -57,12 +72,26 @@ public:
 	static std::string getString(const char *key, std::string defaultValue);
 
 	/**
+	 * Retrieve the requested string variable from the global buffer.
+	 * \param key the requested attribute name
+	 * \return the int value if the key is found, otherwise raise a warning and return 0
+	 */
+	static std::string getStringVar(const char *key);
+
+	/**
 	 * Retrieve the requested string value and set the given reference.
 	 * \param key the requested attribute name
 	 * \param value reference of the value to set
 	 * \return true if the value has been set, false otherwise
 	 */
 	static bool setString(const char *key, std::string &value);
+
+	/**
+	 * Set the value of the given string variable in the global buffer.
+	 * \param key the requested attribute name
+	 * \param value the new value of the variable
+	 */
+	static void setStringVar(const char *key, const std::string &value);
 
 	/**
 	 * Retrieve the requested value. String litteral should be cast as std::string
@@ -114,6 +143,16 @@ private:
 	 * Json instance keeping the file data.
 	 */
 	nlohmann::json m_json;
+
+	/**
+	 * Int data buffer.
+	 */
+	std::unordered_map<std::string, int> m_intBuffer;
+
+	/**
+	 * String data buffer.
+	 */
+	std::unordered_map<std::string, std::string> m_stringBuffer;
 };
 }
 
