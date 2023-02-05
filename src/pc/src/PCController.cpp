@@ -8,7 +8,8 @@
 using namespace utils;
 
 PCController::PCController() : 
-	m_receiver(m_sender, m_videoStream), m_window(m_evHandler) {
+	m_receiver(m_sender, m_videoStream, m_audioStream), 
+	m_window(m_evHandler), m_speaker(m_audioStream) {
 
 }
 
@@ -51,29 +52,16 @@ void PCController::init() {
 }
 
 void PCController::initConfigs() {
-	int fps = Config::getInt(VIDEO_FPS, VIDEO_FPS_DEFAULT);
-	int codec = Config::getInt(VIDEO_CODEC, VIDEO_CODEC_DEFAULT);
-	int format = Config::getInt(VIDEO_FORMAT, VIDEO_FORMAT_DEFAULT);
-	int width = Config::getInt(VIDEO_WIDTH, VIDEO_WIDTH_DEFAULT);
-	int height = Config::getInt(VIDEO_HEIGHT, VIDEO_HEIGHT_DEFAULT);
-	int dst_width = Config::getInt(VIDEO_DST_WIDTH, VIDEO_DST_WIDTH_DEFAULT);
-	int dst_height = Config::getInt(VIDEO_DST_HEIGHT, VIDEO_DST_HEIGHT_DEFAULT);
-	int rcvPort = Config::getInt(CTRL_PORT_RCV, CTRL_PORT_RCV_DEFAULT);
-	int sendPort = Config::getInt(CTRL_PORT_SEND, CTRL_PORT_SEND_DEFAULT);
-	int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
-    std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
+	Controller::initConfigs();
 
-	Config::setIntVar(VIDEO_FPS, fps);
-	Config::setIntVar(VIDEO_CODEC, codec);
-	Config::setIntVar(VIDEO_FORMAT, format);
-	Config::setIntVar(VIDEO_WIDTH, width);
-	Config::setIntVar(VIDEO_HEIGHT, height);
-	Config::setIntVar(VIDEO_DST_WIDTH, dst_width);
-	Config::setIntVar(VIDEO_DST_HEIGHT, dst_height);
-	Config::setIntVar(CTRL_PORT_RCV, rcvPort);
-	Config::setIntVar(CTRL_PORT_SEND, sendPort);
-	Config::setIntVar(DRONE_PORT_DISCOVERY, serverPort);
-	Config::setStringVar(DRONE_ADDRESS, serverAddr);
+	Config::setIntVar(PC_VOLUME, Config::getInt(PC_VOLUME, PC_VOLUME_DEFAULT));
+	Config::setIntVar(PC_FONT_SIZE, Config::getInt(PC_FONT_SIZE, PC_FONT_SIZE_DEFAULT));
+	Config::setStringVar(PC_APP_NAME, Config::getString(PC_APP_NAME, PC_APP_NAME_DEFAULT));
+
+	Config::setIntVar(VIDEO_DST_WIDTH, Config::getInt(VIDEO_DST_WIDTH, VIDEO_DST_WIDTH_DEFAULT));
+	Config::setIntVar(VIDEO_DST_HEIGHT, Config::getInt(VIDEO_DST_HEIGHT, VIDEO_DST_HEIGHT_DEFAULT));
+	Config::setIntVar(CTRL_PORT_RCV, Config::getInt(CTRL_PORT_RCV, CTRL_PORT_RCV_DEFAULT));
+	Config::setIntVar(CTRL_PORT_SEND, Config::getInt(CTRL_PORT_SEND, CTRL_PORT_SEND_DEFAULT));
 }
 
 int PCController::begin() {	
@@ -87,8 +75,18 @@ int PCController::begin() {
 		return -1;
 	}
 
+	if(m_audioStream.begin() == -1) {
+		logE << "Audio stream begin failed!" << std::endl;
+		return -1;
+	}
+
 	if(m_window.begin() == -1) {
 		logE << "UI begin failed!" << std::endl;
+		return -1;
+	}
+
+	if(m_speaker.begin() == -1) {
+		logE << "Speaker begin failed!" << std::endl;
 		return -1;
 	}
 
@@ -110,21 +108,25 @@ int PCController::end() {
 
 	m_conSocket.close();
 
+	result += m_audioStream.end();
 	result += m_videoStream.end();
 	result += m_sender.end();
 	result += m_receiver.end();
+	result += m_speaker.end();
 	result += m_window.end();
 
 	if(m_initProcess.joinable()) {
 		m_initProcess.join();
 	}
 
-	if(result != 4) return -1;
+	if(result != 6) return -1;
 	else return 1;
 }
 
 void PCController::start() {
 	m_videoStream.start();
+	m_audioStream.start();
+	m_speaker.start();
 	m_window.start();
 
 	init();
@@ -181,7 +183,8 @@ int PCController::discovery() {
 
 	char buf[1024] = {0};
 	int droneRcvPort, droneSendPort, maxFragmentSize, maxFragmentNumber,
-		fps, width, height, codec, format;
+		fps, width, height, vcodec, vformat, acodec, aformat, asample,
+		abitrate, achannels;
 
 	if (m_conSocket.receive(buf, 1024) == -1) {
 		logE << "Discovery: TCP receive drone config failed" << std::endl;
@@ -195,10 +198,15 @@ int PCController::discovery() {
 		json[NET_FRAGMENT_SIZE].get_to(maxFragmentSize);
         json[NET_FRAGMENT_NUMBER].get_to(maxFragmentNumber);
 		json[VIDEO_FPS].get_to(fps);
-		json[VIDEO_CODEC].get_to(codec);
-		json[VIDEO_FORMAT].get_to(format);
+		json[VIDEO_CODEC].get_to(vcodec);
+		json[VIDEO_FORMAT].get_to(vformat);
 		json[VIDEO_WIDTH].get_to(width);
 		json[VIDEO_HEIGHT].get_to(height);
+		json[AUDIO_CODEC].get_to(acodec);
+		json[AUDIO_FORMAT].get_to(aformat);
+		json[AUDIO_SAMPLE].get_to(asample);
+		json[AUDIO_BIT_RATE].get_to(abitrate);
+		json[AUDIO_CHANNELS].get_to(achannels);
 	}
 	catch (...) {
 		logE << "Json parser error: " << json.dump() << std::endl;
@@ -210,10 +218,15 @@ int PCController::discovery() {
 	Config::setIntVar(NET_FRAGMENT_SIZE, maxFragmentSize);
 	Config::setIntVar(NET_FRAGMENT_NUMBER, maxFragmentNumber);
 	Config::setIntVar(VIDEO_FPS, fps);
-	Config::setIntVar(VIDEO_CODEC, codec);
-	Config::setIntVar(VIDEO_FORMAT, format);
+	Config::setIntVar(VIDEO_CODEC, vcodec);
+	Config::setIntVar(VIDEO_FORMAT, vformat);
 	Config::setIntVar(VIDEO_WIDTH, width);
 	Config::setIntVar(VIDEO_HEIGHT, height);
+	Config::setIntVar(AUDIO_CODEC, acodec);
+	Config::setIntVar(AUDIO_FORMAT, aformat);
+	Config::setIntVar(AUDIO_SAMPLE, asample);
+	Config::setIntVar(AUDIO_BIT_RATE, abitrate);
+	Config::setIntVar(AUDIO_CHANNELS, achannels);
 
 	m_conSocket.close();
 

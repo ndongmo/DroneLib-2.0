@@ -14,10 +14,12 @@ int PCWindow::begin() {
     m_height = Config::getIntVar(VIDEO_DST_HEIGHT);
     m_format = Config::getIntVar(VIDEO_FORMAT);
     
-	if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-		logE << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
-		return -1;
-	}
+    if(SDL_WasInit(SDL_INIT_EVERYTHING) != SDL_INIT_EVERYTHING) {
+        if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+            logE << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
+            return -1;
+        }
+    }
 	if(SDL_CreateWindowAndRenderer(m_width, m_height, 0, &m_window, &m_renderer) < 0) {
 		logE << "Error creating window or renderer: " << SDL_GetError() << std::endl;
 		return -1;
@@ -27,17 +29,18 @@ int PCWindow::begin() {
         logE << "Error creating streaming texture: " << SDL_GetError() << std::endl;
 		return -1;
     }
-
-    if(TTF_Init() == -1) {
-        logE << "Error initializing ttf font: " << TTF_GetError() << std::endl;
-		return -1;
+    if(TTF_WasInit() < 1) {
+        if(TTF_Init() == -1) {
+            logE << "Error initializing ttf font: " << TTF_GetError() << std::endl;
+            return -1;
+        }
     }
-    if((m_font = TTF_OpenFont(PC_FONT_TYPE_DEFAULT, PC_FONT_SIZE_DEFAULT)) == nullptr) {
+    if((m_font = TTF_OpenFont(PC_FONT_TYPE_DEFAULT, Config::getIntVar(PC_FONT_SIZE))) == nullptr) {
         logE << "Font initialization error: " << TTF_GetError() << std::endl;
 		return -1;
     }
 
-    SDL_SetWindowTitle(m_window, PC_APP_NAME);
+    SDL_SetWindowTitle(m_window, Config::getStringVar(PC_APP_NAME).c_str());
     SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     
     m_txt_color = { 0x00, 0x00, 0x00, 0xFF };
@@ -52,10 +55,15 @@ int PCWindow::begin() {
 int PCWindow::clean() {	
     m_running = false;
     m_evHandler.destroy();
-    
-    if(m_font != nullptr) {
-        TTF_CloseFont(m_font);
-        m_font = nullptr;
+
+    //always destroy window first!!!
+    if(m_window != nullptr) {
+        SDL_DestroyWindow(m_window);
+        m_window = nullptr;
+    }
+	if(m_renderer != nullptr) {
+        SDL_DestroyRenderer(m_renderer);
+        m_renderer = nullptr;
     }
     if(m_basic_texture != NULL) {
         SDL_DestroyTexture(m_basic_texture);
@@ -65,13 +73,9 @@ int PCWindow::clean() {
         SDL_DestroyTexture(m_font_texture);
         m_font_texture = nullptr;
     }
-	if(m_renderer != nullptr) {
-        SDL_DestroyRenderer(m_renderer);
-        m_renderer = nullptr;
-    }
-    if(m_window != nullptr) {
-        SDL_DestroyWindow(m_window);
-        m_window = nullptr;
+    if(m_font != nullptr) {
+        TTF_CloseFont(m_font);
+        m_font = nullptr;
     }
 
 	return 1;

@@ -34,7 +34,7 @@ public:
 	 * @param streamID id of the stream
 	 * @param sender  network sender reference
 	 */
-	StreamSender(unsigned int streamID, NetSender &sender);
+	StreamSender(NetSender &sender);
 
 	int begin() override;
 	void start() override;
@@ -53,10 +53,10 @@ protected:
 	unsigned int m_streamID;
 	/** Frame index */
 	unsigned int m_frameIndex = 0;
-	/** */
-	int64_t m_previousTick;
 	/** Captured file name */
 	std::string m_filename;
+	/** Media input format */
+	std::string m_formatname;
 	/** Main process */
 	std::thread m_process;
 	/** Network sender reference */
@@ -65,6 +65,8 @@ protected:
 	AVMediaType m_mediaType;
 	/** Media packet to send */
 	AVPacket *m_packet = NULL;
+	/** input codec */
+	const AVCodec *m_codec = NULL;
 	/** Media format context */
 	AVFormatContext *m_ifmt_ctx = NULL;
 };

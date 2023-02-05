@@ -11,6 +11,7 @@
 #include "PCSender.h"
 #include "PCReceiver.h"
 #include "PCWindow.h"
+#include "PCSpeaker.h"
 #include "EventHandler.h"
 #include "FPSLimiter.h"
 
@@ -41,16 +42,12 @@ public:
 
 private:
     void run() override;
+    void initConfigs() override;
 
     /**
      * Discover, initialize and start sender and receiver components.
      */
     void init();
-
-    /**
-     * Initialize all required config variables.
-     */
-    void initConfigs();
 
     /**
      * Handle incoming controller events.
@@ -82,6 +79,10 @@ private:
     FPSLimiter m_fpsLimiter;
     /** UI & event manager object */
     PCWindow m_window;
+    /** Speaker object */
+    PCSpeaker m_speaker;
     /** Video stream receiver object */
     StreamReceiver m_videoStream;
+    /** Audio stream receiver object */
+    StreamReceiver m_audioStream;
 };

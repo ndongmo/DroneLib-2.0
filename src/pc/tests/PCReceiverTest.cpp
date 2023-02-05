@@ -15,9 +15,10 @@ class PCReceiverTest : public ::testing::Test {
 public:
     PCSender sender;
     PCReceiver pcrcv;
+    StreamReceiver astream;
     StreamReceiver vstream;
 protected:
-    PCReceiverTest() : pcrcv(sender, vstream) {}
+    PCReceiverTest() : pcrcv(sender, vstream, astream) {}
     void SetUp() override {
         std::ofstream configFile(CONFIG_FILE);
         configFile << "{\"" << DRONE_ADDRESS << "\":\"" << VAR_DRONE_ADDRESS << "\"}";

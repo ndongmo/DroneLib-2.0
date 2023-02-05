@@ -25,4 +25,9 @@ public:
 	 * \return -1 when the communication failed, otherwise 1.
 	 */
 	virtual int discovery() = 0;
+
+	/**
+     * Initialize all required config variables.
+     */
+    virtual void initConfigs();
 };

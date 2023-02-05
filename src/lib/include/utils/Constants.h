@@ -13,9 +13,6 @@
 #define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.0.242"
 #define DRONE_WHEEL_MOVE_LAPS           100 // Time laps of wheel move in millisecond
 
-#define VIDEO_CAPTURE_FILENAME          "/dev/video0"
-#define AUDIO_CAPTURE_FILENAME          "/dev/video0"
-
 /* Drone config variables */
 #define DRONE_ADDRESS 		    "drone_address"
 #define DRONE_PORT_DISCOVERY 	"drone_port_discovery"
@@ -40,11 +37,7 @@
 #define VIDEO_FPS           "video_fps" // Frame per second
 #define VIDEO_WIDTH         "video_width"
 #define VIDEO_HEIGHT        "video_height"
-
-/* Video destination config variables */
-#define VIDEO_DST_FORMAT    "video_dst_format"
-#define VIDEO_DST_WIDTH     "video_dst_width"
-#define VIDEO_DST_HEIGHT    "video_dst_height"
+#define VIDEO_DEVICE         "video_device"
 
 /* Video source config vairiables default values */
 #define VIDEO_CODEC_DEFAULT         13 // https://ffmpeg.org/doxygen/3.2/avcodec_8h_source.html
@@ -53,11 +46,35 @@
 #define VIDEO_WIDTH_DEFAULT         640
 #define VIDEO_HEIGHT_DEFAULT        480
 #define VIDEO_FPS_DEFAULT           60
+#define VIDEO_DEVICE_DEFAULT        "/dev/video0"
+
+/* Video destination config variables */
+#define VIDEO_DST_FORMAT    "video_dst_format"
+#define VIDEO_DST_WIDTH     "video_dst_width"
+#define VIDEO_DST_HEIGHT    "video_dst_height"
 
 /* Video destination config vairiables default values */
 #define VIDEO_DST_FORMAT_DEFAULT    3 // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
 #define VIDEO_DST_WIDTH_DEFAULT     640
 #define VIDEO_DST_HEIGHT_DEFAULT    480
+
+/* Audio source config variables */
+#define AUDIO_CODEC         "audio_codec"
+#define AUDIO_FORMAT        "audio_format"
+#define AUDIO_SAMPLE        "audio_sample" 
+#define AUDIO_CHANNELS      "audio_channels" 
+#define AUDIO_BIT_RATE      "audio_bit_rate" 
+#define AUDIO_DEVICE        "audio_device"
+#define AUDIO_INPUT_FORMAT  "audio_input_format"
+
+/* Video source config vairiables default values */
+#define AUDIO_CODEC_DEFAULT         13 // https://ffmpeg.org/doxygen/3.2/avcodec_8h_source.html
+#define AUDIO_FORMAT_DEFAULT        1 // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
+#define AUDIO_SAMPLE_DEFAULT        44100
+#define AUDIO_CHANNELS_DEFAULT      2
+#define AUDIO_BIT_RATE_DEFAULT      1536
+#define AUDIO_DEVICE_DEFAULT        "hw:0"
+#define AUDIO_INPUT_FORMAT_DEFAULT  "alsa"
 
 // NS_FRAME_TYPE
 #define NS_FRAME_TYPE_QUIT              0

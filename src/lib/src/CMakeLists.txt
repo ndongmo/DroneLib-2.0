@@ -12,9 +12,12 @@ SET(SOURCE_FILES
 	net/NetReceiver.cpp
 	stream/StreamPool.cpp
 	stream/StreamSender.cpp
+	stream/VideoSender.cpp
+	stream/AudioSender.cpp
 	stream/StreamReceiver.cpp
 	stream/VideoReceiver.cpp
 	IController.cpp
+	Controller.cpp
 	Service.cpp
 )
 

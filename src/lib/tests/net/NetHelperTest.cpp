@@ -62,7 +62,8 @@ TEST(NetHelperTest, readFrameWork) {
     EXPECT_EQ(memcmp(wframe.data, rframe.data, wframe.size - NET_FRAME_HEADER), 0);
 
     const char* format = "1b24b";
-    int wv1 = 56, rv1;
+    UINT8 rv1;
+    int wv1 = 56;
     bool wv2 = true, rv2;
     int wv3 = 368, rv3;
     int wv4 = 7899, rv4;

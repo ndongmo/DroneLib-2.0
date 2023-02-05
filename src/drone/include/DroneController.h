@@ -15,7 +15,8 @@
 
 #include <Controller.h>
 #include <net/NetTcp.h>
-#include <stream/StreamSender.h>
+#include <stream/VideoSender.h>
+#include <stream/AudioSender.h>
 
 #include <string>
 #include <thread>
@@ -45,16 +46,12 @@ public:
     
 protected:
     void run() override;
-
+    void initConfigs() override;
+    
     /**
      * Discover, initialize and start sender and receiver components.
      */
     void init();
-
-    /**
-     * Initialize all required config variables.
-     */
-    void initConfigs();
 
     /** Handle action in the queue or/and in the list of events */
     void handleEvents();
@@ -71,8 +68,10 @@ protected:
     DroneSender m_sender;
     /** Network receiver object */
     DroneReceiver m_receiver;
+    /** Audio stream sender object */
+    AudioSender m_audioSender;
     /** Video stream sender object */
-    StreamSender m_videoSender;
+    VideoSender m_videoSender;
     /** Led controller object */
     LedController m_ledCtrl;
     /** Motors (wheels) controller object */

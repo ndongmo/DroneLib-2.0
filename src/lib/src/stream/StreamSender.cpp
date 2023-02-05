@@ -3,33 +3,26 @@
 #include "utils/Config.h"
 #include "utils/Constants.h"
 
-extern "C" {
-#include <libavutil/time.h>
-#include <libavutil/timestamp.h>
-}
-
 using namespace utils;
 
 namespace stream {
 
-StreamSender::StreamSender(unsigned int streamID, NetSender &sender) : 
-	m_streamID(streamID), m_sender(sender) {
-	if(m_streamID == NS_ID_STREAM_AUDIO) {
-		m_filename = AUDIO_CAPTURE_FILENAME;
-		m_mediaType = AVMEDIA_TYPE_AUDIO;
-	} else {
-		m_filename = VIDEO_CAPTURE_FILENAME;
-		m_mediaType = AVMEDIA_TYPE_VIDEO;
-	}
+StreamSender::StreamSender(NetSender &sender) : m_sender(sender) {
+	
 }
 
 int StreamSender::begin() {
 	int ret;
+	const AVInputFormat *format = NULL;
 
 	m_frameIndex = 0;
 	avdevice_register_all();
+
+	if(!m_formatname.empty()) {
+		format = av_find_input_format(m_formatname.c_str());
+	}
 	
-	if ((ret = avformat_open_input(&m_ifmt_ctx, m_filename.c_str(), NULL, NULL)) < 0) {
+	if ((ret = avformat_open_input(&m_ifmt_ctx, m_filename.c_str(), format, NULL)) < 0) {
         logE << "StreamSender: cannot capture input file '" << m_filename << "' -> " << av_err2str(ret) << std::endl;
 		return -1;
     }
@@ -39,7 +32,7 @@ int StreamSender::begin() {
 		return -1;
     }
 
-    if ((ret = av_find_best_stream(m_ifmt_ctx, m_mediaType, -1, -1, NULL, 0)) < 0) {
+    if ((ret = av_find_best_stream(m_ifmt_ctx, m_mediaType, -1, -1, &m_codec, 0)) < 0) {
 		logE << "StreamSender: cannot find a video stream in the input file -> " << av_err2str(ret) << std::endl;
 		return -1;
     }
@@ -47,23 +40,6 @@ int StreamSender::begin() {
 	if (!(m_packet = av_packet_alloc())) {
 		logE << "StreamSender: cannot allocate packet memory -> " << std::endl;
 		return -1;
-	}
-
-	if(m_streamID == NS_ID_STREAM_AUDIO) {
-		
-	} else {
-		logI << "VideoSender:" <<
-		" fps=" << m_ifmt_ctx->streams[0]->r_frame_rate.num <<
-		" codec=" << m_ifmt_ctx->streams[0]->codecpar->codec_id <<
-		" format=" << m_ifmt_ctx->streams[0]->codecpar->format <<
-		" width=" << m_ifmt_ctx->streams[0]->codecpar->width <<
-		" height=" << m_ifmt_ctx->streams[0]->codecpar->height << std::endl;
-
-		Config::setIntVar(VIDEO_FPS, m_ifmt_ctx->streams[0]->r_frame_rate.num);
-		Config::setIntVar(VIDEO_CODEC, m_ifmt_ctx->streams[0]->codecpar->codec_id);
-		Config::setIntVar(VIDEO_FORMAT, m_ifmt_ctx->streams[0]->codecpar->format);
-		Config::setIntVar(VIDEO_WIDTH, m_ifmt_ctx->streams[0]->codecpar->width);
-		Config::setIntVar(VIDEO_HEIGHT, m_ifmt_ctx->streams[0]->codecpar->height);
 	}
 	
 	return 1;
@@ -107,7 +83,6 @@ void StreamSender::run() {
 
 	while (m_running)
 	{
-		m_previousTick = av_gettime(); // start tick 
 		if ((ret = av_read_frame(m_ifmt_ctx, m_packet)) < 0) {
 			logE << "StreamSender: cannot read captured frame -> " << av_err2str(ret) << std::endl;
 			continue;

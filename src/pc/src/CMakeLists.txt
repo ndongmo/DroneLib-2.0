@@ -9,6 +9,7 @@ SET(SOURCE_FILES
 	PCController.cpp
 	PCReceiver.cpp
 	PCSender.cpp
+	PCSpeaker.cpp
 	PCWindow.cpp
 )
 

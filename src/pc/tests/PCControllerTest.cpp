@@ -41,15 +41,20 @@ public:
         ASSERT_EQ(clientRcvPort, CTRL_PORT_RCV_DEFAULT);
 
         json = {
-            {DRONE_PORT_RCV, Config::getInt(DRONE_PORT_RCV, VAR_DRONE_RCV_PORT)},
-            {DRONE_PORT_SEND, Config::getInt(DRONE_PORT_SEND, VAR_DRONE_SEND_PORT)},
-            {NET_FRAGMENT_SIZE, Config::getInt(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE)},
-            {NET_FRAGMENT_NUMBER, Config::getInt(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER)},
-            {VIDEO_FPS, Config::getInt(VIDEO_FPS, VIDEO_FPS_VALUE)},
-            {VIDEO_WIDTH, Config::getInt(VIDEO_WIDTH, VIDEO_WIDTH_VALUE)},
-            {VIDEO_HEIGHT, Config::getInt(VIDEO_HEIGHT, VIDEO_HEIGHT_VALUE)},
-            {VIDEO_FORMAT, Config::getInt(VIDEO_FORMAT, VIDEO_FORMAT_VALUE)},
-            {VIDEO_CODEC, Config::getInt(VIDEO_CODEC, VIDEO_CODEC_VALUE)}
+            {DRONE_PORT_RCV, VAR_DRONE_RCV_PORT},
+            {DRONE_PORT_SEND, VAR_DRONE_SEND_PORT},
+            {NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE},
+            {NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER},
+            {VIDEO_FPS, VIDEO_FPS_VALUE},
+            {VIDEO_WIDTH, VIDEO_WIDTH_VALUE},
+            {VIDEO_HEIGHT, VIDEO_HEIGHT_VALUE},
+            {VIDEO_FORMAT, VIDEO_FORMAT_VALUE},
+            {VIDEO_CODEC, VIDEO_CODEC_VALUE},
+            {AUDIO_CODEC, AUDIO_CODEC_VALUE},
+            {AUDIO_FORMAT, AUDIO_FORMAT_VALUE},
+            {AUDIO_SAMPLE, AUDIO_SAMPLE_VALUE},
+            {AUDIO_BIT_RATE, AUDIO_BIT_RATE_VALUE},
+            {AUDIO_CHANNELS, AUDIO_CHANNELS_VALUE}
         };
         std::string msg = json.dump();
         EXPECT_GT(tcpDrone.send(msg.c_str(), msg.length()), 0);
@@ -81,6 +86,11 @@ protected:
     const int VIDEO_HEIGHT_VALUE = 120;
     const int VIDEO_FORMAT_VALUE = 2;
     const int VIDEO_CODEC_VALUE = 13;
+    const int AUDIO_CODEC_VALUE = 65897;
+    const int AUDIO_FORMAT_VALUE = 2;
+    const int AUDIO_SAMPLE_VALUE = 48000;
+    const int AUDIO_BIT_RATE_VALUE = 158000;
+    const int AUDIO_CHANNELS_VALUE = 2;
 };
 
 // Tests PCController discovery with default config
@@ -103,6 +113,12 @@ TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
     ASSERT_EQ(VIDEO_WIDTH_VALUE, Config::getIntVar(VIDEO_WIDTH));
     ASSERT_EQ(VIDEO_HEIGHT_VALUE, Config::getIntVar(VIDEO_HEIGHT));
     ASSERT_EQ(VIDEO_FORMAT_VALUE, Config::getIntVar(VIDEO_FORMAT));
+
+    ASSERT_EQ(AUDIO_CODEC_VALUE, Config::getIntVar(AUDIO_CODEC));
+    ASSERT_EQ(AUDIO_FORMAT_VALUE, Config::getIntVar(AUDIO_FORMAT));
+    ASSERT_EQ(AUDIO_SAMPLE_VALUE, Config::getIntVar(AUDIO_SAMPLE));
+    ASSERT_EQ(AUDIO_BIT_RATE_VALUE, Config::getIntVar(AUDIO_BIT_RATE));
+    ASSERT_EQ(AUDIO_CHANNELS_VALUE, Config::getIntVar(AUDIO_CHANNELS));
 }
 
 // Tests PCController end

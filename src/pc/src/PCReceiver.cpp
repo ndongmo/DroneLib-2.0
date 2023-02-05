@@ -8,8 +8,10 @@
 
 using namespace utils; 
 
-PCReceiver::PCReceiver(PCSender &sender, StreamReceiver &videoReceiver) : 
-	NetReceiver(sender), m_pcSender(sender), m_videoReceiver(videoReceiver) {
+PCReceiver::PCReceiver(PCSender &sender, StreamReceiver &videoReceiver, 
+	StreamReceiver &audioReceiver) : 
+	NetReceiver(sender), m_pcSender(sender), m_videoReceiver(videoReceiver), 
+	m_audioReceiver(audioReceiver) {
 
 }
 
@@ -31,8 +33,12 @@ void PCReceiver::innerRun(NetFrame &netFrame) {
 		if (netFrame.id == NS_ID_STREAM_VIDEO) {
 			StreamFragment streamFragment;
 			net::NetHelper::readFrame(netFrame, streamFragment);
-
 			m_videoReceiver.newFragment(streamFragment);
+		} 
+		else if (netFrame.id == NS_ID_STREAM_AUDIO) {
+			StreamFragment streamFragment;
+			net::NetHelper::readFrame(netFrame, streamFragment);
+			m_audioReceiver.newFragment(streamFragment);
 		}
 	}
 }

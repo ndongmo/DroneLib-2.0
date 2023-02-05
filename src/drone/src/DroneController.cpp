@@ -10,9 +10,8 @@
 using namespace utils;
 
 DroneController::DroneController() : 
-	m_receiver(m_sender, m_motorCtrl), 
-	m_videoSender(NS_ID_STREAM_VIDEO, m_sender) {
-
+	m_receiver(m_sender, m_motorCtrl), m_audioSender(m_sender),
+	m_videoSender(m_sender) {
 }
 
 void DroneController::init() {
@@ -20,6 +19,7 @@ void DroneController::init() {
 		m_initProcess.join();
 	}
 
+	m_audioSender.stop();
 	m_videoSender.stop();
 	m_sender.end();
 	m_receiver.end();
@@ -49,6 +49,7 @@ void DroneController::init() {
 
 		m_sender.start();
 		m_receiver.start();
+		m_audioSender.start();
 		m_videoSender.start();
 
 		updateState(APP_RUNNING);
@@ -56,29 +57,12 @@ void DroneController::init() {
 }
 
 void DroneController::initConfigs() {
-	int fps = Config::getInt(VIDEO_FPS, VIDEO_FPS_DEFAULT);
-	int codec = Config::getInt(VIDEO_CODEC, VIDEO_CODEC_DEFAULT);
-	int format = Config::getInt(VIDEO_FORMAT, VIDEO_FORMAT_DEFAULT);
-	int width = Config::getInt(VIDEO_WIDTH, VIDEO_WIDTH_DEFAULT);
-	int height = Config::getInt(VIDEO_HEIGHT, VIDEO_HEIGHT_DEFAULT);
-	int rcvPort = Config::getInt(DRONE_PORT_RCV, DRONE_PORT_RCV_DEFAULT);
-	int sendPort = Config::getInt(DRONE_PORT_SEND, DRONE_PORT_SEND_DEFAULT);
-	int serverPort = Config::getInt(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
-	int maxFragmentSize = Config::getInt(NET_FRAGMENT_SIZE, NET_FRAGMENT_SIZE_DEFAULT);
-	int maxFragmentNumber = Config::getInt(NET_FRAGMENT_NUMBER, NET_FRAGMENT_NUMBER_DEFAULT);
-    std::string serverAddr = Config::getString(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
-
-	Config::setIntVar(VIDEO_FPS, fps);
-	Config::setIntVar(VIDEO_CODEC, codec);
-	Config::setIntVar(VIDEO_FORMAT, format);
-	Config::setIntVar(VIDEO_WIDTH, width);
-	Config::setIntVar(VIDEO_HEIGHT, height);
-	Config::setIntVar(DRONE_PORT_RCV, rcvPort);
-	Config::setIntVar(DRONE_PORT_SEND, sendPort);
-	Config::setIntVar(DRONE_PORT_DISCOVERY, serverPort);
-	Config::setIntVar(NET_FRAGMENT_SIZE, maxFragmentSize);
-	Config::setIntVar(NET_FRAGMENT_NUMBER, maxFragmentNumber);
-	Config::setStringVar(DRONE_ADDRESS, serverAddr);
+	Controller::initConfigs();
+	
+	Config::setIntVar(DRONE_PORT_RCV, Config::getInt(DRONE_PORT_RCV, DRONE_PORT_RCV_DEFAULT));
+	Config::setIntVar(DRONE_PORT_SEND, Config::getInt(DRONE_PORT_SEND, DRONE_PORT_SEND_DEFAULT));
+	Config::setIntVar(NET_FRAGMENT_SIZE, Config::getInt(NET_FRAGMENT_SIZE, NET_FRAGMENT_SIZE_DEFAULT));
+	Config::setIntVar(NET_FRAGMENT_NUMBER, Config::getInt(NET_FRAGMENT_NUMBER, NET_FRAGMENT_NUMBER_DEFAULT));
 }
 
 int DroneController::begin() {	
@@ -94,6 +78,10 @@ int DroneController::begin() {
 	}
 	if(m_motorCtrl.begin() == -1) {
 		logE << "DroneController: Motors (Wheels) initialization failed!" << std::endl;
+		return -1;
+	}
+	if(m_audioSender.begin() == -1) {
+		logE << "DroneController: Audio stream capture begin failed!" << std::endl;
 		return -1;
 	}
 	if(m_videoSender.begin() == -1) {
@@ -116,6 +104,7 @@ int DroneController::end() {
 	m_cv.notify_all();
 	m_conSocket.close();
 
+	result += m_audioSender.end();
 	result += m_videoSender.end();
 	result += m_sender.end();
 	result += m_receiver.end();
@@ -126,7 +115,7 @@ int DroneController::end() {
 		m_initProcess.join();
 	}
 
-	if(result != 5) return -1;
+	if(result != 6) return -1;
 	else return 1;
 }
 
@@ -236,7 +225,12 @@ int DroneController::discovery() {
 		{VIDEO_CODEC, Config::getIntVar(VIDEO_CODEC)},
 		{VIDEO_FORMAT, Config::getIntVar(VIDEO_FORMAT)},
 		{VIDEO_WIDTH, Config::getIntVar(VIDEO_WIDTH)},
-		{VIDEO_HEIGHT, Config::getIntVar(VIDEO_HEIGHT)}
+		{VIDEO_HEIGHT, Config::getIntVar(VIDEO_HEIGHT)},
+		{AUDIO_CODEC, Config::getIntVar(AUDIO_CODEC)},
+		{AUDIO_FORMAT, Config::getIntVar(AUDIO_FORMAT)},
+		{AUDIO_SAMPLE, Config::getIntVar(AUDIO_SAMPLE)},
+		{AUDIO_BIT_RATE, Config::getIntVar(AUDIO_BIT_RATE)},
+		{AUDIO_CHANNELS, Config::getIntVar(AUDIO_CHANNELS)}
     };
     std::string msg = json.dump();
 

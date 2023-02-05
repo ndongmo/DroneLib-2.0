@@ -13,7 +13,11 @@ using namespace stream;
 // Mock class of the StreamSender
 class MockStreamSender : public StreamSender {
 public:
-    MockStreamSender() : StreamSender(NS_ID_STREAM_VIDEO, netSender) {}
+    MockStreamSender() : StreamSender(netSender) {
+        m_streamID = NS_ID_STREAM_VIDEO;
+        m_filename = Config::getString(VIDEO_DEVICE, VIDEO_DEVICE_DEFAULT);
+	    m_mediaType = AVMEDIA_TYPE_VIDEO;
+    }
     int getStreamID() { return m_streamID; }
     int getFrameIndex() { return m_frameIndex; }
     std::string getFileName() { return m_filename; }
@@ -34,7 +38,7 @@ public:
 protected:
     void SetUp() override {
         EXPECT_EQ(streamSender.getStreamID(), NS_ID_STREAM_VIDEO);
-        EXPECT_EQ(streamSender.getFileName(), VIDEO_CAPTURE_FILENAME);
+        EXPECT_EQ(streamSender.getFileName(), VIDEO_DEVICE_DEFAULT);
         EXPECT_EQ(streamSender.getMediaType(), AVMEDIA_TYPE_VIDEO);
         EXPECT_EQ(streamSender.getFrameIndex(), 0);
     }

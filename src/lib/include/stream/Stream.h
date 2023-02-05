@@ -44,6 +44,7 @@ struct AvStreamFrame {
 		frame = new UINT8[0];
 		rcvWindow = new UINT8[STREAM_FRAME_ACK];
 		frameSize = 0;
+		frameRealSize = 0;
 		frameNumber = -1;
 		fragmentPerFrame = 1;
 		fragmentNumber = -1;

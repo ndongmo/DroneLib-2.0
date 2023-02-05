@@ -1,6 +1,6 @@
 /*!
-* \file PCController.h
-* \brief PC main controller class.
+* \file PCWindow.h
+* \brief PC window ui class.
 * \author Ndongmo Silatsa
 * \date 25-14-2022
 * \version 2.0
@@ -20,8 +20,8 @@
 using namespace stream;
 
 /**
- * PC controller service class which starts and stops
- * all others services and handle the input events.
+ * PC window ui class which displays the video output,
+ * error messages and handles keyboard/mouse/joystick events.
  */
 class PCWindow : public Service
 {

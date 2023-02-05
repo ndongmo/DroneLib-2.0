@@ -40,7 +40,7 @@ UINT8* StreamReceiver::newFragment(const StreamFragment &frag) {
 	if (frag.frameNumber != m_frame.frameNumber) {
 		// push the frame if the last frame has at least one fragment and
 		// the frameFlags is 1 (override) or the incoming frame is new
-		if (m_frame.fragmentNumber > 0 &&
+		if (m_frame.frameRealSize > 0 &&
 			(m_frame.frameFlags == 1 || frag.frameNumber > m_frame.frameNumber)) {
 			m_pool.add(m_frame.frame, m_frame.frameRealSize);
 			m_rcvMtx.lock();

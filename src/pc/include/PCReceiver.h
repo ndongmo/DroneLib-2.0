@@ -27,8 +27,10 @@ public:
      * 
      * @param receiver network sender reference
      * @param videoReceiver video stream receiver reference
+     * @param audioReceiver audio stream receiver reference
      */
-    PCReceiver(PCSender &sender, StreamReceiver &videoReceiver);
+    PCReceiver(PCSender &sender, StreamReceiver &videoReceiver, 
+        StreamReceiver &audioReceiver);
 
     int begin() override;
 
@@ -39,4 +41,6 @@ private:
     PCSender &m_pcSender;
     /** Video stream receiver reference */
     StreamReceiver &m_videoReceiver;
+    /** Audio stream receiver reference */
+    StreamReceiver &m_audioReceiver;
 };
