@@ -16,9 +16,9 @@ PCReceiver::PCReceiver(PCSender &sender, StreamReceiver &videoReceiver,
 }
 
 int PCReceiver::begin() {
-    int rcvPort = Config::getIntVar(CTRL_PORT_RCV);
-	int droneSendPort = Config::getIntVar(DRONE_PORT_SEND);
-    std::string droneAddr = Config::getStringVar(DRONE_ADDRESS);
+    int rcvPort = Config::getInt(CTRL_PORT_RCV);
+	int droneSendPort = Config::getInt(DRONE_PORT_SEND);
+    std::string droneAddr = Config::getString(DRONE_ADDRESS);
 
 	if (m_rcvSocket.open(droneAddr.c_str(), droneSendPort, "", rcvPort) == -1) {
 		logE << "UDP open error" << std::endl;

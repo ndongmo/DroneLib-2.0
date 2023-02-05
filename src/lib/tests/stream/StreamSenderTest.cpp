@@ -15,7 +15,7 @@ class MockStreamSender : public StreamSender {
 public:
     MockStreamSender() : StreamSender(netSender) {
         m_streamID = NS_ID_STREAM_VIDEO;
-        m_filename = Config::getString(VIDEO_DEVICE, VIDEO_DEVICE_DEFAULT);
+        m_filename = VIDEO_DEVICE_DEFAULT;
 	    m_mediaType = AVMEDIA_TYPE_VIDEO;
     }
     int getStreamID() { return m_streamID; }

@@ -33,7 +33,7 @@ void NetReceiver::start() {
 
 void NetReceiver::run() {
 	int len = 0;
-	int maxFragmentSize = Config::getIntVar(NET_FRAGMENT_SIZE);
+	int maxFragmentSize = Config::getInt(NET_FRAGMENT_SIZE);
 	char buf[maxFragmentSize];
 
 	while (m_running) {

@@ -59,10 +59,10 @@ void DroneController::init() {
 void DroneController::initConfigs() {
 	Controller::initConfigs();
 	
-	Config::setIntVar(DRONE_PORT_RCV, Config::getInt(DRONE_PORT_RCV, DRONE_PORT_RCV_DEFAULT));
-	Config::setIntVar(DRONE_PORT_SEND, Config::getInt(DRONE_PORT_SEND, DRONE_PORT_SEND_DEFAULT));
-	Config::setIntVar(NET_FRAGMENT_SIZE, Config::getInt(NET_FRAGMENT_SIZE, NET_FRAGMENT_SIZE_DEFAULT));
-	Config::setIntVar(NET_FRAGMENT_NUMBER, Config::getInt(NET_FRAGMENT_NUMBER, NET_FRAGMENT_NUMBER_DEFAULT));
+	Config::setIntDefault(DRONE_PORT_RCV, DRONE_PORT_RCV_DEFAULT);
+	Config::setIntDefault(DRONE_PORT_SEND, DRONE_PORT_SEND_DEFAULT);
+	Config::setIntDefault(NET_FRAGMENT_SIZE, NET_FRAGMENT_SIZE_DEFAULT);
+	Config::setIntDefault(NET_FRAGMENT_NUMBER, NET_FRAGMENT_NUMBER_DEFAULT);
 }
 
 int DroneController::begin() {	
@@ -182,8 +182,8 @@ void DroneController::handleError(int error) {
 }
 
 int DroneController::discovery() {
-    int serverPort = Config::getIntVar(DRONE_PORT_DISCOVERY);
-    std::string serverAddr = Config::getStringVar(DRONE_ADDRESS);
+    int serverPort = Config::getInt(DRONE_PORT_DISCOVERY);
+    std::string serverAddr = Config::getString(DRONE_ADDRESS);
 	struct sockaddr_in client;
 
 	if (m_conSocket.openServer(serverAddr.c_str(), serverPort) == -1) {
@@ -196,51 +196,32 @@ int DroneController::discovery() {
         return -1;
 	}
 
-	std::string clientAddr = net::NetHelper::getIpv4Addr(client);
+	Config::setString(CTRL_ADDRESS, net::NetHelper::getIpv4Addr(client));
 
-	int clientRcvPort;
 	char buf[1024] = {0};
-	nlohmann::json json;
 
 	if (m_conSocket.receive(buf, 1024) == -1) {
 		logE << "Discovery: TCP receive client config failed" << std::endl;
 		return -1;
 	}
 
-	try {
-        json = nlohmann::json::parse(buf);
-		json[CTRL_PORT_RCV].get_to(clientRcvPort);
-	}
-	catch (...) {
+	if(Config::decodeJson(std::string(buf)) == -1) {
 		logE << "Discovery: Json parser error" << std::endl;
 		return -1;
 	}
-	
-    json = {
-        {DRONE_PORT_RCV, Config::getIntVar(DRONE_PORT_RCV)},
-		{DRONE_PORT_SEND, Config::getIntVar(DRONE_PORT_SEND)},
-		{NET_FRAGMENT_SIZE, Config::getIntVar(NET_FRAGMENT_SIZE)},
-		{NET_FRAGMENT_NUMBER, Config::getIntVar(NET_FRAGMENT_NUMBER)},
-		{VIDEO_FPS, Config::getIntVar(VIDEO_FPS)},
-		{VIDEO_CODEC, Config::getIntVar(VIDEO_CODEC)},
-		{VIDEO_FORMAT, Config::getIntVar(VIDEO_FORMAT)},
-		{VIDEO_WIDTH, Config::getIntVar(VIDEO_WIDTH)},
-		{VIDEO_HEIGHT, Config::getIntVar(VIDEO_HEIGHT)},
-		{AUDIO_CODEC, Config::getIntVar(AUDIO_CODEC)},
-		{AUDIO_FORMAT, Config::getIntVar(AUDIO_FORMAT)},
-		{AUDIO_SAMPLE, Config::getIntVar(AUDIO_SAMPLE)},
-		{AUDIO_BIT_RATE, Config::getIntVar(AUDIO_BIT_RATE)},
-		{AUDIO_CHANNELS, Config::getIntVar(AUDIO_CHANNELS)}
-    };
-    std::string msg = json.dump();
+	logI << "Discovery: receive client address:" <<  Config::getString(CTRL_ADDRESS)
+		<< " port:" << Config::getInt(CTRL_PORT_RCV) << std::endl;
+
+	std::string msg = Config::encodeJson({
+		DRONE_PORT_RCV, DRONE_PORT_SEND, NET_FRAGMENT_SIZE, NET_FRAGMENT_NUMBER,
+		VIDEO_FPS, VIDEO_CODEC, VIDEO_FORMAT, VIDEO_WIDTH, VIDEO_HEIGHT, 
+		AUDIO_CODEC, AUDIO_FORMAT, AUDIO_SAMPLE, AUDIO_BIT_RATE, AUDIO_CHANNELS
+	});
 
 	if (m_conSocket.send(msg.c_str(), msg.length()) == -1) {
 		logE << "Discovery: TCP send config failed" << std::endl;
 		return -1;
 	}
-
-	Config::setStringVar(CTRL_ADDRESS, clientAddr);
-	Config::setIntVar(CTRL_PORT_RCV, clientRcvPort);
 
 	m_conSocket.close();
 

@@ -15,9 +15,9 @@ PCSpeaker::PCSpeaker(IStreamListener& stream) : m_stream(stream) {
 
 int PCSpeaker::begin() {	
 	SDL_AudioSpec audio;
-	audio.freq = Config::getIntVar(AUDIO_SAMPLE);
+	audio.freq = Config::getInt(AUDIO_SAMPLE);
 	audio.format = getAudioFormat();
-	audio.channels = Config::getIntVar(AUDIO_CHANNELS);
+	audio.channels = Config::getInt(AUDIO_CHANNELS);
 	audio.silence = 0;
 	audio.samples = SDL_AUDIO_BUFFER_SIZE;
 	audio.callback = PCSpeaker::forwardCallback;
@@ -26,7 +26,7 @@ int PCSpeaker::begin() {
     m_streamLen = 0;
     m_streamPos = nullptr;
 
-    setVolume(Config::getIntVar(PC_VOLUME));
+    setVolume(Config::getInt(PC_VOLUME));
 
 	if (SDL_OpenAudio(&audio, NULL) < 0) {
 		logE << "PCSpeaker: couldn't open audio. " << SDL_GetError() << std::endl;
@@ -77,13 +77,13 @@ void PCSpeaker::setVolume(int volume) {
 }
 
 SDL_AudioFormat PCSpeaker::getAudioFormat() const {
-    if(Config::getIntVar(AUDIO_FORMAT) == AV_SAMPLE_FMT_U8) {
+    if(Config::getInt(AUDIO_FORMAT) == AV_SAMPLE_FMT_U8) {
         return AUDIO_U8;
-    } else if(Config::getIntVar(AUDIO_FORMAT) == AV_SAMPLE_FMT_S16) {
+    } else if(Config::getInt(AUDIO_FORMAT) == AV_SAMPLE_FMT_S16) {
         return AUDIO_S16;
-    } else if(Config::getIntVar(AUDIO_FORMAT) == AV_SAMPLE_FMT_S32) {
+    } else if(Config::getInt(AUDIO_FORMAT) == AV_SAMPLE_FMT_S32) {
         return AUDIO_S32;
-    } else if(Config::getIntVar(AUDIO_FORMAT) == AV_SAMPLE_FMT_FLT) {
+    } else if(Config::getInt(AUDIO_FORMAT) == AV_SAMPLE_FMT_FLT) {
         return AUDIO_F32;
     } else {
         return AUDIO_S16SYS;

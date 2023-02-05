@@ -25,11 +25,11 @@ protected:
         configFile.close();
         Config::init();
 
-        Config::setIntVar(DRONE_PORT_SEND, VAR_DRONE_PORT);
-        Config::setStringVar(DRONE_ADDRESS, VAR_DRONE_ADDRESS);
-        Config::setIntVar(CTRL_PORT_RCV, VAR_RCV_PORT);
-        Config::setIntVar(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE);
-        Config::setIntVar(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER);
+        Config::setInt(DRONE_PORT_SEND, VAR_DRONE_PORT);
+        Config::setString(DRONE_ADDRESS, VAR_DRONE_ADDRESS);
+        Config::setInt(CTRL_PORT_RCV, VAR_RCV_PORT);
+        Config::setInt(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE);
+        Config::setInt(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER);
     }
     void TearDown() override {
         remove(CONFIG_FILE);

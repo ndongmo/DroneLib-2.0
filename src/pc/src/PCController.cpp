@@ -54,14 +54,14 @@ void PCController::init() {
 void PCController::initConfigs() {
 	Controller::initConfigs();
 
-	Config::setIntVar(PC_VOLUME, Config::getInt(PC_VOLUME, PC_VOLUME_DEFAULT));
-	Config::setIntVar(PC_FONT_SIZE, Config::getInt(PC_FONT_SIZE, PC_FONT_SIZE_DEFAULT));
-	Config::setStringVar(PC_APP_NAME, Config::getString(PC_APP_NAME, PC_APP_NAME_DEFAULT));
+	Config::setIntDefault(PC_VOLUME, PC_VOLUME_DEFAULT);
+	Config::setIntDefault(PC_FONT_SIZE, PC_FONT_SIZE_DEFAULT);
+	Config::setStringDefault(PC_APP_NAME, PC_APP_NAME_DEFAULT);
 
-	Config::setIntVar(VIDEO_DST_WIDTH, Config::getInt(VIDEO_DST_WIDTH, VIDEO_DST_WIDTH_DEFAULT));
-	Config::setIntVar(VIDEO_DST_HEIGHT, Config::getInt(VIDEO_DST_HEIGHT, VIDEO_DST_HEIGHT_DEFAULT));
-	Config::setIntVar(CTRL_PORT_RCV, Config::getInt(CTRL_PORT_RCV, CTRL_PORT_RCV_DEFAULT));
-	Config::setIntVar(CTRL_PORT_SEND, Config::getInt(CTRL_PORT_SEND, CTRL_PORT_SEND_DEFAULT));
+	Config::setIntDefault(VIDEO_DST_WIDTH, VIDEO_DST_WIDTH_DEFAULT);
+	Config::setIntDefault(VIDEO_DST_HEIGHT, VIDEO_DST_HEIGHT_DEFAULT);
+	Config::setIntDefault(CTRL_PORT_RCV, CTRL_PORT_RCV_DEFAULT);
+	Config::setIntDefault(CTRL_PORT_SEND, CTRL_PORT_SEND_DEFAULT);
 }
 
 int PCController::begin() {	
@@ -163,70 +163,33 @@ void PCController::run() {
 }
 
 int PCController::discovery() {
-    int serverPort = Config::getIntVar(DRONE_PORT_DISCOVERY);
-    std::string serverAddr = Config::getStringVar(DRONE_ADDRESS);
+    int serverPort = Config::getInt(DRONE_PORT_DISCOVERY);
+    std::string serverAddr = Config::getString(DRONE_ADDRESS);
 
 	if (m_conSocket.openClient(serverAddr.c_str(), serverPort) == -1) {
 		logE << "Discovery: TCP open client error" << std::endl;
         return -1;
 	}
-	
-    nlohmann::json json = {
-        {CTRL_PORT_RCV, Config::getIntVar(CTRL_PORT_RCV)}
-    };
-    std::string msg = json.dump();
+
+	std::string msg = Config::encodeJson({ CTRL_PORT_RCV });
 
 	if (m_conSocket.send(msg.c_str(), msg.length()) == -1) {
 		logE << "Discovery: TCP send PC config failed" << std::endl;
 		return -1;
 	}
 
-	char buf[1024] = {0};
-	int droneRcvPort, droneSendPort, maxFragmentSize, maxFragmentNumber,
-		fps, width, height, vcodec, vformat, acodec, aformat, asample,
-		abitrate, achannels;
+	char buf[2048] = {0};
 
-	if (m_conSocket.receive(buf, 1024) == -1) {
+	if (m_conSocket.receive(buf, 2048) == -1) {
 		logE << "Discovery: TCP receive drone config failed" << std::endl;
 		return -1;
 	}
 
-	try {
-        json = nlohmann::json::parse(buf);
-		json[DRONE_PORT_RCV].get_to(droneRcvPort);
-		json[DRONE_PORT_SEND].get_to(droneSendPort);
-		json[NET_FRAGMENT_SIZE].get_to(maxFragmentSize);
-        json[NET_FRAGMENT_NUMBER].get_to(maxFragmentNumber);
-		json[VIDEO_FPS].get_to(fps);
-		json[VIDEO_CODEC].get_to(vcodec);
-		json[VIDEO_FORMAT].get_to(vformat);
-		json[VIDEO_WIDTH].get_to(width);
-		json[VIDEO_HEIGHT].get_to(height);
-		json[AUDIO_CODEC].get_to(acodec);
-		json[AUDIO_FORMAT].get_to(aformat);
-		json[AUDIO_SAMPLE].get_to(asample);
-		json[AUDIO_BIT_RATE].get_to(abitrate);
-		json[AUDIO_CHANNELS].get_to(achannels);
-	}
-	catch (...) {
-		logE << "Json parser error: " << json.dump() << std::endl;
+	if(Config::decodeJson(std::string(buf)) == -1) {
+		logE << "Discovery: Json parser error" << std::endl;
 		return -1;
 	}
-
-	Config::setIntVar(DRONE_PORT_RCV, droneRcvPort);
-	Config::setIntVar(DRONE_PORT_SEND, droneSendPort);
-	Config::setIntVar(NET_FRAGMENT_SIZE, maxFragmentSize);
-	Config::setIntVar(NET_FRAGMENT_NUMBER, maxFragmentNumber);
-	Config::setIntVar(VIDEO_FPS, fps);
-	Config::setIntVar(VIDEO_CODEC, vcodec);
-	Config::setIntVar(VIDEO_FORMAT, vformat);
-	Config::setIntVar(VIDEO_WIDTH, width);
-	Config::setIntVar(VIDEO_HEIGHT, height);
-	Config::setIntVar(AUDIO_CODEC, acodec);
-	Config::setIntVar(AUDIO_FORMAT, aformat);
-	Config::setIntVar(AUDIO_SAMPLE, asample);
-	Config::setIntVar(AUDIO_BIT_RATE, abitrate);
-	Config::setIntVar(AUDIO_CHANNELS, achannels);
+	logI << "Discovery: received from drone -> " <<  std::string(buf) << std::endl;
 
 	m_conSocket.close();
 

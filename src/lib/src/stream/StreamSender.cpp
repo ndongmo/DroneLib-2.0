@@ -95,7 +95,7 @@ void StreamSender::run() {
 void StreamSender::sendPacket() {	
 	StreamFragment sf;
 	sf.frameNumber = ++m_frameIndex;
-	sf.fragmentSize = Config::getIntVar(NET_FRAGMENT_SIZE) - NET_FRAME_HEADER - STREAM_FRAME_HEADER;
+	sf.fragmentSize = Config::getInt(NET_FRAGMENT_SIZE) - NET_FRAME_HEADER - STREAM_FRAME_HEADER;
 	sf.fragmentPerFrame = (int)std::ceil(m_packet->size / (float)sf.fragmentSize);
 	int total = (int)(sf.fragmentPerFrame * sf.fragmentSize);
 

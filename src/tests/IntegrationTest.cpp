@@ -3,7 +3,6 @@
 #include <fstream>
 #include <thread>
 #include <chrono>
-#include <nlohmann/json.hpp>
 
 #include <net/NetTcp.h>
 #include <net/NetHelper.h>
@@ -107,5 +106,4 @@ TEST_F(IntegrationTest, NavCmdsWork) {
     EXPECT_FALSE(motorCtrl.isOn(WHEEL_TL_FORWARD));
     EXPECT_FALSE(motorCtrl.isOn(WHEEL_BR_FORWARD));
     EXPECT_FALSE(motorCtrl.isOn(WHEEL_BL_FORWARD));
-    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
 }

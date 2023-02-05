@@ -3,7 +3,6 @@
 #include <fstream>
 #include <thread>
 #include <chrono>
-#include <nlohmann/json.hpp>
 
 #include <PCController.h>
 #include <Constants.h>
@@ -19,7 +18,6 @@ using namespace net;
 class PCControllerTest : public ::testing::Test {
 public:
     void discovery() {
-        int clientRcvPort;
         struct sockaddr_in client;
 
         EXPECT_EQ(tcpDrone.openServer(VAR_DRONE_ADDRESS, DRONE_PORT_DISCOVERY_DEFAULT), 1);
@@ -28,35 +26,32 @@ public:
         ASSERT_EQ(NetHelper::getIpv4Addr(client), VAR_DRONE_ADDRESS);
 
         char buf[1024];
-        nlohmann::json json;
         EXPECT_GT(tcpDrone.receive(buf, 1024), 0);
 
-        try {
-            json = nlohmann::json::parse(buf);
-            json[CTRL_PORT_RCV].get_to(clientRcvPort);
-        }
-        catch (...) {
-            FAIL();
-        }
-        ASSERT_EQ(clientRcvPort, CTRL_PORT_RCV_DEFAULT);
+        EXPECT_EQ(Config::decodeJson(std::string(buf)), 1);
+        ASSERT_EQ(Config::getInt(CTRL_PORT_RCV), CTRL_PORT_RCV_DEFAULT);
 
-        json = {
-            {DRONE_PORT_RCV, VAR_DRONE_RCV_PORT},
-            {DRONE_PORT_SEND, VAR_DRONE_SEND_PORT},
-            {NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE},
-            {NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER},
-            {VIDEO_FPS, VIDEO_FPS_VALUE},
-            {VIDEO_WIDTH, VIDEO_WIDTH_VALUE},
-            {VIDEO_HEIGHT, VIDEO_HEIGHT_VALUE},
-            {VIDEO_FORMAT, VIDEO_FORMAT_VALUE},
-            {VIDEO_CODEC, VIDEO_CODEC_VALUE},
-            {AUDIO_CODEC, AUDIO_CODEC_VALUE},
-            {AUDIO_FORMAT, AUDIO_FORMAT_VALUE},
-            {AUDIO_SAMPLE, AUDIO_SAMPLE_VALUE},
-            {AUDIO_BIT_RATE, AUDIO_BIT_RATE_VALUE},
-            {AUDIO_CHANNELS, AUDIO_CHANNELS_VALUE}
-        };
-        std::string msg = json.dump();
+        Config::setInt(DRONE_PORT_RCV, VAR_DRONE_RCV_PORT);
+        Config::setInt(DRONE_PORT_SEND, VAR_DRONE_SEND_PORT);
+        Config::setInt(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE);
+        Config::setInt(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER);
+        Config::setInt(VIDEO_FPS, VIDEO_FPS_VALUE);
+        Config::setInt(VIDEO_WIDTH, VIDEO_WIDTH_VALUE);
+        Config::setInt(VIDEO_HEIGHT, VIDEO_HEIGHT_VALUE);
+        Config::setInt(VIDEO_FORMAT, VIDEO_FORMAT_VALUE);
+        Config::setInt(VIDEO_CODEC, VIDEO_CODEC_VALUE);
+        Config::setInt(AUDIO_CODEC, AUDIO_CODEC_VALUE);
+        Config::setInt(AUDIO_FORMAT, AUDIO_FORMAT_VALUE);
+        Config::setInt(AUDIO_SAMPLE, AUDIO_SAMPLE_VALUE);
+        Config::setInt(AUDIO_BIT_RATE, AUDIO_BIT_RATE_VALUE);
+        Config::setInt(AUDIO_CHANNELS, AUDIO_CHANNELS_VALUE);
+
+        std::string msg = Config::encodeJson({
+            DRONE_PORT_RCV, DRONE_PORT_SEND, NET_FRAGMENT_SIZE, NET_FRAGMENT_NUMBER,
+            VIDEO_FPS, VIDEO_CODEC, VIDEO_FORMAT, VIDEO_WIDTH, VIDEO_HEIGHT, 
+            AUDIO_CODEC, AUDIO_FORMAT, AUDIO_SAMPLE, AUDIO_BIT_RATE, AUDIO_CHANNELS
+        });
+
         EXPECT_GT(tcpDrone.send(msg.c_str(), msg.length()), 0);
     }
 
@@ -105,20 +100,20 @@ TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
     droneProcess.join();
     clientProcess.join();
 
-    ASSERT_EQ(VAR_DRONE_RCV_PORT, Config::getIntVar(DRONE_PORT_RCV));
-    ASSERT_EQ(VAR_DRONE_SEND_PORT, Config::getIntVar(DRONE_PORT_SEND));
-    ASSERT_EQ(MAX_FRAGMENT_SIZE, Config::getIntVar(NET_FRAGMENT_SIZE));
-    ASSERT_EQ(MAX_FRAGMENT_NUMBER, Config::getIntVar(NET_FRAGMENT_NUMBER));
-    ASSERT_EQ(VIDEO_FPS_VALUE, Config::getIntVar(VIDEO_FPS));
-    ASSERT_EQ(VIDEO_WIDTH_VALUE, Config::getIntVar(VIDEO_WIDTH));
-    ASSERT_EQ(VIDEO_HEIGHT_VALUE, Config::getIntVar(VIDEO_HEIGHT));
-    ASSERT_EQ(VIDEO_FORMAT_VALUE, Config::getIntVar(VIDEO_FORMAT));
+    ASSERT_EQ(VAR_DRONE_RCV_PORT, Config::getInt(DRONE_PORT_RCV));
+    ASSERT_EQ(VAR_DRONE_SEND_PORT, Config::getInt(DRONE_PORT_SEND));
+    ASSERT_EQ(MAX_FRAGMENT_SIZE, Config::getInt(NET_FRAGMENT_SIZE));
+    ASSERT_EQ(MAX_FRAGMENT_NUMBER, Config::getInt(NET_FRAGMENT_NUMBER));
+    ASSERT_EQ(VIDEO_FPS_VALUE, Config::getInt(VIDEO_FPS));
+    ASSERT_EQ(VIDEO_WIDTH_VALUE, Config::getInt(VIDEO_WIDTH));
+    ASSERT_EQ(VIDEO_HEIGHT_VALUE, Config::getInt(VIDEO_HEIGHT));
+    ASSERT_EQ(VIDEO_FORMAT_VALUE, Config::getInt(VIDEO_FORMAT));
 
-    ASSERT_EQ(AUDIO_CODEC_VALUE, Config::getIntVar(AUDIO_CODEC));
-    ASSERT_EQ(AUDIO_FORMAT_VALUE, Config::getIntVar(AUDIO_FORMAT));
-    ASSERT_EQ(AUDIO_SAMPLE_VALUE, Config::getIntVar(AUDIO_SAMPLE));
-    ASSERT_EQ(AUDIO_BIT_RATE_VALUE, Config::getIntVar(AUDIO_BIT_RATE));
-    ASSERT_EQ(AUDIO_CHANNELS_VALUE, Config::getIntVar(AUDIO_CHANNELS));
+    ASSERT_EQ(AUDIO_CODEC_VALUE, Config::getInt(AUDIO_CODEC));
+    ASSERT_EQ(AUDIO_FORMAT_VALUE, Config::getInt(AUDIO_FORMAT));
+    ASSERT_EQ(AUDIO_SAMPLE_VALUE, Config::getInt(AUDIO_SAMPLE));
+    ASSERT_EQ(AUDIO_BIT_RATE_VALUE, Config::getInt(AUDIO_BIT_RATE));
+    ASSERT_EQ(AUDIO_CHANNELS_VALUE, Config::getInt(AUDIO_CHANNELS));
 }
 
 // Tests PCController end

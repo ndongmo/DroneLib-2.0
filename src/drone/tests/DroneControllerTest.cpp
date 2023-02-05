@@ -9,7 +9,6 @@
 #include <net/NetTcp.h>
 #include <utils/Constants.h>
 #include <utils/Config.h>
-#include <nlohmann/json.hpp>
 #include <controller/LedController.h>
 
 using namespace utils;
@@ -29,33 +28,21 @@ public:
     void discovery() {
         EXPECT_EQ(tcpClient.openClient(VAR_DRONE_ADDRESS, DRONE_PORT_DISCOVERY_DEFAULT), 1);
 
-        nlohmann::json json = {
-            {CTRL_PORT_RCV, VAR_CLIENT_RCV_PORT}
-        };
-        std::string msg = json.dump();
+        Config::setInt(CTRL_PORT_RCV, VAR_CLIENT_RCV_PORT);
+        
+        std::string msg = Config::encodeJson({ CTRL_PORT_RCV });
 
         EXPECT_GT(tcpClient.send(msg.c_str(), msg.length()), 0);
 
         char buf[1024];
-        int droneRcvPort, droneSendPort, maxFragmentSize, maxFragmentNumber;
 
         EXPECT_GT(tcpClient.receive(buf, 1024), 0);
+        EXPECT_EQ(Config::decodeJson(std::string(buf)), 1);
 
-        try {
-            json = nlohmann::json::parse(buf);
-            json[DRONE_PORT_RCV].get_to(droneRcvPort);
-            json[DRONE_PORT_SEND].get_to(droneSendPort);
-            json[NET_FRAGMENT_SIZE].get_to(maxFragmentSize);
-            json[NET_FRAGMENT_NUMBER].get_to(maxFragmentNumber);
-        }
-        catch (...) {
-            FAIL();
-        }
-
-        ASSERT_EQ(droneRcvPort, DRONE_PORT_RCV_DEFAULT);
-        ASSERT_EQ(droneSendPort, DRONE_PORT_SEND_DEFAULT);
-        ASSERT_EQ(maxFragmentSize, NET_FRAGMENT_SIZE_DEFAULT);
-        ASSERT_EQ(maxFragmentNumber, NET_FRAGMENT_NUMBER_DEFAULT);
+        ASSERT_EQ(Config::getInt(DRONE_PORT_RCV), DRONE_PORT_RCV_DEFAULT);
+        ASSERT_EQ(Config::getInt(DRONE_PORT_SEND), DRONE_PORT_SEND_DEFAULT);
+        ASSERT_EQ(Config::getInt(NET_FRAGMENT_SIZE), NET_FRAGMENT_SIZE_DEFAULT);
+        ASSERT_EQ(Config::getInt(NET_FRAGMENT_NUMBER), NET_FRAGMENT_NUMBER_DEFAULT);
     }
 
     MockDroneController ctrl;
@@ -93,8 +80,8 @@ TEST_F(DroneControllerTest, DiscoveryWithDefaultConfigWorks) {
     droneProcess.join();
     clientProcess.join();
 
-    ASSERT_EQ(VAR_DRONE_ADDRESS, Config::getStringVar(DRONE_ADDRESS));
-    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getIntVar(CTRL_PORT_RCV));
+    ASSERT_EQ(VAR_DRONE_ADDRESS, Config::getString(DRONE_ADDRESS));
+    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getInt(CTRL_PORT_RCV));
     ASSERT_EQ(ctrl.end(), 1);
 }
 
@@ -113,8 +100,8 @@ TEST_F(DroneControllerTest, RunWorks) {
 
     clientProcess.join();
     
-    ASSERT_EQ(VAR_DRONE_ADDRESS, Config::getStringVar(DRONE_ADDRESS));
-    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getIntVar(CTRL_PORT_RCV));
+    ASSERT_EQ(VAR_DRONE_ADDRESS, Config::getString(DRONE_ADDRESS));
+    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getInt(CTRL_PORT_RCV));
     ASSERT_EQ(ctrl.getState(), APP_RUNNING);
 
     ASSERT_EQ(ctrl.end(), 1);

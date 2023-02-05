@@ -15,7 +15,7 @@ namespace stream {
 int VideoReceiver::begin() {
 	StreamReceiver::begin();
 	
-	m_decoder.codec = avcodec_find_decoder((AVCodecID)Config::getIntVar(VIDEO_CODEC));
+	m_decoder.codec = avcodec_find_decoder((AVCodecID)Config::getInt(VIDEO_CODEC));
 	if (!m_decoder.codec) {
 		logE << "VideoReceiver: video codec not found!" << std::endl;
 		return -1;
@@ -27,15 +27,15 @@ int VideoReceiver::begin() {
 		return -1;
 	}
 	
-	m_decoder.codecCtx->bit_rate = Config::getIntVar(VIDEO_BIT_RATE);
-	m_decoder.codecCtx->width = Config::getIntVar(VIDEO_WIDTH);
-	m_decoder.codecCtx->height = Config::getIntVar(VIDEO_HEIGHT);
-	m_decoder.codecCtx->time_base = (AVRational){1, Config::getIntVar(VIDEO_FPS)};
-	m_decoder.codecCtx->framerate = (AVRational){Config::getIntVar(VIDEO_FPS), 1};
+	m_decoder.codecCtx->bit_rate = Config::getInt(VIDEO_BIT_RATE);
+	m_decoder.codecCtx->width = Config::getInt(VIDEO_WIDTH);
+	m_decoder.codecCtx->height = Config::getInt(VIDEO_HEIGHT);
+	m_decoder.codecCtx->time_base = (AVRational){1, Config::getInt(VIDEO_FPS)};
+	m_decoder.codecCtx->framerate = (AVRational){Config::getInt(VIDEO_FPS), 1};
 
 	m_decoder.codecCtx->gop_size = 10; /* emit one intra frame every ten frames */
 	m_decoder.codecCtx->max_b_frames = 1;
-	m_decoder.codecCtx->pix_fmt = (AVPixelFormat)Config::getIntVar(VIDEO_FORMAT);
+	m_decoder.codecCtx->pix_fmt = (AVPixelFormat)Config::getInt(VIDEO_FORMAT);
 
 	if (m_decoder.codec->id == AV_CODEC_ID_H264) {
         av_opt_set(m_decoder.codecCtx->priv_data, "preset", "slow", 0);
@@ -69,13 +69,13 @@ int VideoReceiver::begin() {
 	m_decoder.frame->width  = m_decoder.codecCtx->width;
 	m_decoder.frame->height = m_decoder.codecCtx->height;
 
-	m_decoder.frameScl->format = (AVPixelFormat)Config::getIntVar(VIDEO_DST_FORMAT);
-    m_decoder.frameScl->width  = Config::getIntVar(VIDEO_DST_WIDTH);
-    m_decoder.frameScl->height = Config::getIntVar(VIDEO_DST_HEIGHT);
+	m_decoder.frameScl->format = (AVPixelFormat)Config::getInt(VIDEO_DST_FORMAT);
+    m_decoder.frameScl->width  = Config::getInt(VIDEO_DST_WIDTH);
+    m_decoder.frameScl->height = Config::getInt(VIDEO_DST_HEIGHT);
 
 	m_decoder.convertCtx = sws_getContext(m_decoder.codecCtx->width, m_decoder.codecCtx->height, 
-		m_decoder.codecCtx->pix_fmt, Config::getIntVar(VIDEO_DST_WIDTH), Config::getIntVar(VIDEO_DST_HEIGHT), 
-		(AVPixelFormat)Config::getIntVar(VIDEO_DST_FORMAT), SWS_SPLINE, NULL, NULL, NULL);
+		m_decoder.codecCtx->pix_fmt, Config::getInt(VIDEO_DST_WIDTH), Config::getInt(VIDEO_DST_HEIGHT), 
+		(AVPixelFormat)Config::getInt(VIDEO_DST_FORMAT), SWS_SPLINE, NULL, NULL, NULL);
 
 	if (!m_decoder.convertCtx) {
 		logE << "VideoReceiver: could not create scale context for the conversion" << std::endl;
@@ -92,8 +92,8 @@ int VideoReceiver::begin() {
 		return -1;
 	}
 
-	m_size = av_image_get_buffer_size((AVPixelFormat)Config::getIntVar(VIDEO_DST_FORMAT), 
-		Config::getIntVar(VIDEO_DST_WIDTH), Config::getIntVar(VIDEO_DST_HEIGHT), 1);
+	m_size = av_image_get_buffer_size((AVPixelFormat)Config::getInt(VIDEO_DST_FORMAT), 
+		Config::getInt(VIDEO_DST_WIDTH), Config::getInt(VIDEO_DST_HEIGHT), 1);
 	m_data = new UINT8[m_size];
 
 	return 1;

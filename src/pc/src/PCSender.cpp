@@ -14,9 +14,9 @@ int PCSender::begin() {
 		return -1;
 	}
 
-	int sendPort = Config::getIntVar(CTRL_PORT_SEND);
-	int droneRcvPort = Config::getIntVar(DRONE_PORT_RCV);
-    std::string droneAddr = Config::getStringVar(DRONE_ADDRESS);
+	int sendPort = Config::getInt(CTRL_PORT_SEND);
+	int droneRcvPort = Config::getInt(DRONE_PORT_RCV);
+    std::string droneAddr = Config::getString(DRONE_ADDRESS);
 
 	if (m_sendSocket.open(droneAddr.c_str(), droneRcvPort, "", sendPort) == -1) {
 		logE << "UDP send socket open error" << std::endl;

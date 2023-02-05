@@ -14,7 +14,7 @@ VideoSender::VideoSender(NetSender &sender) : StreamSender(sender) {
 }
 
 int VideoSender::begin() {
-	m_filename = Config::getStringVar(VIDEO_DEVICE);
+	m_filename = Config::getString(VIDEO_DEVICE);
 	
 	if(StreamSender::begin() == -1) {
 		return -1;
@@ -27,11 +27,11 @@ int VideoSender::begin() {
 	" width=" << m_ifmt_ctx->streams[0]->codecpar->width <<
 	" height=" << m_ifmt_ctx->streams[0]->codecpar->height << std::endl;
 
-	Config::setIntVar(VIDEO_FPS, m_ifmt_ctx->streams[0]->r_frame_rate.num);
-	Config::setIntVar(VIDEO_CODEC, m_ifmt_ctx->streams[0]->codecpar->codec_id);
-	Config::setIntVar(VIDEO_FORMAT, m_ifmt_ctx->streams[0]->codecpar->format);
-	Config::setIntVar(VIDEO_WIDTH, m_ifmt_ctx->streams[0]->codecpar->width);
-	Config::setIntVar(VIDEO_HEIGHT, m_ifmt_ctx->streams[0]->codecpar->height);
+	Config::setInt(VIDEO_FPS, m_ifmt_ctx->streams[0]->r_frame_rate.num);
+	Config::setInt(VIDEO_CODEC, m_ifmt_ctx->streams[0]->codecpar->codec_id);
+	Config::setInt(VIDEO_FORMAT, m_ifmt_ctx->streams[0]->codecpar->format);
+	Config::setInt(VIDEO_WIDTH, m_ifmt_ctx->streams[0]->codecpar->width);
+	Config::setInt(VIDEO_HEIGHT, m_ifmt_ctx->streams[0]->codecpar->height);
 	
 	return 1;
 }

@@ -10,9 +10,9 @@ using namespace utils;
 #define TEXT_MARGIN 5
 
 int PCWindow::begin() {	
-	m_width = Config::getIntVar(VIDEO_DST_WIDTH);
-    m_height = Config::getIntVar(VIDEO_DST_HEIGHT);
-    m_format = Config::getIntVar(VIDEO_FORMAT);
+	m_width = Config::getInt(VIDEO_DST_WIDTH);
+    m_height = Config::getInt(VIDEO_DST_HEIGHT);
+    m_format = Config::getInt(VIDEO_FORMAT);
     
     if(SDL_WasInit(SDL_INIT_EVERYTHING) != SDL_INIT_EVERYTHING) {
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -35,12 +35,12 @@ int PCWindow::begin() {
             return -1;
         }
     }
-    if((m_font = TTF_OpenFont(PC_FONT_TYPE_DEFAULT, Config::getIntVar(PC_FONT_SIZE))) == nullptr) {
+    if((m_font = TTF_OpenFont(PC_FONT_TYPE_DEFAULT, Config::getInt(PC_FONT_SIZE))) == nullptr) {
         logE << "Font initialization error: " << TTF_GetError() << std::endl;
 		return -1;
     }
 
-    SDL_SetWindowTitle(m_window, Config::getStringVar(PC_APP_NAME).c_str());
+    SDL_SetWindowTitle(m_window, Config::getString(PC_APP_NAME).c_str());
     SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     
     m_txt_color = { 0x00, 0x00, 0x00, 0xFF };
@@ -181,18 +181,18 @@ void PCWindow::updateState(utils::AppState state, int error) {
     }
     else if(state == APP_DISCOVERING) {
         str = "Drone discovering ongoing on ip [" + 
-            Config::getStringVar(DRONE_ADDRESS) + "] and port [" +
-            std::to_string(Config::getIntVar(DRONE_PORT_DISCOVERY)) + "] ...";
+            Config::getString(DRONE_ADDRESS) + "] and port [" +
+            std::to_string(Config::getInt(DRONE_PORT_DISCOVERY)) + "] ...";
     }
     else if(state == APP_RUNNING) {
-        str = "FPS: " + std::to_string(Config::getIntVar(VIDEO_FPS));
+        str = "FPS: " + std::to_string(Config::getInt(VIDEO_FPS));
 
-        if(Config::getIntVar(VIDEO_WIDTH) != m_width || 
-            Config::getIntVar(VIDEO_HEIGHT) != m_height || 
-            Config::getIntVar(VIDEO_FORMAT) != m_format) {
+        if(Config::getInt(VIDEO_WIDTH) != m_width || 
+            Config::getInt(VIDEO_HEIGHT) != m_height || 
+            Config::getInt(VIDEO_FORMAT) != m_format) {
 
-            Config::setIntVar(VIDEO_DST_WIDTH, Config::getIntVar(VIDEO_WIDTH));
-            Config::setIntVar(VIDEO_DST_HEIGHT, Config::getIntVar(VIDEO_HEIGHT));
+            Config::setInt(VIDEO_DST_WIDTH, Config::getInt(VIDEO_WIDTH));
+            Config::setInt(VIDEO_DST_HEIGHT, Config::getInt(VIDEO_HEIGHT));
 
             clean();
             begin();

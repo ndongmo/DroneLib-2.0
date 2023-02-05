@@ -15,8 +15,8 @@ void FPSLimiter::end() {
     calculateFPS();
 
     float frameTicks = (float) (SDL_GetTicks() - m_startTicks);
-    if (1000.0f / Config::getIntVar(VIDEO_FPS) > frameTicks) {
-        SDL_Delay((unsigned int)(1000.0f / Config::getIntVar(VIDEO_FPS) - frameTicks));
+    if (1000.0f / Config::getInt(VIDEO_FPS) > frameTicks) {
+        SDL_Delay((unsigned int)(1000.0f / Config::getInt(VIDEO_FPS) - frameTicks));
     }
 }
 

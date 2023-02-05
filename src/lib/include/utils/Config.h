@@ -9,8 +9,8 @@
 #pragma once
 
 #include <string>
+#include <initializer_list>
 #include <unordered_map>
-#include <nlohmann/json.hpp>
 
 #define CONFIG_FILE "config.json"
 
@@ -34,94 +34,66 @@ public:
 	static bool exists();
 
 	/**
-	 * Retrieve the requested int value.
-	 * \param key the requested attribute name
-	 * \param defaultValue returned value in case the key is not found
-	 * \return the int value if the key is found, otherwise the default value
-	 */
-	static int getInt(const char *key, int defaultValue);
-
-	/**
 	 * Retrieve the requested int variable from the global buffer.
 	 * \param key the requested attribute name
 	 * \return the int value if the key is found, otherwise raise a warning and return 0
 	 */
-	static int getIntVar(const char *key);
+	static int getInt(const char *key);
 
 	/**
-	 * Retrieve the requested int value and set the given reference.
-	 * \param key the requested attribute name
-	 * \param value reference of the value to set
-	 * \return true if the value has been set, false otherwise
-	 */
-	static bool setInt(const char *key, int &value);
-
-	/**
-	 * Set the value of the given int variable in the global buffer.
-	 * \param key the requested attribute name
-	 * \param value the new value of the variable
-	 */
-	static void setIntVar(const char *key, int value);
-
-	/**
-	 * Retrieve the requested string value.
-	 * \param key the requested attribute name
-	 * \param defaultValue returned value in case the key is not found
-	 * \return the string value if the key is found, otherwise the default value
-	 */
-	static std::string getString(const char *key, std::string defaultValue);
-
-	/**
-	 * Retrieve the requested string variable from the global buffer.
+	 * Retrieve the requested string key from the global buffer.
 	 * \param key the requested attribute name
 	 * \return the int value if the key is found, otherwise raise a warning and return 0
 	 */
-	static std::string getStringVar(const char *key);
+	static std::string getString(const char *key);
 
 	/**
-	 * Retrieve the requested string value and set the given reference.
+	 * Set the value of the given int key in the global buffer.
 	 * \param key the requested attribute name
-	 * \param value reference of the value to set
-	 * \return true if the value has been set, false otherwise
+	 * \param value the new value of the key
 	 */
-	static bool setString(const char *key, std::string &value);
+	static void setInt(const char *key, int value);
 
 	/**
-	 * Set the value of the given string variable in the global buffer.
+	 * Set the value of the given int key in the global buffer only if 
+	 * it is not already set.
 	 * \param key the requested attribute name
-	 * \param value the new value of the variable
+	 * \param value the new value of the key
 	 */
-	static void setStringVar(const char *key, const std::string &value);
+	static void setIntDefault(const char *key, int value);
 
 	/**
-	 * Retrieve the requested value. String litteral should be cast as std::string
-	 * before sending as parameter.
+	 * Set the value of the given string key in the global buffer.
 	 * \param key the requested attribute name
-	 * \param defaultValue returned value in case the key is not found
-	 * \return the stored value if the key is found, otherwise the default value
+	 * \param value the new value of the key
 	 */
-	template<typename T>
-	static T get(const char *key, T defaultValue) {
-		if(m_config.m_json.contains(key)) {
-			m_config.m_json[key].get_to(defaultValue);
-		}
-		return defaultValue;
-	}
+	static void setString(const char *key, const std::string &value);
 
 	/**
-	 * Retrieve the requested value and set the given reference.
+	 * Set the value of the given string key in the global buffer only if
+	 * it is not already set.
 	 * \param key the requested attribute name
-	 * \param value reference of the value to set
-	 * \return true if the value has been set, false otherwise
+	 * \param value the new value of the key
 	 */
-	template<typename T>
-	static bool set(const char *key, T& value) {
-		if(m_config.m_json.contains(key)) {
-			m_config.m_json[key].get_to(value);
-			return true;
-		}
-		return false;
-	}
+	static void setStringDefault(const char *key, const std::string &value);
+
+	/**
+	 * @brief Encode the given list of keys with their values into json string.
+	 * The key -> value pairs must have been set beforehand.
+	 * 
+	 * @param keys the list of keys to encode
+	 * @return json string 
+	 */
+	static std::string encodeJson(const std::initializer_list<const std::string> &keys);
+
+	/**
+	 * @brief Decode the given json string and store the couple key -> value into the 
+	 * global buffer.
+	 * 
+	 * @param json the json string to decode
+	 * @return int 1 if the decoding was succeed, otherwise -1
+	 */
+	static int decodeJson(const std::string& json);
 
 private:
 	/**
@@ -138,11 +110,6 @@ private:
 	 * Keep the config initialization state.
 	 */
 	bool m_init;
-
-	/**
-	 * Json instance keeping the file data.
-	 */
-	nlohmann::json m_json;
 
 	/**
 	 * Int data buffer.

@@ -30,47 +30,57 @@ protected:
 };
 
 // Tests Config get/set returning expected value
-TEST_F(ConfigTest, GetIntReturnExpectedValue) {
-    int var1, var2;
-    std::string var3, var4;
-
-    EXPECT_EQ(Config::getInt(INT_NAME, 0), INT_VALUE);
-    EXPECT_EQ(Config::getString(STRING_NAME, ""), STRING_VALUE);
-    EXPECT_TRUE(Config::setInt(INT_NAME, var1));
-    EXPECT_TRUE(Config::setString(STRING_NAME, var3));
-    EXPECT_EQ(Config::get(INT_NAME, 0), INT_VALUE);
-    EXPECT_EQ(Config::get(STRING_NAME, std::string("")), STRING_VALUE);
-    EXPECT_TRUE(Config::set(INT_NAME, var2));
-    EXPECT_TRUE(Config::set(STRING_NAME, var4));
-    EXPECT_EQ(var1, INT_VALUE);
-    EXPECT_EQ(var3, STRING_VALUE);
-    EXPECT_EQ(var2, INT_VALUE);
-    EXPECT_EQ(var4, STRING_VALUE);
-}
-
-// Tests Config get/set returning expected value
-TEST_F(ConfigTest, GetIntVarReturnExpectedValue) {
-    Config::setIntVar(INT_NAME, INT_VALUE);
-    Config::setStringVar(STRING_NAME, STRING_VALUE);
-
-    EXPECT_EQ(Config::getIntVar(INT_NAME), INT_VALUE);
-    EXPECT_EQ(Config::getStringVar(STRING_NAME), STRING_VALUE);
+TEST_F(ConfigTest, GetReturnExpectedValue) {
+    EXPECT_EQ(Config::getInt(INT_NAME), INT_VALUE);
+    EXPECT_EQ(Config::getString(STRING_NAME), STRING_VALUE);
 }
 
 // Tests Config get/set returning unexpected value
-TEST_F(ConfigTest, GetIntReturnUnexpectedValue) {
-    int var1, var2;
-    int def1 = 35;
-    std::string var3, var4;
-    std::string def2 = "default";
-    const char *NOT_EXIST = "not_exist";
+TEST_F(ConfigTest, GetReturnUnexpectedValue) {
+    EXPECT_EQ(Config::getInt(STRING_VALUE), 0);
+    EXPECT_EQ(Config::getString(STRING_VALUE), "");
+}
 
-    EXPECT_EQ(Config::getInt(NOT_EXIST, def1), def1);
-    EXPECT_EQ(Config::getString(NOT_EXIST, def2), def2);
-    EXPECT_FALSE(Config::setInt(NOT_EXIST, var1));
-    EXPECT_FALSE(Config::setString(NOT_EXIST, var3));
-    EXPECT_EQ(Config::get(NOT_EXIST, def1), def1);
-    EXPECT_EQ(Config::get(NOT_EXIST, def2), def2);
-    EXPECT_FALSE(Config::set(NOT_EXIST, var2));
-    EXPECT_FALSE(Config::set(NOT_EXIST, var4));
+// Tests Config encode/decode json return expected value
+TEST_F(ConfigTest, EncodeAndDecodeJson) {
+    int eivar1 = 234, eivar2 = 98783, eivar3 = 0;
+    std::string esvar1 = "my value to is : not ", esvar2 = ";:sisf", esvar3 = "";
+    std::string ikey1 = "KEY1", ikey2 = "SssS:EG", ikey3 = "KEY3 SF";
+    std::string skey1 = "23SKEY1", skey2 = "2SsffsS:EG", skey3 = "KEY3sfdsf2 SF";
+
+    Config::setInt(ikey1.c_str(), eivar1);
+    Config::setInt(ikey2.c_str(), eivar2);
+    Config::setInt(ikey3.c_str(), eivar3);
+
+    Config::setString(skey1.c_str(), esvar1);
+    Config::setString(skey2.c_str(), esvar2);
+    Config::setString(skey3.c_str(), esvar3);
+
+    std::string estr = Config::encodeJson({ikey1, ikey2, ikey3, skey1, skey2, skey3});
+    std::string exp = "{\"" + 
+        ikey1 + "\" : " + std::to_string(eivar1) + ",\"" +
+        ikey2 + "\" : " + std::to_string(eivar2) + ",\"" +
+        ikey3 + "\" : " + std::to_string(eivar3) + ",\"" +
+        skey1 + "\" : \"" + esvar1 + "\",\"" +
+        skey2 + "\" : \"" + esvar2 + "\",\"" +
+        skey3 + "\" : \"" + esvar3 +
+    "\"}";
+
+    EXPECT_EQ(estr, exp);
+
+    Config::setInt(ikey1.c_str(), 0);
+    Config::setInt(ikey2.c_str(), 0);
+    Config::setInt(ikey3.c_str(), 0);
+
+    Config::setString(skey1.c_str(), "");
+    Config::setString(skey2.c_str(), "");
+    Config::setString(skey3.c_str(), "");
+
+    EXPECT_EQ(Config::decodeJson(estr), 1);
+    EXPECT_EQ(Config::getInt(ikey1.c_str()), eivar1);
+    EXPECT_EQ(Config::getInt(ikey2.c_str()), eivar2);
+    EXPECT_EQ(Config::getInt(ikey3.c_str()), eivar3);
+    EXPECT_EQ(Config::getString(skey1.c_str()), esvar1);
+    EXPECT_EQ(Config::getString(skey2.c_str()), esvar2);
+    EXPECT_EQ(Config::getString(skey3.c_str()), esvar3);
 }

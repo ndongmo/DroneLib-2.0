@@ -15,8 +15,8 @@ NetSender::NetSender() {
 }
 
 int NetSender::begin() {
-	m_seqBuf = new int[Config::getIntVar(NET_FRAGMENT_NUMBER)]();
-	m_buffer = new UINT8[Config::getIntVar(NET_FRAGMENT_SIZE)]();
+	m_seqBuf = new int[Config::getInt(NET_FRAGMENT_NUMBER)]();
+	m_buffer = new UINT8[Config::getInt(NET_FRAGMENT_SIZE)]();
 
 	return 1;
 }
@@ -102,7 +102,7 @@ void NetSender::sendFrame(int id, int type, const char* format, ...) {
 
 void NetSender::sendFrame(int id, int type, const StreamFragment &fragment) {
 	int totalSize = NET_FRAME_HEADER + STREAM_FRAME_HEADER + fragment.fragmentSize;
-	if(totalSize > Config::getIntVar(NET_FRAGMENT_SIZE)) {
+	if(totalSize > Config::getInt(NET_FRAGMENT_SIZE)) {
 		logE << "NetSender: data size is bigger than the buffer size" << std::endl;
 		return;
 	}
@@ -148,7 +148,7 @@ int NetSender::getLength(const char* format) {
 
 UINT8 NetSender::getNextSeqID(int id) {
 	m_seqBuf[id]++;
-	if (m_seqBuf[id] >= Config::getIntVar(NET_FRAGMENT_NUMBER)) {
+	if (m_seqBuf[id] >= Config::getInt(NET_FRAGMENT_NUMBER)) {
 		 m_seqBuf[id] = 0;
 	}
 	return m_seqBuf[id];
