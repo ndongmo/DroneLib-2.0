@@ -159,11 +159,18 @@ void NetSender::addCommand(int id, unsigned int frequency) {
 	m_currentFreqs[id] = 0;
 }
 
-bool NetSender::canSend(int id, int deltatime) {
+bool NetSender::CheckAndUpdateSend(int id, int deltatime) {
+	bool ret = true;
+
 	if(m_freqs.find(id) != m_freqs.end()) {
-		return m_freqs[id] <= m_currentFreqs[id] + deltatime;
+		ret = m_freqs[id] <= m_currentFreqs[id] + deltatime;
 	}
-	return true;
+	if(ret) {
+		m_currentFreqs[id] = 0;
+	} else {
+		m_currentFreqs[id] += deltatime;
+	}
+	return ret;
 }
 
 bool NetSender::isConnected() {
@@ -175,11 +182,8 @@ void NetSender::sendAck(UINT8 id, UINT8 seq) {
 }
 
 void NetSender::sendPing(int deltatime, UINT8 seq) {
-	if(canSend(NS_ID_PING, deltatime)) {
+	if(CheckAndUpdateSend(NS_ID_PING, deltatime)) {
 		sendFrame(NS_ID_PING, NS_FRAME_TYPE_DATA, "1", seq);
-		m_currentFreqs[NS_ID_PING] = 0;
-	} else {
-		m_currentFreqs[NS_ID_PING] += deltatime;
 	}
 }
 

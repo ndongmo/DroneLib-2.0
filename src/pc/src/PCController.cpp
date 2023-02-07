@@ -231,6 +231,18 @@ void PCController::handleEvents(int elapsedTime) {
 		else if (m_evHandler.isEventDown(CtrlEvent::GO_RIGHT)) {
 			m_sender.sendNav(elapsedTime, DIR_RIGHT, getSpeed());
 		}
+		else if (m_evHandler.isEventDown(CtrlEvent::CAM_UP)) {
+			m_sender.sendCamera(elapsedTime, CAMERA_Y_AXE, CAMERA_ROTATION_ANGLE);
+		}
+		else if (m_evHandler.isEventDown(CtrlEvent::CAM_DOWN)) {
+			m_sender.sendCamera(elapsedTime, CAMERA_Y_AXE, -CAMERA_ROTATION_ANGLE);
+		}
+		else if (m_evHandler.isEventDown(CtrlEvent::CAM_LEFT)) {
+			m_sender.sendCamera(elapsedTime, CAMERA_X_AXE, -CAMERA_ROTATION_ANGLE);
+		}
+		else if (m_evHandler.isEventDown(CtrlEvent::CAM_RIGHT)) {
+			m_sender.sendCamera(elapsedTime, CAMERA_X_AXE, CAMERA_ROTATION_ANGLE);
+		}
 	}
 
 	if(m_oldState != copyState) {

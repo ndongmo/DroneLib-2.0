@@ -10,6 +10,7 @@
 
 #include "DroneSender.h"
 #include "controller/MotorController.h"
+#include "controller/ServoController.h"
 
 #include <net/NetReceiver.h>
 
@@ -27,8 +28,9 @@ public:
      * 
      * @param sender drone network sender reference
      * @param motorCtrl motor controller reference
+     * @param servoCtrl servo controller reference
      */
-    DroneReceiver(DroneSender& sender, MotorController& motorCtrl);
+    DroneReceiver(DroneSender& sender, MotorController& motorCtrl, ServoController& servoCtrl);
 
     int begin() override;
 
@@ -39,4 +41,6 @@ private:
     DroneSender& m_droneSender;
     /** Motor controller reference */
     MotorController& m_motorCtrl;
+    /** Servo controller reference */
+    ServoController& m_servoCtrl;
 };

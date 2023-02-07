@@ -12,6 +12,9 @@
 
 #define MOTOR_FREQUENCY     50 // Motor frequency in Hz between 40 and 1600
 #define WHEEL_COUNT         8  // Wheel actions count
+#define SERVO_COUNT         2  // Number of servo motor
+#define SERVO_MAX_ANGLE     180 // max rotation angle
+#define SERVO_DEFAULT_ANGLE 90 // default rotation angle
 
 namespace component {
 
@@ -51,6 +54,16 @@ struct MotorAction {
 };
 
 /**
+ * Servo action structure.
+ */
+struct ServoAction {
+    /* Servo move index */
+    unsigned int moveId;
+    /* rotation angle increment */
+    int angle;
+};
+
+/**
  * Motor move indexes.
  */
 enum MotorMove {
@@ -62,6 +75,14 @@ enum MotorMove {
     WHEEL_BR_BACKWARD       = 5,  // wheel bottom right backward
     WHEEL_TR_FORWARD        = 6,  // wheel top right forward
     WHEEL_TR_BACKWARD       = 7,  // wheel top right backward
+};
+
+/**
+ * Servo rotation axes.
+ */
+enum ServoMove {
+    SERVO_HORIZONTAL        = 0,  // servo handling horizontal rotation
+    SERVO_VERTICAL          = 1,  // servo handling vertical rotation
 };
 
 } // component

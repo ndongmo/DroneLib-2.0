@@ -41,6 +41,14 @@ public:
     bool isOn(unsigned int componentIndex);
 
     /**
+     * @brief Get the component current value.
+     * 
+     * @param componentIndex index of the component
+     * @return current value of the component 
+     */
+    unsigned int getValue(unsigned int componentIndex);
+
+    /**
      * Add component action in the queue.
      * @param action action to add
      */
@@ -126,6 +134,14 @@ bool ComponentController<T, C>::isOn(unsigned int index) {
         return m_components[index] != 0;
     }
     return false;
+}
+
+template<typename T, unsigned int C>
+unsigned int ComponentController<T, C>::getValue(unsigned int index) {
+    if(index < C && m_components.find(index) != m_components.end()) {
+        return m_components[index];
+    }
+    return 0;
 }
 
 template<typename T, unsigned int C>

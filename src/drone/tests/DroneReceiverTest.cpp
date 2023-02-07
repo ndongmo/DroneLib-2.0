@@ -16,8 +16,9 @@ public:
     DroneSender sender;
     DroneReceiver droneRcv;
     MotorController motorCtrl;
+    ServoController servoCtrl;
 protected:
-    DroneReceiverTest() : droneRcv(sender, motorCtrl) {}
+    DroneReceiverTest() : droneRcv(sender, motorCtrl, servoCtrl) {}
     void SetUp() override {
         std::ofstream configFile(CONFIG_FILE);
         configFile << "{\"" << DRONE_ADDRESS << "\":\"" << VAR_DRONE_ADDRESS << "\"}";

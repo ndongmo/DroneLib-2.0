@@ -152,6 +152,10 @@ void PCWindow::initEvents() {
         m_evHandler.addEvent(CtrlEvent::GO_RIGHT, SDLK_d, Joystick::AXE1_RIGHT);
         m_evHandler.addEvent(CtrlEvent::GO_SPEED_1, SDLK_o, Joystick::A);
         m_evHandler.addEvent(CtrlEvent::GO_SPEED_2, SDLK_p, Joystick::B);
+        m_evHandler.addEvent(CtrlEvent::CAM_UP, SDLK_UP, Joystick::AXE2_UP);
+        m_evHandler.addEvent(CtrlEvent::CAM_DOWN, SDLK_DOWN, Joystick::AXE2_DOWN);
+        m_evHandler.addEvent(CtrlEvent::CAM_LEFT, SDLK_LEFT, Joystick::AXE2_LEFT);
+        m_evHandler.addEvent(CtrlEvent::CAM_RIGHT, SDLK_RIGHT, Joystick::AXE2_RIGHT);
         m_evHandler.saveConfig();
     }
 }

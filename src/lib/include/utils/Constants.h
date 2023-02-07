@@ -90,12 +90,14 @@
 #define NS_ID_PONG              2   // pong cmd id
 #define NS_ID_MAX               3   // max cmd id
 #define NS_ID_NAV               4   // navigation cmd id
-#define NS_ID_STREAM_AUDIO      5   // audio stream id
-#define NS_ID_STREAM_VIDEO      6   // video stream id
+#define NS_ID_CAMERA            5   // navigation cmd id
+#define NS_ID_STREAM_AUDIO      6   // audio stream id
+#define NS_ID_STREAM_VIDEO      7   // video stream id
 
 // Command frequencies in millisecond
-#define NS_FREQ_PING  50                        // ping cmd frequency
-#define NS_FREQ_NAV   DRONE_WHEEL_MOVE_LAPS / 2 // navigation cmd frequency
+#define NS_FREQ_PING            50                          // ping cmd frequency
+#define NS_FREQ_NAV             DRONE_WHEEL_MOVE_LAPS / 2   // navigation cmd frequency
+#define NS_FREQ_CAMERA          50                          // camera rotation frequency
 
 // Error codes
 #define ERROR_NET_SEND          1   // error sending data through network

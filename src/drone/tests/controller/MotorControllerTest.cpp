@@ -22,12 +22,6 @@ protected:
     void TearDown() override {
         EXPECT_EQ(ctr.end(), 1);
     }
-
-    const char* VAR_DRONE_ADDRESS = "127.0.0.1";
-    const int VAR_DRONE_RCV_PORT = 1555;
-    const int VAR_DRONE_SEND_PORT = 1556;
-    const int MAX_FRAGMENT_SIZE = 800;
-    const int MAX_FRAGMENT_NUMBER = 256;
 };
 
 // Tests MotorController moving and stopping is working

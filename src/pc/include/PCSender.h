@@ -29,8 +29,19 @@ public:
 
     /**
 	 * Sends navigation data.
+     * 
+     * @param deltatime elapsed time since the last call
      * @param dir drone direction
      * @param speed drone speed 
 	 */
 	void sendNav(int deltatime, DroneDir dir, DroneSpeed speed);
+
+    /**
+	 * Sends camera rotation angle.
+     * 
+     * @param deltatime elapsed time since the last call
+     * @param axe camera axe
+     * @param angle desired camera rotation angle
+	 */
+	void sendCamera(int deltatime, DroneCamera axe, int angle);
 };

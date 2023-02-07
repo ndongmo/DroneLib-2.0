@@ -10,7 +10,7 @@
 using namespace utils;
 
 DroneController::DroneController() : 
-	m_receiver(m_sender, m_motorCtrl), m_audioSender(m_sender),
+	m_receiver(m_sender, m_motorCtrl, m_servoCtrl), m_audioSender(m_sender),
 	m_videoSender(m_sender) {
 }
 
@@ -80,6 +80,10 @@ int DroneController::begin() {
 		logE << "DroneController: Motors (Wheels) initialization failed!" << std::endl;
 		return -1;
 	}
+	if(m_servoCtrl.begin() == -1) {
+		logE << "DroneController: Servo (Camera motors) initialization failed!" << std::endl;
+		return -1;
+	}
 	if(m_audioSender.begin() == -1) {
 		logE << "DroneController: Audio stream capture begin failed!" << std::endl;
 		return -1;
@@ -110,18 +114,20 @@ int DroneController::end() {
 	result += m_receiver.end();
 	result += m_ledCtrl.end();
 	result += m_motorCtrl.end();
+	result += m_servoCtrl.end();
 
 	if(m_initProcess.joinable()) {
 		m_initProcess.join();
 	}
 
-	if(result != 6) return -1;
+	if(result != 7) return -1;
 	else return 1;
 }
 
 void DroneController::start() {
 	m_ledCtrl.start();
 	m_motorCtrl.start();
+	m_servoCtrl.start();
 
 	init();
 	run();

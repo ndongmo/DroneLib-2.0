@@ -126,15 +126,16 @@ protected:
     void addCommand(int id, unsigned int frequency);
 
     /**
-     * Check if the command with the given id can be sent.
-     * Should only be used for commands which need frequency for sending.
+     * Check if the command with the given id can be sent. If it is 
+	 * the case, reset the timer for the given id otherwise increment 
+	 * this timer. Should only be used for commands which need frequency for sending.
      * 
      * @param id command id
      * @param deltatime elapsed time
      * @return true if the deltatime is bigger than the command frequency,
      * false otherwise
      */
-    bool canSend(int id, int deltatime);
+    bool CheckAndUpdateSend(int id, int deltatime);
 
     /** Buffer's sequence */
 	int* m_seqBuf = nullptr;

@@ -8,6 +8,7 @@ SET(SOURCE_FILES
 	DroneSenderTest.cpp
 	DroneControllerTest.cpp
 	controller/LedControllerTest.cpp
+	controller/ServoControllerTest.cpp
 	controller/MotorControllerTest.cpp
 )
 

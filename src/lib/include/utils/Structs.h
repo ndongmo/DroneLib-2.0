@@ -8,6 +8,8 @@
 
 #pragma once
 
+#define CAMERA_ROTATION_ANGLE 5 // camera rotation increment value
+
 namespace utils
 {
 /**
@@ -38,5 +40,13 @@ enum DroneDir {
     DIR_BACKWARD    = 1,
     DIR_LEFT        = 2,
     DIR_RIGHT       = 3,
+};
+
+/**
+ * Drone camera rotation axes.
+ */
+enum DroneCamera {
+    CAMERA_X_AXE    = 0, // horizontal axe
+    CAMERA_Y_AXE    = 1, // vertical axe
 };
 }

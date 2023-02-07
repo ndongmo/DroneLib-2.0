@@ -12,6 +12,7 @@
 #include "DroneReceiver.h"
 #include "controller/LedController.h"
 #include "controller/MotorController.h"
+#include "controller/ServoController.h"
 
 #include <Controller.h>
 #include <net/NetTcp.h>
@@ -76,4 +77,6 @@ protected:
     LedController m_ledCtrl;
     /** Motors (wheels) controller object */
     MotorController m_motorCtrl;
+    /** Servo (camera motors) controller object */
+    ServoController m_servoCtrl;
 };

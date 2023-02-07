@@ -7,6 +7,7 @@
 
 PCSender::PCSender() : NetSender() {
 	addCommand(NS_ID_NAV, NS_FREQ_NAV);
+	addCommand(NS_ID_CAMERA, NS_FREQ_CAMERA);
 }
 
 int PCSender::begin() {
@@ -27,10 +28,15 @@ int PCSender::begin() {
 }
 
 void PCSender::sendNav(int deltatime, DroneDir dir, DroneSpeed speed) {
-	if(canSend(NS_ID_NAV, deltatime)) {
+	if(CheckAndUpdateSend(NS_ID_NAV, deltatime)) {
 		sendFrame(NS_ID_NAV, NS_FRAME_TYPE_DATA, "12", dir, speed);
-		m_currentFreqs[NS_ID_NAV] = 0;
-	} else {
-		m_currentFreqs[NS_ID_NAV] += deltatime;
+	}
+}
+
+void PCSender::sendCamera(int deltatime, DroneCamera axe, int angle) {
+	if(CheckAndUpdateSend(NS_ID_CAMERA, deltatime)) {
+		bool sign = 1;
+		if(angle < 0) { angle = -angle; sign = 0; }
+		sendFrame(NS_ID_CAMERA, NS_FRAME_TYPE_DATA, "11b", axe, angle, sign);
 	}
 }

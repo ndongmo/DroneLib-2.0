@@ -27,6 +27,10 @@ enum CtrlEvent {
 	GO_RIGHT,
 	GO_SPEED_1,
 	GO_SPEED_2,
+	CAM_UP,
+	CAM_DOWN,
+	CAM_LEFT,
+	CAM_RIGHT,
 	DISCOVER,
 	QUIT,
 };

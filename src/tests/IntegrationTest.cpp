@@ -14,6 +14,7 @@
 #include <DroneController.h>
 #include <EventHandler.h>
 #include <controller/MotorController.h>
+#include <controller/ServoController.h>
 
 using namespace utils;
 using namespace net;
@@ -22,8 +23,12 @@ using namespace controller;
 // Mock class of the DroneController
 class MockDroneController : public DroneController {
 public:
-    MotorController& getMotorCtroller() {
+    MotorController& getMotorController() {
         return m_motorCtrl;
+    }
+
+    ServoController& getServoController() {
+        return m_servoCtrl;
     }
 };
 
@@ -84,7 +89,7 @@ TEST_F(IntegrationTest, QuitCmdWorks) {
 
 // Integration test for navigation commands
 TEST_F(IntegrationTest, NavCmdsWork) {  
-    MotorController& motorCtrl = droneCtrl.getMotorCtroller();
+    MotorController& motorCtrl = droneCtrl.getMotorController();
     ASSERT_TRUE(motorCtrl.isRunning());
 
     SDL_Event sdlevent = {};
@@ -106,4 +111,26 @@ TEST_F(IntegrationTest, NavCmdsWork) {
     EXPECT_FALSE(motorCtrl.isOn(WHEEL_TL_FORWARD));
     EXPECT_FALSE(motorCtrl.isOn(WHEEL_BR_FORWARD));
     EXPECT_FALSE(motorCtrl.isOn(WHEEL_BL_FORWARD));
+}
+
+// Integration test for camera rotation commands
+TEST_F(IntegrationTest, CameraCmdsWork) {  
+    ServoController& serovoCtrl = droneCtrl.getServoController();
+    ASSERT_TRUE(serovoCtrl.isRunning());
+
+    SDL_Event sdlevent = {};
+    sdlevent.type = SDL_KEYDOWN;
+    sdlevent.key.keysym.sym = SDLK_RIGHT;
+    SDL_PushEvent(&sdlevent);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(serovoCtrl.isOn(SERVO_HORIZONTAL));
+    EXPECT_GE((int)serovoCtrl.getValue(SERVO_HORIZONTAL), SERVO_DEFAULT_ANGLE + CAMERA_ROTATION_ANGLE);
+
+    sdlevent.key.keysym.sym = SDLK_DOWN;
+    SDL_PushEvent(&sdlevent);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(serovoCtrl.isOn(SERVO_VERTICAL));
+    EXPECT_LE((int)serovoCtrl.getValue(SERVO_VERTICAL), SERVO_DEFAULT_ANGLE - CAMERA_ROTATION_ANGLE);
 }

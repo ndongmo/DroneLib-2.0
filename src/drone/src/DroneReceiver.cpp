@@ -11,8 +11,8 @@
 
 using namespace utils; 
 
-DroneReceiver::DroneReceiver(DroneSender& sender, MotorController& motorCtrl) : 
-	NetReceiver(sender), m_droneSender(sender), m_motorCtrl(motorCtrl) {
+DroneReceiver::DroneReceiver(DroneSender& sender, MotorController& motorCtrl, ServoController& servoCtrl) : 
+	NetReceiver(sender), m_droneSender(sender), m_motorCtrl(motorCtrl), m_servoCtrl(servoCtrl) {
 
 }
 
@@ -41,6 +41,13 @@ void DroneReceiver::innerRun(NetFrame& netFrame) {
 			int dir = (int)netFrame.data[0];
 			int speed = NetHelper::readUInt16(netFrame.data, 1);
 			m_motorCtrl.move((DroneDir)dir, (DroneSpeed)speed);
+		}
+		else if (netFrame.id == NS_ID_CAMERA) {
+			int axe = (int)netFrame.data[0];
+			int angle = (int)netFrame.data[1];
+			int sign = (int)netFrame.data[2];
+			if(sign == 0) angle = -angle;
+			m_servoCtrl.rotate((DroneCamera)axe, angle);
 		}
 	}
 }

@@ -8,6 +8,7 @@ SET(SOURCE_FILES
 	DroneReceiver.cpp
 	DroneSender.cpp
 	controller/LedController.cpp
+	controller/ServoController.cpp
 	controller/MotorController.cpp
 	controller/ComponentController.cpp
 	hardware/I2C.cpp
