@@ -45,11 +45,17 @@ public:
         Config::setInt(AUDIO_SAMPLE, AUDIO_SAMPLE_VALUE);
         Config::setInt(AUDIO_BIT_RATE, AUDIO_BIT_RATE_VALUE);
         Config::setInt(AUDIO_CHANNELS, AUDIO_CHANNELS_VALUE);
+        Config::setInt(LEDS_ACTIVE, LEDS_ACTIVE_VALUE);
+        Config::setInt(MOTORS_ACTIVE, MOTORS_ACTIVE_VALUE);
+        Config::setInt(SERVOS_ACTIVE, SERVOS_ACTIVE_VALUE);
+        Config::setInt(MICRO_ACTIVE, MICRO_ACTIVE_VALUE);
+        Config::setInt(CAMERA_ACTIVE, CAMERA_ACTIVE_VALUE);
 
         std::string msg = Config::encodeJson({
             DRONE_PORT_RCV, DRONE_PORT_SEND, NET_FRAGMENT_SIZE, NET_FRAGMENT_NUMBER,
             VIDEO_FPS, VIDEO_CODEC, VIDEO_FORMAT, VIDEO_WIDTH, VIDEO_HEIGHT, 
-            AUDIO_CODEC, AUDIO_FORMAT, AUDIO_SAMPLE, AUDIO_BIT_RATE, AUDIO_CHANNELS
+            AUDIO_CODEC, AUDIO_FORMAT, AUDIO_SAMPLE, AUDIO_BIT_RATE, AUDIO_CHANNELS,
+            LEDS_ACTIVE, MOTORS_ACTIVE, SERVOS_ACTIVE, MICRO_ACTIVE, CAMERA_ACTIVE
         });
 
         EXPECT_GT(tcpDrone.send(msg.c_str(), msg.length()), 0);
@@ -86,6 +92,11 @@ protected:
     const int AUDIO_SAMPLE_VALUE = 48000;
     const int AUDIO_BIT_RATE_VALUE = 158000;
     const int AUDIO_CHANNELS_VALUE = 2;
+    const int LEDS_ACTIVE_VALUE = 1;
+    const int MOTORS_ACTIVE_VALUE = 0;
+    const int SERVOS_ACTIVE_VALUE = 1;
+    const int MICRO_ACTIVE_VALUE = 0;
+    const int CAMERA_ACTIVE_VALUE = 1;
 };
 
 // Tests PCController discovery with default config
@@ -114,6 +125,12 @@ TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
     ASSERT_EQ(AUDIO_SAMPLE_VALUE, Config::getInt(AUDIO_SAMPLE));
     ASSERT_EQ(AUDIO_BIT_RATE_VALUE, Config::getInt(AUDIO_BIT_RATE));
     ASSERT_EQ(AUDIO_CHANNELS_VALUE, Config::getInt(AUDIO_CHANNELS));
+
+    ASSERT_EQ(LEDS_ACTIVE_VALUE, Config::getInt(LEDS_ACTIVE));
+    ASSERT_EQ(MOTORS_ACTIVE_VALUE, Config::getInt(MOTORS_ACTIVE));
+    ASSERT_EQ(SERVOS_ACTIVE_VALUE, Config::getInt(SERVOS_ACTIVE));
+    ASSERT_EQ(MICRO_ACTIVE_VALUE, Config::getInt(MICRO_ACTIVE));
+    ASSERT_EQ(CAMERA_ACTIVE_VALUE, Config::getInt(CAMERA_ACTIVE));
 }
 
 // Tests PCController end

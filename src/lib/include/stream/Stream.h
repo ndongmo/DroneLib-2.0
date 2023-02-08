@@ -44,9 +44,7 @@ struct AvStreamFrame {
 		frame = new UINT8[0];
 		rcvWindow = new UINT8[STREAM_FRAME_ACK];
 		frameSize = 0;
-		frameRealSize = 0;
 		frameNumber = -1;
-		fragmentPerFrame = 1;
 		fragmentNumber = -1;
 	}
 	~AvStreamFrame() {
@@ -63,12 +61,8 @@ struct AvStreamFrame {
 	UINT8 frameFlags;
     /** frame size */
 	int frameSize;
-	/** frame real size */
-	int frameRealSize;
 	/** frame number */
 	int frameNumber;
-    /** total number of fragments within the frame */
-	int fragmentPerFrame;
 	/** fragment size */
 	int fragmentSize;
     /** index of the current fragment within the frame */

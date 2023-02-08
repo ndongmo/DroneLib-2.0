@@ -45,6 +45,7 @@ public:
 
     int begin() override;
     void start() override;
+    void stop() override;
     int end() override;
     void run() override;
 

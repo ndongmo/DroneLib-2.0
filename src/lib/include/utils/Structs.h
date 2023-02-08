@@ -8,8 +8,6 @@
 
 #pragma once
 
-#define CAMERA_ROTATION_ANGLE 5 // camera rotation increment value
-
 namespace utils
 {
 /**

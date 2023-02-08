@@ -26,7 +26,7 @@ namespace controller {
  * @param C max number of components
  */
 template <typename T, unsigned int C>
-class ComponentController : Service
+class ComponentController : public Service
 {
 public:    
     void start() override;

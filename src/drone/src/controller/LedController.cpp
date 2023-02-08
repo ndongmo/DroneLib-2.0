@@ -24,6 +24,10 @@ const unsigned int LedController::m_state_leds[STATE_LEDS] = {
     1, 2
 };
 
+LedController::LedController() {
+    m_name = "LedsService";
+}
+
 int LedController::begin() {
     m_ledBuffer.freq = TARGET_FREQ;
     m_ledBuffer.dmanum = DMA;

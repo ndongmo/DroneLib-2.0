@@ -9,6 +9,11 @@ using namespace utils;
 
 #define TEXT_MARGIN 5
 
+PCWindow::PCWindow(EventHandler& evHandler) : m_evHandler(evHandler) 
+{ 
+    m_name = "PCWindow";
+}
+
 int PCWindow::begin() {	
 	m_width = Config::getInt(VIDEO_DST_WIDTH);
     m_height = Config::getInt(VIDEO_DST_HEIGHT);
@@ -86,8 +91,12 @@ int PCWindow::end() {
         return -1;
     }
 
-    TTF_Quit();
-	SDL_Quit();
+    if(TTF_WasInit() > 0) {
+        TTF_Quit();
+    }
+    if(SDL_WasInit(SDL_INIT_EVERYTHING) == SDL_INIT_EVERYTHING) {
+        SDL_Quit();
+    }
 
 	return 1;
 }
@@ -191,9 +200,8 @@ void PCWindow::updateState(utils::AppState state, int error) {
     else if(state == APP_RUNNING) {
         str = "FPS: " + std::to_string(Config::getInt(VIDEO_FPS));
 
-        if(Config::getInt(VIDEO_WIDTH) != m_width || 
-            Config::getInt(VIDEO_HEIGHT) != m_height || 
-            Config::getInt(VIDEO_FORMAT) != m_format) {
+        if(Config::getInt(CAMERA_ACTIVE) && (Config::getInt(VIDEO_WIDTH) != m_width || 
+            Config::getInt(VIDEO_HEIGHT) != m_height || Config::getInt(VIDEO_FORMAT) != m_format)) {
 
             Config::setInt(VIDEO_DST_WIDTH, Config::getInt(VIDEO_WIDTH));
             Config::setInt(VIDEO_DST_HEIGHT, Config::getInt(VIDEO_HEIGHT));
@@ -218,7 +226,7 @@ void PCWindow::updateState(utils::AppState state, int error) {
 
 SDL_PixelFormatEnum PCWindow::getPixelFormat() {
     if(m_format == AV_PIX_FMT_YUV420P) {
-        return SDL_PIXELFORMAT_YVYU;
+        return SDL_PIXELFORMAT_YV12;
     } else  {
         return SDL_PIXELFORMAT_YUY2;
     }

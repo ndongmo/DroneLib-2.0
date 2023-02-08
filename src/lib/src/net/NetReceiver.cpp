@@ -9,7 +9,7 @@ using namespace utils;
 namespace net {
 
 NetReceiver::NetReceiver(NetSender& sender) : m_sender(sender) {
-
+	m_name = "NetReciver";
 }
 
 int NetReceiver::end() {

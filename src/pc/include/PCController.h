@@ -17,7 +17,8 @@
 
 #include <utils/Structs.h>
 #include <net/NetTcp.h>
-#include <stream/StreamReceiver.h>
+#include <stream/AudioReceiver.h>
+#include <stream/VideoReceiver.h>
 #include <Controller.h>
 
 #include <thread>
@@ -82,7 +83,7 @@ private:
     /** Speaker object */
     PCSpeaker m_speaker;
     /** Video stream receiver object */
-    StreamReceiver m_videoStream;
+    VideoReceiver m_videoStream;
     /** Audio stream receiver object */
-    StreamReceiver m_audioStream;
+    AudioReceiver m_audioStream;
 };

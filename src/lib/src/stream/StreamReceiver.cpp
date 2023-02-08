@@ -40,9 +40,9 @@ UINT8* StreamReceiver::newFragment(const StreamFragment &frag) {
 	if (frag.frameNumber != m_frame.frameNumber) {
 		// push the frame if the last frame has at least one fragment and
 		// the frameFlags is 1 (override) or the incoming frame is new
-		if (m_frame.frameRealSize > 0 &&
+		if (m_frame.frameSize > 0 &&
 			(m_frame.frameFlags == 1 || frag.frameNumber > m_frame.frameNumber)) {
-			m_pool.add(m_frame.frame, m_frame.frameRealSize);
+			m_pool.add(m_frame.frame, m_frame.frameSize);
 			m_rcvMtx.lock();
 			m_currentFrame = m_pool.next();
 			m_rcvMtx.unlock();
@@ -54,9 +54,7 @@ UINT8* StreamReceiver::newFragment(const StreamFragment &frag) {
 		m_frame.frameNumber = frag.frameNumber;
 		m_frame.fragmentSize = frag.fragmentSize;
 		m_frame.frameFlags = frag.frameFlags;
-		m_frame.fragmentPerFrame = frag.fragmentPerFrame;
-		m_frame.frameSize = frag.fragmentPerFrame * frag.fragmentSize;
-		m_frame.frameRealSize = m_frame.frameSize;
+		m_frame.frameSize = frag.frameSize;
 
 		if(oldFrameSize != m_frame.frameSize) {
 			delete[] m_frame.frame;
@@ -74,9 +72,6 @@ UINT8* StreamReceiver::newFragment(const StreamFragment &frag) {
 	}
 	
 	if(frag.fragmentNumber > m_frame.fragmentNumber) {
-		if(frag.fragmentNumber + 1 == frag.fragmentPerFrame && (int)frag.fragmentSize < m_frame.fragmentSize) {
-			m_frame.frameRealSize -= m_frame.fragmentSize - frag.fragmentSize;
-		}
 		m_frame.fragmentNumber = frag.fragmentNumber;
 	}
 	

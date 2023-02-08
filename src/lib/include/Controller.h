@@ -30,4 +30,39 @@ public:
      * Initialize all required config variables.
      */
     virtual void initConfigs();
+
+protected:
+	/**
+	 * @brief Initialize the given service when it is activated.
+	 * 
+	 * @param service service to initialize
+	 * @param activeID active ID of the service
+	 * @return -1 when the initialization failed, otherwise 1
+	 */
+	int beginService(Service& service, const char* activeID);
+
+	/**
+	 * @brief Start the given service when it is activated.
+	 * 
+	 * @param service service to start
+	 * @param activeID active ID of the service
+	 */
+	void startService(Service& service, const char* activeID);
+
+	/**
+	 * @brief Stop the given service when it is activated.
+	 * 
+	 * @param service service to stop
+	 * @param activeID active ID of the service
+	 */
+	void stopService(Service& service, const char* activeID);
+
+	/**
+	 * @brief End the given service when it is activated.
+	 * 
+	 * @param service service to end
+	 * @param activeID active ID of the service
+	 * @return -1 when the ending failed, otherwise 1
+	 */
+	int endService(Service& service, const char* activeID);
 };

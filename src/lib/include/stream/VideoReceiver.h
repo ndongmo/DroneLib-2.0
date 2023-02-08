@@ -10,10 +10,6 @@
 
 #include "StreamReceiver.h"
 
-#include <mutex>
-#include <thread>
-#include <condition_variable>
-
 namespace stream
 {
 
@@ -40,22 +36,11 @@ struct VideoDecoder {
 class VideoReceiver: public StreamReceiver
 {
 public:
-	int begin() override;
-	void start() override;
-    int end() override;
-	void updateFrame() override;
+	VideoReceiver();
 
-private:	
-	void run() override;
-	
-	/** new network frame arrived */
-	bool m_newNetworkFrame;
-	/** Stream mutex */
-	std::mutex m_streamMtx;
-	/** Condition variable for controlling access to the mutex */
-    std::condition_variable m_cv;
-	/** Main process */
-	std::thread m_process;
+	int end() override;
+
+private:
 	/** Video decoder object */
 	VideoDecoder m_decoder;
 };

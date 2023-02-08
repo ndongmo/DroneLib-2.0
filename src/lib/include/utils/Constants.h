@@ -8,10 +8,15 @@
 
 #pragma once
 
+#define MAX_FPS                 60  // camera rotation increment value
+#define CAMERA_ROTATION_ANGLE   5   // camera rotation increment value
+#define MOTORS_MOVE_LAPS        100 // Time laps of wheel move in millisecond
+#define SERVOS_MOVE_LAPS        25  // Time laps of servo rotation in millisecond
+#define SERVOS_MOVE_APL         2   // Servo rotation value per laps
+
 /* Drone config variables */
 #define DRONE_PORT_DISCOVERY_DEFAULT 	4444
 #define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.0.242"
-#define DRONE_WHEEL_MOVE_LAPS           100 // Time laps of wheel move in millisecond
 
 /* Drone config variables */
 #define DRONE_ADDRESS 		    "drone_address"
@@ -37,7 +42,8 @@
 #define VIDEO_FPS           "video_fps" // Frame per second
 #define VIDEO_WIDTH         "video_width"
 #define VIDEO_HEIGHT        "video_height"
-#define VIDEO_DEVICE         "video_device"
+#define VIDEO_DEVICE        "video_device"
+#define VIDEO_INPUT_FORMAT  "video_input_format"
 
 /* Video source config vairiables default values */
 #define VIDEO_CODEC_DEFAULT         13 // https://ffmpeg.org/doxygen/3.2/avcodec_8h_source.html
@@ -45,8 +51,9 @@
 #define VIDEO_BIT_RATE_DEFAULT      400000
 #define VIDEO_WIDTH_DEFAULT         640
 #define VIDEO_HEIGHT_DEFAULT        480
-#define VIDEO_FPS_DEFAULT           60
+#define VIDEO_FPS_DEFAULT           30
 #define VIDEO_DEVICE_DEFAULT        "/dev/video0"
+#define VIDEO_INPUT_FORMAT_DEFAULT  "v4l2"
 
 /* Video destination config variables */
 #define VIDEO_DST_FORMAT    "video_dst_format"
@@ -76,6 +83,20 @@
 #define AUDIO_DEVICE_DEFAULT        "hw:0"
 #define AUDIO_INPUT_FORMAT_DEFAULT  "alsa"
 
+/* Resource activation config variables */
+#define CAMERA_ACTIVE               "camera_active"
+#define MICRO_ACTIVE                "micro_active"
+#define SERVOS_ACTIVE               "servos_active"
+#define MOTORS_ACTIVE               "motors_active"
+#define LEDS_ACTIVE                 "leds_active"
+
+/* Resource activation config variables default values */
+#define CAMERA_ACTIVE_DEFAULT       1
+#define MICRO_ACTIVE_DEFAULT        1
+#define SERVOS_ACTIVE_DEFAULT       1 
+#define MOTORS_ACTIVE_DEFAULT       1
+#define LEDS_ACTIVE_DEFAULT         1
+
 // NS_FRAME_TYPE
 #define NS_FRAME_TYPE_QUIT              0
 #define NS_FRAME_TYPE_ACK               1
@@ -95,9 +116,9 @@
 #define NS_ID_STREAM_VIDEO      7   // video stream id
 
 // Command frequencies in millisecond
-#define NS_FREQ_PING            50                          // ping cmd frequency
-#define NS_FREQ_NAV             DRONE_WHEEL_MOVE_LAPS / 2   // navigation cmd frequency
-#define NS_FREQ_CAMERA          50                          // camera rotation frequency
+#define NS_FREQ_PING            50                     // ping cmd frequency
+#define NS_FREQ_NAV             MOTORS_MOVE_LAPS / 2   // navigation cmd frequency
+#define NS_FREQ_CAMERA          SERVOS_MOVE_LAPS / 2   // camera rotation frequency
 
 // Error codes
 #define ERROR_NET_SEND          1   // error sending data through network

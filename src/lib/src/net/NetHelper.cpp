@@ -61,7 +61,7 @@ void NetHelper::readFrame(const NetFrame& frame, StreamFragment& fragment) {
 	fragment.frameFlags = frame.data[0];
 	fragment.frameNumber = readUInt16(frame.data, 1);
 	fragment.fragmentNumber = readUInt16(frame.data, 3);
-	fragment.fragmentPerFrame = readUInt16(frame.data, 5);
+	fragment.frameSize = readUInt32(frame.data, 5);
 	fragment.fragmentSize = frame.size - NET_FRAME_HEADER - STREAM_FRAME_HEADER;
 	fragment.fragmentData = frame.data + STREAM_FRAME_HEADER;
 }

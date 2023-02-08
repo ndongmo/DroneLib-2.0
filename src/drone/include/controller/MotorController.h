@@ -24,7 +24,9 @@ using namespace utils;
  */
 class MotorController : public ComponentController<MotorAction, WHEEL_COUNT>
 {
-public:    
+public:   
+    MotorController();
+    
     int begin() override;
     int end() override;
 

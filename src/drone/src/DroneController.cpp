@@ -12,6 +12,7 @@ using namespace utils;
 DroneController::DroneController() : 
 	m_receiver(m_sender, m_motorCtrl, m_servoCtrl), m_audioSender(m_sender),
 	m_videoSender(m_sender) {
+	m_name = "DroneController";
 }
 
 void DroneController::init() {
@@ -19,8 +20,9 @@ void DroneController::init() {
 		m_initProcess.join();
 	}
 
-	m_audioSender.stop();
-	m_videoSender.stop();
+	stopService(m_audioSender, MICRO_ACTIVE);
+	stopService(m_videoSender, CAMERA_ACTIVE);
+
 	m_sender.end();
 	m_receiver.end();
 	m_conSocket.close();
@@ -49,8 +51,9 @@ void DroneController::init() {
 
 		m_sender.start();
 		m_receiver.start();
-		m_audioSender.start();
-		m_videoSender.start();
+
+		startService(m_audioSender, MICRO_ACTIVE);
+		startService(m_videoSender, CAMERA_ACTIVE);
 
 		updateState(APP_RUNNING);
 	});
@@ -72,24 +75,19 @@ int DroneController::begin() {
 	m_sender.setController(this);
 	m_receiver.setController(this);
 
-	if(m_ledCtrl.begin() == -1) {
-		logE << "DroneController: Leds initialization failed!" << std::endl;
+	if(beginService(m_ledCtrl, LEDS_ACTIVE) == -1) {
 		return -1;
 	}
-	if(m_motorCtrl.begin() == -1) {
-		logE << "DroneController: Motors (Wheels) initialization failed!" << std::endl;
+	if(beginService(m_motorCtrl, MOTORS_ACTIVE) == -1) {
 		return -1;
 	}
-	if(m_servoCtrl.begin() == -1) {
-		logE << "DroneController: Servo (Camera motors) initialization failed!" << std::endl;
+	if(beginService(m_servoCtrl, SERVOS_ACTIVE) == -1) {
 		return -1;
 	}
-	if(m_audioSender.begin() == -1) {
-		logE << "DroneController: Audio stream capture begin failed!" << std::endl;
+	if(beginService(m_audioSender, MICRO_ACTIVE) == -1) {
 		return -1;
 	}
-	if(m_videoSender.begin() == -1) {
-		logE << "DroneController: Video stream capture begin failed!" << std::endl;
+	if(beginService(m_videoSender, CAMERA_ACTIVE) == -1) {
 		return -1;
 	}
 	
@@ -97,7 +95,7 @@ int DroneController::begin() {
 }
 
 int DroneController::end() {
-	int result = 0;
+	bool result = true;
 
 	if(m_sender.isConnected()) {
 		m_sender.sendQuit();
@@ -108,26 +106,25 @@ int DroneController::end() {
 	m_cv.notify_all();
 	m_conSocket.close();
 
-	result += m_audioSender.end();
-	result += m_videoSender.end();
-	result += m_sender.end();
-	result += m_receiver.end();
-	result += m_ledCtrl.end();
-	result += m_motorCtrl.end();
-	result += m_servoCtrl.end();
+	result = result && endService(m_ledCtrl, LEDS_ACTIVE) != -1;
+	result = result && endService(m_motorCtrl, MOTORS_ACTIVE) != -1;
+	result = result && endService(m_servoCtrl, SERVOS_ACTIVE) != -1;
+	result = result && endService(m_audioSender, MICRO_ACTIVE) != -1;
+	result = result && endService(m_videoSender, CAMERA_ACTIVE) != -1;
+	result = result && m_sender.end() != -1;
+	result = result && m_receiver.end() != -1;
 
 	if(m_initProcess.joinable()) {
 		m_initProcess.join();
 	}
 
-	if(result != 7) return -1;
-	else return 1;
+	return result ? 1 : -1;
 }
 
 void DroneController::start() {
-	m_ledCtrl.start();
-	m_motorCtrl.start();
-	m_servoCtrl.start();
+	startService(m_ledCtrl, LEDS_ACTIVE);
+	startService(m_motorCtrl, MOTORS_ACTIVE);
+	startService(m_servoCtrl, SERVOS_ACTIVE);
 
 	init();
 	run();
@@ -193,12 +190,12 @@ int DroneController::discovery() {
 	struct sockaddr_in client;
 
 	if (m_conSocket.openServer(serverAddr.c_str(), serverPort) == -1) {
-		logE << "Discovery: TCP open server error" << std::endl;
+		logE << m_name << " discovery: TCP open server error" << std::endl;
         return -1;
 	}
 
 	if (m_conSocket.listen(client) == -1) {
-		logE << "Discovery: TCP listen client error" << std::endl;
+		logE << m_name << " discovery: TCP listen client error" << std::endl;
         return -1;
 	}
 
@@ -207,21 +204,22 @@ int DroneController::discovery() {
 	char buf[1024] = {0};
 
 	if (m_conSocket.receive(buf, 1024) == -1) {
-		logE << "Discovery: TCP receive client config failed" << std::endl;
+		logE << m_name << " discovery: TCP receive client config failed" << std::endl;
 		return -1;
 	}
 
 	if(Config::decodeJson(std::string(buf)) == -1) {
-		logE << "Discovery: Json parser error" << std::endl;
+		logE << m_name << " discovery: Json parser error" << std::endl;
 		return -1;
 	}
-	logI << "Discovery: receive client address:" <<  Config::getString(CTRL_ADDRESS)
-		<< " port:" << Config::getInt(CTRL_PORT_RCV) << std::endl;
+	logI << m_name << " discovery: receive client address[" <<  Config::getString(CTRL_ADDRESS)
+		<< "] port[" << Config::getInt(CTRL_PORT_RCV) << "]" << std::endl;
 
 	std::string msg = Config::encodeJson({
 		DRONE_PORT_RCV, DRONE_PORT_SEND, NET_FRAGMENT_SIZE, NET_FRAGMENT_NUMBER,
 		VIDEO_FPS, VIDEO_CODEC, VIDEO_FORMAT, VIDEO_WIDTH, VIDEO_HEIGHT, 
-		AUDIO_CODEC, AUDIO_FORMAT, AUDIO_SAMPLE, AUDIO_BIT_RATE, AUDIO_CHANNELS
+		AUDIO_CODEC, AUDIO_FORMAT, AUDIO_SAMPLE, AUDIO_BIT_RATE, AUDIO_CHANNELS,
+		LEDS_ACTIVE, MOTORS_ACTIVE, SERVOS_ACTIVE, MICRO_ACTIVE, CAMERA_ACTIVE
 	});
 
 	if (m_conSocket.send(msg.c_str(), msg.length()) == -1) {

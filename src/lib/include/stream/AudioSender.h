@@ -28,5 +28,6 @@ public:
 	AudioSender(NetSender &sender);
 
 	int begin() override;
+	std::string toString() override;
 };
 } // namespace stream

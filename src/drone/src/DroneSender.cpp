@@ -7,6 +7,10 @@
 
 using namespace utils;
 
+DroneSender::DroneSender() {
+	m_name = "DroneSenderService";
+}
+
 int DroneSender::begin() {
 	if(NetSender::begin() == -1) {
 		return -1;

@@ -1,10 +1,15 @@
 #include "controller/ServoController.h"
 
 #include <utils/Constants.h>
+#include <utils/Logger.h>
 
 #include <algorithm>
 
 namespace controller {
+
+ServoController::ServoController() {
+    m_name = "CameraRotationService";
+}
 
 int ServoController::begin() {
     int ret = 1;
@@ -38,6 +43,11 @@ void ServoController::start() {
 }
 
 void ServoController::handleActions() {
+    if(m_actions.size() > 0) {
+        m_delay -= std::chrono::duration_cast<std::chrono::milliseconds>
+            (std::chrono::steady_clock::now() - m_previousClock).count();
+    }
+
     m_mutex.lock();
     while(!m_queue.empty()) {
         auto& a = m_queue.front();
@@ -46,16 +56,33 @@ void ServoController::handleActions() {
     }
     m_mutex.unlock();
 
-    for(auto &a : m_actions) {
-        if(m_components.find(a.first) != m_components.end()) {
-            int angle = m_components[a.first] + a.second.angle;
-            if(angle > SERVO_MAX_ANGLE) angle = SERVO_MAX_ANGLE;
-            else if(angle <= 0) angle = 0;
+    if(m_delay <= 0) {
+        for(auto it = m_actions.begin(); it != m_actions.end();) {
+            if(m_components.find(it->first) != m_components.end()) {
+                int angle = (it->second.angle < 0) ? -SERVOS_MOVE_APL : SERVOS_MOVE_APL;
+                it->second.angle -= angle;
+                angle = m_components[it->first] + angle;
 
-            setServoAngle(a.first, angle);
+                if(it->first == SERVO_HORIZONTAL) {
+                    if(angle > SERVO_MAX_ANGLE_X)       angle = SERVO_MAX_ANGLE_X;
+                    else if(angle < SERVO_MIN_ANGLE_X)  angle = SERVO_MIN_ANGLE_X;
+                } else {
+                    if(angle > SERVO_MAX_ANGLE_Y)       angle = SERVO_MAX_ANGLE_Y;
+                    else if(angle < SERVO_MIN_ANGLE_Y)  angle = SERVO_MIN_ANGLE_Y;
+                }
+                
+                setServoAngle(it->first, angle);
+
+                if(abs(it->second.angle) < SERVOS_MOVE_APL) {
+                    it = m_actions.erase(it);
+                } else {
+                    it++;
+                }
+            }
         }
+        m_delay = (m_actions.size() > 0) ? SERVOS_MOVE_LAPS : 0;
     }
-    m_actions.clear();
+    m_previousClock = std::chrono::steady_clock::now();
 }
 
 void ServoController::rotate(DroneCamera axe, int angle) {

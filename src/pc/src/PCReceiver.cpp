@@ -12,7 +12,7 @@ PCReceiver::PCReceiver(PCSender &sender, StreamReceiver &videoReceiver,
 	StreamReceiver &audioReceiver) : 
 	NetReceiver(sender), m_pcSender(sender), m_videoReceiver(videoReceiver), 
 	m_audioReceiver(audioReceiver) {
-
+	m_name = "PCReceiver";
 }
 
 int PCReceiver::begin() {

@@ -27,6 +27,8 @@ using namespace component;
 class LedController : public ComponentController<LedAction, LED_COUNT>
 {
 public:    
+    LedController();
+    
     int begin() override;
     int end() override;
 

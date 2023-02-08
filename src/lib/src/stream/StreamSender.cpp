@@ -22,7 +22,7 @@ int StreamSender::begin() {
 		format = av_find_input_format(m_formatname.c_str());
 	}
 	
-	if ((ret = avformat_open_input(&m_ifmt_ctx, m_filename.c_str(), format, NULL)) < 0) {
+	if ((ret = avformat_open_input(&m_ifmt_ctx, m_filename.c_str(), format, &m_options)) < 0) {
         logE << "StreamSender: cannot capture input file '" << m_filename << "' -> " << av_err2str(ret) << std::endl;
 		return -1;
     }
@@ -62,6 +62,11 @@ int StreamSender::end() {
 		m_packet = NULL;
 	}
 
+	if(m_options != NULL) {
+		av_dict_free(&m_options);
+		m_options = NULL;
+	}
+
 	return 1;
 }
 
@@ -95,20 +100,24 @@ void StreamSender::run() {
 void StreamSender::sendPacket() {	
 	StreamFragment sf;
 	sf.frameNumber = ++m_frameIndex;
+	sf.frameSize = m_packet->size;
 	sf.fragmentSize = Config::getInt(NET_FRAGMENT_SIZE) - NET_FRAME_HEADER - STREAM_FRAME_HEADER;
-	sf.fragmentPerFrame = (int)std::ceil(m_packet->size / (float)sf.fragmentSize);
-	int total = (int)(sf.fragmentPerFrame * sf.fragmentSize);
 
-	for(int i = 0; i < sf.fragmentPerFrame; i++) {
+	int fragmentPerFrame = (int)std::ceil(m_packet->size / (float)sf.fragmentSize);
+	int total = (int)(fragmentPerFrame * sf.fragmentSize);
+
+	for(int i = 0; i < fragmentPerFrame; i++) {
 		sf.fragmentNumber = i;
 		sf.fragmentData = m_packet->data + (sf.fragmentSize * i);
 
-		if(i == sf.fragmentPerFrame - 1 && total > m_packet->size) {
+		if(i == fragmentPerFrame - 1 && total > m_packet->size) {
 			sf.fragmentSize = sf.fragmentSize - (total - m_packet->size);
 		}
 		
 		m_sender.sendFrame(m_streamID, NS_FRAME_TYPE_DATA, sf);
+#ifndef __arm__
 		usleep(10);
+#endif
 	}
 }
 

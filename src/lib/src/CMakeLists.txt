@@ -16,6 +16,7 @@ SET(SOURCE_FILES
 	stream/AudioSender.cpp
 	stream/StreamReceiver.cpp
 	stream/VideoReceiver.cpp
+	stream/AudioReceiver.cpp
 	IController.cpp
 	Controller.cpp
 	Service.cpp

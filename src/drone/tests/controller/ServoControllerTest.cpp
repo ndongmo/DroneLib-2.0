@@ -39,24 +39,26 @@ TEST_F(ServoControllerTest, AddActionWorks) {
     ServoAction a2 {SERVO_VERTICAL, 10};
 
     ctr.addActions({a1, a2});
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10 * SERVOS_MOVE_LAPS / SERVOS_MOVE_APL));
     EXPECT_EQ((int)ctr.getValue(a1.moveId), SERVO_DEFAULT_ANGLE + a1.angle);
     EXPECT_EQ((int)ctr.getValue(a2.moveId), SERVO_DEFAULT_ANGLE + a2.angle);
 
     a1.angle = -90;
     a2.angle = 90;
     ctr.addActions({a1, a2});
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(ctr.getValue(a1.moveId), 0u);
-    EXPECT_EQ((int)ctr.getValue(a2.moveId), SERVO_MAX_ANGLE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(90 * SERVOS_MOVE_LAPS / SERVOS_MOVE_APL));
+    EXPECT_EQ((int)ctr.getValue(a1.moveId), SERVO_MIN_ANGLE_X);
+    EXPECT_EQ((int)ctr.getValue(a2.moveId), SERVO_MAX_ANGLE_Y);
 }
 
 // Tests ServoController rotate method works
 TEST_F(ServoControllerTest, RotateWorks) {
     ctr.rotate(DroneCamera::CAMERA_X_AXE, 50);
     ctr.rotate(DroneCamera::CAMERA_Y_AXE, -50);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50 * SERVOS_MOVE_LAPS / SERVOS_MOVE_APL));
 
-    EXPECT_EQ((int)ctr.getValue(SERVO_HORIZONTAL), SERVO_DEFAULT_ANGLE + 50);
-    EXPECT_EQ((int)ctr.getValue(SERVO_VERTICAL), SERVO_DEFAULT_ANGLE - 50);
+    EXPECT_EQ((int)ctr.getValue(SERVO_HORIZONTAL),
+        ((SERVO_DEFAULT_ANGLE + 50 > SERVO_MAX_ANGLE_X) ? SERVO_MAX_ANGLE_X : SERVO_DEFAULT_ANGLE + 50));
+    EXPECT_EQ((int)ctr.getValue(SERVO_VERTICAL), 
+        ((SERVO_DEFAULT_ANGLE - 50 < SERVO_MIN_ANGLE_Y) ? SERVO_MIN_ANGLE_Y : SERVO_DEFAULT_ANGLE - 50));
 }

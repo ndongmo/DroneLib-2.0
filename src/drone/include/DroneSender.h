@@ -18,5 +18,7 @@ using namespace net;
 class DroneSender : public NetSender
 {
 public:
+	DroneSender();
+	
 	int begin() override;
 };

@@ -23,7 +23,7 @@ typedef uint8_t UINT8;
 #endif
 
 #define NET_FRAME_HEADER 7
-#define STREAM_FRAME_HEADER 7
+#define STREAM_FRAME_HEADER 9
 
 namespace net
 {
@@ -55,8 +55,8 @@ struct StreamFragment {
 	UINT16 frameNumber;
     /** Current fragment number within the frame */
 	UINT16 fragmentNumber;
-    /** Total number of fragments within the frame */
-	UINT16 fragmentPerFrame;
+    /** Frame size */
+	UINT32 frameSize;
     /** Fragment size */
 	UINT32 fragmentSize;
     /** Fragment data buffer */

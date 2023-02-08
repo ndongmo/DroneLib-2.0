@@ -29,7 +29,7 @@ public:
     /**
      * Constructor for initializing the event handler
      */
-    PCWindow(EventHandler& evHandler) : m_evHandler(evHandler) {}
+    PCWindow(EventHandler& evHandler);
 
     int begin() override;
     void start() override;

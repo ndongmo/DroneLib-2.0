@@ -39,8 +39,7 @@ public:
         EXPECT_EQ(videoRcv.getFrame().frameNumber, (int)sf.frameNumber);
         EXPECT_EQ(videoRcv.getFrame().fragmentSize, (int)sf.fragmentSize);
         EXPECT_EQ(videoRcv.getFrame().frameFlags, sf.frameFlags);
-        EXPECT_EQ(videoRcv.getFrame().fragmentPerFrame, (int)sf.fragmentPerFrame);
-        EXPECT_EQ(videoRcv.getFrame().frameSize, (int) (sf.fragmentPerFrame * sf.fragmentSize));
+        EXPECT_EQ(videoRcv.getFrame().frameSize, (int)sf.frameSize);
         EXPECT_EQ(sentValue, rcvValue);
     }
     MockStreamReceiver videoRcv;
@@ -88,7 +87,7 @@ TEST_F(StreamReceiverTest, newFragmentWorks) {
     StreamFragment sf {
         .frameNumber = 1,
         .fragmentNumber = 0,
-        .fragmentPerFrame = 2,
+        .frameSize = 20,
         .fragmentSize = 10,
         .fragmentData = new UINT8[10]()
     };

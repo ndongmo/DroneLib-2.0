@@ -11,6 +11,7 @@ using namespace utils;
 namespace net {
 
 NetSender::NetSender() {
+	m_name = "NetSender";
 	addCommand(NS_ID_PING, NS_FREQ_PING);
 }
 
@@ -116,8 +117,8 @@ void NetSender::sendFrame(int id, int type, const StreamFragment &fragment) {
 	count += 2;
 	NetHelper::writeUInt16(fragment.fragmentNumber, m_buffer, count);
 	count += 2;
-	NetHelper::writeUInt16(fragment.fragmentPerFrame, m_buffer, count);
-	count += 2;
+	NetHelper::writeUInt32(fragment.frameSize, m_buffer, count);
+	count += 4;
 	memcpy(&m_buffer[count], fragment.fragmentData, fragment.fragmentSize);
 
 	totalSize = m_sendSocket.send((char*)m_buffer, totalSize);

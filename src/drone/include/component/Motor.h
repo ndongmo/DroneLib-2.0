@@ -10,11 +10,14 @@
 
 #include <cstdint>
 
-#define MOTOR_FREQUENCY     50 // Motor frequency in Hz between 40 and 1600
-#define WHEEL_COUNT         8  // Wheel actions count
-#define SERVO_COUNT         2  // Number of servo motor
-#define SERVO_MAX_ANGLE     180 // max rotation angle
-#define SERVO_DEFAULT_ANGLE 90 // default rotation angle
+#define MOTOR_FREQUENCY         50  // Motor frequency in Hz between 40 and 1600
+#define WHEEL_COUNT             8   // Wheel actions count
+#define SERVO_COUNT             2   // Number of servo motor
+#define SERVO_DEFAULT_ANGLE     90  // default rotation angle
+#define SERVO_MAX_ANGLE_X       180 // max rotation angle
+#define SERVO_MAX_ANGLE_Y       180 // max rotation angle
+#define SERVO_MIN_ANGLE_X       0   // max rotation angle
+#define SERVO_MIN_ANGLE_Y       60  // max rotation angle
 
 namespace component {
 

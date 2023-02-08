@@ -24,7 +24,9 @@ using namespace utils;
  */
 class ServoController : public ComponentController<ServoAction, SERVO_COUNT>
 {
-public:    
+public: 
+    ServoController();
+    
     int begin() override;
     void start() override;
     int end() override;

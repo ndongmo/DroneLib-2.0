@@ -10,7 +10,7 @@
 using namespace utils;
 
 PCSpeaker::PCSpeaker(IStreamListener& stream) : m_stream(stream) {
-
+    m_name = "PCSpeaker";
 }
 
 int PCSpeaker::begin() {	
@@ -45,6 +45,11 @@ int PCSpeaker::end() {
 void PCSpeaker::start() {
 	m_running = true;
     SDL_PauseAudio(0);
+}
+
+void PCSpeaker::stop() {
+	m_running = false;
+    SDL_PauseAudio(1);
 }
 
 void PCSpeaker::run() {

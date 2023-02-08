@@ -6,6 +6,9 @@
 
 namespace controller {
 
+MotorController::MotorController() {
+    m_name = "WheelsService";
+}
 int MotorController::begin() {
     int ret = 1;
 #ifdef __arm__
@@ -73,10 +76,10 @@ void MotorController::handleActions() {
 }
 
 void MotorController::move(DroneDir dir, DroneSpeed speed) {
-    MotorAction tr {0, speed, DRONE_WHEEL_MOVE_LAPS};
-    MotorAction tl {0, speed, DRONE_WHEEL_MOVE_LAPS};
-    MotorAction br {0, speed, DRONE_WHEEL_MOVE_LAPS};
-    MotorAction bl {0, speed, DRONE_WHEEL_MOVE_LAPS};
+    MotorAction tr {0, speed, MOTORS_MOVE_LAPS};
+    MotorAction tl {0, speed, MOTORS_MOVE_LAPS};
+    MotorAction br {0, speed, MOTORS_MOVE_LAPS};
+    MotorAction bl {0, speed, MOTORS_MOVE_LAPS};
 
     if(dir == DroneDir::DIR_FORWARD) {
         tr.moveId = WHEEL_TR_FORWARD;

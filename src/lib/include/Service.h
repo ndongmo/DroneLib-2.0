@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <string>
+
 class IController;
 
 /**
@@ -30,7 +32,7 @@ public:
     /**
 	 * Stop the controller from outside.
 	 */
-    virtual void stop() {}
+    virtual void stop() { m_running = false; }
 
     /**
      * Stop the service and clean initialized components.
@@ -44,6 +46,24 @@ public:
      */
     virtual bool isRunning() {
         return m_running;
+    }
+
+    /**
+     * @brief Return the service's name
+     * 
+     * @return service's name
+     */
+    virtual const std::string& getName() const {
+        return m_name;
+    }
+    
+    /**
+     * @brief Return the Service description
+     * 
+     * @return description
+     */
+    virtual std::string toString() { 
+        return "No description"; 
     }
 
     /**
@@ -70,6 +90,11 @@ protected:
      * Running state.
      */
     bool m_running = false;
+
+    /**
+     * Service's name.
+     */
+    std::string m_name;
 
     /**
      * Pointer to service's controller.

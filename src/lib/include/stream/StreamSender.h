@@ -67,6 +67,8 @@ protected:
 	AVPacket *m_packet = NULL;
 	/** input codec */
 	const AVCodec *m_codec = NULL;
+	/** Video input options */
+	AVDictionary *m_options = NULL;
 	/** Media format context */
 	AVFormatContext *m_ifmt_ctx = NULL;
 };

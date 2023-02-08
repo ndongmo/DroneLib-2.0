@@ -6,6 +6,7 @@
 #include <utils/Constants.h>
 
 PCSender::PCSender() : NetSender() {
+	m_name = "PCSender";
 	addCommand(NS_ID_NAV, NS_FREQ_NAV);
 	addCommand(NS_ID_CAMERA, NS_FREQ_CAMERA);
 }

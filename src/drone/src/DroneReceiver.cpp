@@ -13,7 +13,7 @@ using namespace utils;
 
 DroneReceiver::DroneReceiver(DroneSender& sender, MotorController& motorCtrl, ServoController& servoCtrl) : 
 	NetReceiver(sender), m_droneSender(sender), m_motorCtrl(motorCtrl), m_servoCtrl(servoCtrl) {
-
+	m_name = "DroneReceiverService";
 }
 
 int DroneReceiver::begin() {
