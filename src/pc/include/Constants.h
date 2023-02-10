@@ -22,7 +22,7 @@
 
 /* PC application constants default values */
 #define PC_APP_NAME_DEFAULT             "PC controller for Drone"
-#define PC_FONT_SIZE_DEFAULT            16
+#define PC_FONT_SIZE_DEFAULT            12
 #define PC_FONT_TYPE_DEFAULT            "arial.ttf"
 #define PC_VOLUME_DEFAULT               128
 

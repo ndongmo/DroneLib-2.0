@@ -158,7 +158,7 @@ void PCController::run() {
 			m_window.run();
 			handleEvents(m_fpsLimiter.getFPS());
 			m_videoStream.updateFrame();
-			m_window.render(m_videoStream);
+			m_window.render(m_videoStream, m_fpsLimiter.getFPS());
 			m_videoStream.frameHandled();
 		}
 		m_fpsLimiter.end();

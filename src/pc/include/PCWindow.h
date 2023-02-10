@@ -20,6 +20,20 @@
 using namespace stream;
 
 /**
+ * @brief Shown text structure.
+ */
+struct PCText {
+    /** Dynamic text */
+    bool dynamic = false;
+    /** Text to show */
+    std::string text;
+    /** Texture of the text */
+    SDL_Texture *texture = nullptr;
+    /** Texture rect */
+    SDL_Rect rect;
+};
+
+/**
  * PC window ui class which displays the video output,
  * error messages and handles keyboard/mouse/joystick events.
  */
@@ -39,8 +53,9 @@ public:
     /**
      * Render the current frame.
      * @param stream stream frame provider
+     * @param fps current fps
      */
-    void render(const IStreamListener& stream);
+    void render(const IStreamListener& stream, unsigned int fps);
 
     /**
      * Update the current state.
@@ -61,6 +76,20 @@ private:
     int clean();
 
     /**
+     * @brief Render the given text structure.
+     * 
+     * @param text the text structure to render
+     */
+    void renderText(PCText& text);
+
+    /**
+     * @brief Print the given text into the texture.
+     * 
+     * @param text text structure
+     */
+    void updateText(PCText& text);
+
+    /**
      * @brief Get the Pixel Format value for the current video format.
      * 
      * @return an SDL_PixelFormatEnum 
@@ -74,14 +103,19 @@ private:
     /** Stream video format */
     int m_format;
 
+    /** FPS text */
+    PCText m_fps_text;
+    /** Batterie life text */
+    PCText m_bat_text;
+    /** Message text */
+    PCText m_msg_text;
+
     SDL_Color m_txt_color;
     SDL_Color m_back_color;
-    SDL_Rect m_font_rect;
 
     TTF_Font * m_font = nullptr;
     SDL_Window* m_window = nullptr;
 	SDL_Texture* m_basic_texture = nullptr;
-    SDL_Texture* m_font_texture = nullptr;
 	SDL_Renderer* m_renderer = nullptr;
 
     EventHandler& m_evHandler;

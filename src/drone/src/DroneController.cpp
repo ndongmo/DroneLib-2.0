@@ -159,7 +159,9 @@ void DroneController::waitNextEvent() {
 void DroneController::handleEvents() {
 	if(m_oldState == m_state) return;
 
-	m_ledCtrl.play(m_state);
+	if(Config::getInt(LEDS_ACTIVE)) {
+		m_ledCtrl.play(m_state);
+	}
 
 	if(m_state == APP_INIT || m_state == APP_ERROR) {
 		init();

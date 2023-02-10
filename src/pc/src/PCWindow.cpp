@@ -8,6 +8,9 @@
 using namespace utils;
 
 #define TEXT_MARGIN 5
+#define TEXT_FPS_WIDTH 50
+#define TEXT_BATTERIE_WIDTH 50
+#define TEXT_LINE_HEIGHT 14
 
 PCWindow::PCWindow(EventHandler& evHandler) : m_evHandler(evHandler) 
 { 
@@ -51,6 +54,16 @@ int PCWindow::begin() {
     m_txt_color = { 0x00, 0x00, 0x00, 0xFF };
     m_back_color = { 0xFF, 0xFF, 0xFF, 0x80 };
 
+    m_fps_text.dynamic = true;
+    m_fps_text.rect = {TEXT_MARGIN, TEXT_MARGIN, TEXT_FPS_WIDTH, TEXT_LINE_HEIGHT};
+
+    m_bat_text.dynamic = true;
+    m_bat_text.rect = {m_width - (TEXT_BATTERIE_WIDTH + TEXT_MARGIN), 
+        TEXT_MARGIN, TEXT_BATTERIE_WIDTH, TEXT_LINE_HEIGHT};
+
+    m_msg_text.rect = {TEXT_MARGIN, m_height - (TEXT_LINE_HEIGHT + TEXT_MARGIN), 
+        m_width - (TEXT_MARGIN * 2), TEXT_LINE_HEIGHT};
+
     m_evHandler.init();
 	initEvents();
 
@@ -70,13 +83,21 @@ int PCWindow::clean() {
         SDL_DestroyRenderer(m_renderer);
         m_renderer = nullptr;
     }
-    if(m_basic_texture != NULL) {
+    if(m_basic_texture != nullptr) {
         SDL_DestroyTexture(m_basic_texture);
-        m_basic_texture = NULL;
+        m_basic_texture = nullptr;
     }
-    if(m_font_texture != nullptr) {
-        SDL_DestroyTexture(m_font_texture);
-        m_font_texture = nullptr;
+    if(m_fps_text.texture != nullptr) {
+        SDL_DestroyTexture(m_fps_text.texture);
+        m_fps_text.texture = nullptr;
+    }
+    if(m_bat_text.texture != nullptr) {
+        SDL_DestroyTexture(m_bat_text.texture);
+        m_bat_text.texture = nullptr;
+    }
+    if(m_msg_text.texture != nullptr) {
+        SDL_DestroyTexture(m_msg_text.texture);
+        m_msg_text.texture = nullptr;
     }
     if(m_font != nullptr) {
         TTF_CloseFont(m_font);
@@ -169,7 +190,9 @@ void PCWindow::initEvents() {
     }
 }
 
-void PCWindow::render(const IStreamListener& stream) {
+void PCWindow::render(const IStreamListener& stream, unsigned int fps) {
+    m_fps_text.text = "FPS: " + std::to_string(fps);
+
     if(stream.hasNewFrame()) {
         unsigned char * texture_data = NULL;
 	    int texture_pitch = 0;
@@ -181,7 +204,11 @@ void PCWindow::render(const IStreamListener& stream) {
 
     SDL_RenderClear(m_renderer);
     SDL_RenderCopy(m_renderer, m_basic_texture, NULL, NULL);
-    SDL_RenderCopy(m_renderer, m_font_texture, NULL, &m_font_rect);
+
+    renderText(m_fps_text);
+    renderText(m_bat_text);
+    renderText(m_msg_text);
+
     SDL_RenderPresent(m_renderer);
 }
 
@@ -189,16 +216,18 @@ void PCWindow::updateState(utils::AppState state, int error) {
     std::string str;
 
     if(state == APP_ERROR) {
-        str = logError(error) + " Press [" + m_evHandler.getMapping(CtrlEvent::DISCOVER)
-            + "] to restart discovering.";
+        m_msg_text.text = logError(error) + " Press [" + 
+            m_evHandler.getMapping(CtrlEvent::DISCOVER) + "] to restart discovering.";
+        updateText(m_msg_text);
     }
     else if(state == APP_DISCOVERING) {
-        str = "Drone discovering ongoing on ip [" + 
+        m_msg_text.text = "Drone discovering ongoing on ip [" + 
             Config::getString(DRONE_ADDRESS) + "] and port [" +
             std::to_string(Config::getInt(DRONE_PORT_DISCOVERY)) + "] ...";
+        updateText(m_msg_text);
     }
     else if(state == APP_RUNNING) {
-        str = "FPS: " + std::to_string(Config::getInt(VIDEO_FPS));
+        m_msg_text.text = "";
 
         if(Config::getInt(CAMERA_ACTIVE) && (Config::getInt(VIDEO_WIDTH) != m_width || 
             Config::getInt(VIDEO_HEIGHT) != m_height || Config::getInt(VIDEO_FORMAT) != m_format)) {
@@ -211,16 +240,28 @@ void PCWindow::updateState(utils::AppState state, int error) {
             start();
         }
     }
+}
 
-    if(m_font_texture != nullptr) {
-        SDL_DestroyTexture(m_font_texture);
-        m_font_texture = nullptr;
+void PCWindow::renderText(PCText& text) {
+    if(!text.text.empty()) {
+        if(text.dynamic) {
+            updateText(text);
+        } 
+        SDL_RenderCopy(m_renderer, text.texture, NULL, &text.rect);
+    }
+}
+
+void PCWindow::updateText(PCText& text) {
+    if(text.texture != nullptr) {
+        SDL_DestroyTexture(text.texture);
+        text.texture = nullptr;
     }
 
-    SDL_Surface* text_surf = TTF_RenderText_Shaded_Wrapped(m_font, str.c_str(), 
-        m_txt_color, m_back_color, m_width - (TEXT_MARGIN * 2));
-    m_font_texture = SDL_CreateTextureFromSurface(m_renderer, text_surf);
-    m_font_rect = {10, 10, text_surf->w, text_surf->h};
+    SDL_Surface* text_surf = TTF_RenderText_Shaded(m_font, text.text.c_str(), 
+        m_txt_color, m_back_color);
+    text.texture = SDL_CreateTextureFromSurface(m_renderer, text_surf);
+    text.rect.w = text_surf->w;
+    text.rect.h = text_surf->h;
     SDL_FreeSurface(text_surf);
 }
 
