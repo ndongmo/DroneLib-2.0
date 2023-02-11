@@ -1,5 +1,4 @@
 #include "hardware/I2C.h"
-#include "component/Motor.h"
 
 #include <utils/Logger.h>
 
@@ -7,6 +6,7 @@
 #include <cmath>
 #include <unistd.h>
 #include <fcntl.h>
+#include <algorithm>
 #include <sys/ioctl.h>
 
 extern "C" {
@@ -14,8 +14,6 @@ extern "C" {
 #include <linux/i2c-dev.h>
 #include <i2c/smbus.h>
 }
-
-using namespace component;
 
 namespace hardware {
 
@@ -40,6 +38,10 @@ int I2C::open_pwm_pca9685(const std::string &device, int address, const double f
     return 1;
 }
 
+int I2C::open_adc_ads7830(const std::string& device, int address) {
+    return open(device, address);
+}
+
 int I2C::open(const std::string& device, const uint8_t address) {
     close();
 
@@ -62,6 +64,12 @@ void I2C::close() {
     }
 }
 
+void I2C::write(const uint8_t value) {
+    if(i2c_smbus_write_byte(m_fd, value)) {
+        logE << "Failed to write on i2c bus address: " << strerror(errno) << std::endl;
+    }
+}
+
 void I2C::write(const uint8_t address, const uint8_t value) {
     i2c_smbus_data data;
     data.byte = value;
@@ -70,12 +78,35 @@ void I2C::write(const uint8_t address, const uint8_t value) {
     }
 }
 
+uint8_t I2C::read() {
+    int ret;
+    if((ret = i2c_smbus_read_byte(m_fd)) < 0) {
+        logE << "Failed to read the value of i2c bus address: " << strerror(errno) << std::endl;
+    }
+    return ret;
+}
+
 uint8_t I2C::read(const uint8_t address) {
     i2c_smbus_data data;
     if(i2c_smbus_access(m_fd, I2C_SMBUS_READ, address, I2C_SMBUS_BYTE_DATA, &data)) {
         logE << "Failed to read the value of i2c bus address: " << strerror(errno) << std::endl;
     }
     return data.byte & 0xFF;
+}
+
+float I2C::get_adc_ads7830(const int channel) {
+    float voltage;
+    uint8_t value1, value2;
+    uint8_t cmd = ADS7830_CMD | ((((channel<<2)|(channel>>1))&0x07)<<4);
+    write(cmd);
+
+    do {
+        value1 = read();
+        value2 = read();
+    } while(value1 != value2);
+            
+    voltage = value1 / 256.0 * 3.3;
+    return voltage;
 }
 
 void I2C::set_pwm_pca9685(const int channel, const uint16_t on, const uint16_t off) {

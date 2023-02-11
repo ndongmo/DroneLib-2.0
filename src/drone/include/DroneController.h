@@ -13,6 +13,7 @@
 #include "controller/LedController.h"
 #include "controller/MotorController.h"
 #include "controller/ServoController.h"
+#include "controller/BatteryController.h"
 
 #include <Controller.h>
 #include <net/NetTcp.h>
@@ -79,4 +80,6 @@ protected:
     MotorController m_motorCtrl;
     /** Servo (camera motors) controller object */
     ServoController m_servoCtrl;
+    /** Battery controller object */
+    BatteryController m_batteryCtrl;
 };

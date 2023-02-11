@@ -14,10 +14,11 @@
 
 #include <utils/Structs.h>
 
-namespace controller {
-
 using namespace component;
 using namespace utils;
+
+namespace controller
+{
 
 /**
  * Servo controller class in charge of servo motor rotation.

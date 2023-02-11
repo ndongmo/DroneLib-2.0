@@ -10,14 +10,14 @@
 
 #include <cstdint>
 
-#define MOTOR_FREQUENCY         50  // Motor frequency in Hz between 40 and 1600
-#define WHEEL_COUNT             8   // Wheel actions count
-#define SERVO_COUNT             2   // Number of servo motor
-#define SERVO_DEFAULT_ANGLE     90  // default rotation angle
-#define SERVO_MAX_ANGLE_X       180 // max rotation angle
-#define SERVO_MAX_ANGLE_Y       180 // max rotation angle
-#define SERVO_MIN_ANGLE_X       0   // max rotation angle
-#define SERVO_MIN_ANGLE_Y       60  // max rotation angle
+#define MOTOR_FREQUENCY         50.0    // Motor frequency in Hz between 40 and 1600
+#define WHEEL_COUNT             8       // Wheel actions count
+#define SERVO_COUNT             2       // Number of servo motor
+#define SERVO_DEFAULT_ANGLE     90      // default rotation angle
+#define SERVO_MAX_ANGLE_X       180     // max rotation angle
+#define SERVO_MAX_ANGLE_Y       180     // max rotation angle
+#define SERVO_MIN_ANGLE_X       0       // max rotation angle
+#define SERVO_MIN_ANGLE_Y       60      // max rotation angle
 
 namespace component {
 
@@ -43,6 +43,9 @@ constexpr uint8_t SLEEP              = 0x10;
 constexpr uint8_t ALLCALL            = 0x01;
 constexpr uint8_t INVRT              = 0x10;
 constexpr uint8_t OUTDRV             = 0x04;
+constexpr uint8_t I2C_ADDRES         = 0x48;
+constexpr uint8_t PCF8591_CMD        = 0x40;
+constexpr uint8_t ADS7830_CMD        = 0x84;
 
 /**
  * Motor action structure.
@@ -86,6 +89,15 @@ enum MotorMove {
 enum ServoMove {
     SERVO_HORIZONTAL        = 0,  // servo handling horizontal rotation
     SERVO_VERTICAL          = 1,  // servo handling vertical rotation
+};
+
+/**
+ * Servo rotation axes.
+ */
+enum BatteryChannel {
+    BAT_LEFT                = 0,  // left photoresistor voltage
+    BAT_RIGHT               = 1,  // right photoresistor voltage
+    BAT_TOTAL               = 2   // total battery voltage 
 };
 
 } // component

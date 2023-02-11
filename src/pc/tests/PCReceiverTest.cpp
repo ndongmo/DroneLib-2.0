@@ -4,6 +4,7 @@
 
 #include <PCSender.h>
 #include <PCReceiver.h>
+#include <PCWindow.h>
 #include <stream/StreamReceiver.h>
 #include <utils/Constants.h>
 #include <utils/Config.h>
@@ -14,11 +15,13 @@ using namespace stream;
 class PCReceiverTest : public ::testing::Test {
 public:
     PCSender sender;
+    PCWindow window;
     PCReceiver pcrcv;
+    EventHandler evHandler;
     StreamReceiver astream;
     StreamReceiver vstream;
 protected:
-    PCReceiverTest() : pcrcv(sender, vstream, astream) {}
+    PCReceiverTest() : window(evHandler), pcrcv(window, sender, vstream, astream) {}
     void SetUp() override {
         std::ofstream configFile(CONFIG_FILE);
         configFile << "{\"" << DRONE_ADDRESS << "\":\"" << VAR_DRONE_ADDRESS << "\"}";

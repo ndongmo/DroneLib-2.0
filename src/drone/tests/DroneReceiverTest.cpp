@@ -4,9 +4,10 @@
 
 #include <DroneSender.h>
 #include <DroneReceiver.h>
-#include <controller/MotorController.h>
 #include <utils/Constants.h>
 #include <utils/Config.h>
+#include <controller/MotorController.h>
+#include <controller/ServoController.h>
 
 using namespace utils;
 using namespace controller;

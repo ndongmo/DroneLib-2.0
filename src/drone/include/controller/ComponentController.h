@@ -17,7 +17,8 @@
 
 #include <Service.h>
 
-namespace controller {
+namespace controller
+{
 
 /*!
  * Hardware component generic controller class in charge of 
@@ -31,6 +32,7 @@ class ComponentController : public Service
 public:    
     void start() override;
     int end() override;
+    void stop() override;
     bool isRunning() override;
 
     /**
@@ -93,6 +95,14 @@ template<typename T, unsigned int C>
 void ComponentController<T, C>::start() {
     m_running = true;
     m_process = std::thread([this]{run(); });
+}
+
+template<typename T, unsigned int C>
+void ComponentController<T, C>::stop() {
+	m_running = false;
+	if(m_process.joinable()) {
+		m_process.join();
+	}
 }
 
 template<typename T, unsigned int C>

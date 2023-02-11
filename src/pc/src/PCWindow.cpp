@@ -272,3 +272,7 @@ SDL_PixelFormatEnum PCWindow::getPixelFormat() {
         return SDL_PIXELFORMAT_YUY2;
     }
 }
+
+void PCWindow::newBatteryLife(int life) {
+    m_bat_text.text = "Bat: " + std::to_string(life) + "%";
+}

@@ -10,11 +10,13 @@
 
 #include "Service.h"
 #include "Stream.h"
-#include "net/NetSender.h"
-#include "net/NetHelper.h"
 
 #include <thread>
 #include <mutex>
+
+namespace net {
+class NetSender;	
+}
 
 using namespace net;
 

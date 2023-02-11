@@ -11,13 +11,15 @@
 #include "Service.h"
 #include "Stream.h"
 #include "StreamPool.h"
-#include "StreamReceiver.h"
-#include "net/NetUdp.h"
 
 #include <vector>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+
+namespace net {
+class StreamFragment;
+}
 
 using namespace net;
 

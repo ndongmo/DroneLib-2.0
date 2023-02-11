@@ -8,8 +8,12 @@
 
 #pragma once
 
+#include "component/Motor.h"
+
 #include <string>
 #include <cstdint>
+
+using namespace component;
 
 namespace hardware {
 
@@ -27,7 +31,16 @@ public:
      * @param freq_hz pulse width modulation (pwm) frequency
      */
     int open_pwm_pca9685(const std::string &device = "/dev/i2c-1", 
-        int address = 0x40, const double freq_hz = 50.0);
+        int address = PCF8591_CMD, const double freq_hz = MOTOR_FREQUENCY);
+
+    /**
+     * Open and initialize the ads7830 ADC (analog to digital converter).
+     * 
+     * @param device device's name
+     * @param address bus's address
+     */
+    int open_adc_ads7830(const std::string &device = "/dev/i2c-1", 
+        int address = I2C_ADDRES);
 
     /**
      * Close the i2c file descriptor.
@@ -44,6 +57,14 @@ public:
      */
     void set_pwm_pca9685(const int channel, const uint16_t on, const uint16_t off);
 
+    /**
+     * @brief Get the adc ADS7830 voltage value.
+     * 
+     * @param channel the channel to read
+     * @return float voltage value
+     */
+    float get_adc_ads7830(const int channel);
+
 private:
     /**
      * Open and initialize the i2c bus.
@@ -53,11 +74,23 @@ private:
     int open(const std::string& device, const uint8_t address);
 
     /**
+     * Write the given value into the descriptor memory address.
+     * @param value to write
+     */
+    void write(const uint8_t value);
+
+    /**
      * Write the given value in the given register address.
      * @param address register address
      * @param value to write in the register
      */
     void write(const uint8_t address, const uint8_t value);
+
+    /**
+     * Read the the descriptor memory address and return the data value.
+     * @return the read value
+     */
+    uint8_t read();
 
     /**
      * Read the given register address and return the data value.

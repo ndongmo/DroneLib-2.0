@@ -56,21 +56,22 @@ int LedController::begin() {
 }
 
 int LedController::end() {
-    if(ComponentController::end() != 1) return -1;
+    int ret1 = ComponentController::end();
 
 #ifdef __arm__  
     for(unsigned int i = 0; i < LED_COUNT; i++) {
         m_ledBuffer.channel[0].leds[i] = 0;
     }
     
-    ws2811_return_t ret;
-    if ((ret = ws2811_render(&m_ledBuffer)) != WS2811_SUCCESS) {
-        logE << "Led ws2811_render failed when clearing: " << ws2811_get_return_t_str(ret) << std::endl;
+    ws2811_return_t ret2;
+    if ((ret2 = ws2811_render(&m_ledBuffer)) != WS2811_SUCCESS) {
+        logE << "Led ws2811_render failed when clearing: " << ws2811_get_return_t_str(ret2) << std::endl;
+        ret1 = -1;
     }
     ws2811_fini(&m_ledBuffer);
 #endif
 
-    return 1;
+    return ret1;
 }
 
 void LedController::turn(unsigned int ledIndex, bool state, unsigned int colorIndex) {

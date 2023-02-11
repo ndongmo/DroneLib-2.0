@@ -8,11 +8,13 @@
 
 #pragma once
 
-#define MAX_FPS                 60  // camera rotation increment value
-#define CAMERA_ROTATION_ANGLE   5   // camera rotation increment value
-#define MOTORS_MOVE_LAPS        100 // Time laps of wheel move in millisecond
-#define SERVOS_MOVE_LAPS        25  // Time laps of servo rotation in millisecond
-#define SERVOS_MOVE_APL         2   // Servo rotation value per laps
+#define MAX_FPS                 60      // camera rotation increment value
+#define CAMERA_ROTATION_ANGLE   5       // camera rotation increment value
+#define MOTORS_MOVE_LAPS        100     // Time laps of wheel move in millisecond
+#define SERVOS_MOVE_LAPS        25      // Time laps of servo rotation in millisecond
+#define SERVOS_MOVE_APL         2       // Servo rotation value per laps
+#define BATTERY_LAPS            1000    // Battery update time laps in millisecond
+#define BATTERY_VOLT_MAX        8.4f    // Battery maximum voltage
 
 /* Drone config variables */
 #define DRONE_PORT_DISCOVERY_DEFAULT 	4444
@@ -89,6 +91,7 @@
 #define SERVOS_ACTIVE               "servos_active"
 #define MOTORS_ACTIVE               "motors_active"
 #define LEDS_ACTIVE                 "leds_active"
+#define BATTERY_ACTIVE              "battery_active"
 
 /* Resource activation config variables default values */
 #define CAMERA_ACTIVE_DEFAULT       1
@@ -96,6 +99,7 @@
 #define SERVOS_ACTIVE_DEFAULT       1 
 #define MOTORS_ACTIVE_DEFAULT       1
 #define LEDS_ACTIVE_DEFAULT         1
+#define BATTERY_ACTIVE_DEFAULT      1
 
 // NS_FRAME_TYPE
 #define NS_FRAME_TYPE_QUIT              0
@@ -114,6 +118,7 @@
 #define NS_ID_CAMERA            5   // navigation cmd id
 #define NS_ID_STREAM_AUDIO      6   // audio stream id
 #define NS_ID_STREAM_VIDEO      7   // video stream id
+#define NS_ID_BATTERY_LIFE      8   // battery life id
 
 // Command frequencies in millisecond
 #define NS_FREQ_PING            50                     // ping cmd frequency

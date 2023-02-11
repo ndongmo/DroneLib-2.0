@@ -18,7 +18,7 @@ int MotorController::begin() {
 }
 
 int MotorController::end() {
-    if(ComponentController::end() != 1) return -1;
+    int ret = ComponentController::end();
 
 #ifdef __arm__
     for(unsigned int i = 0; i < WHEEL_COUNT; i++) {
@@ -27,7 +27,7 @@ int MotorController::end() {
     m_pca.close();
 #endif
 
-    return 1;
+    return ret;
 }
 
 void MotorController::handleActions() {

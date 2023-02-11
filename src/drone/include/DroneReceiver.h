@@ -8,11 +8,13 @@
 
 #pragma once
 
-#include "DroneSender.h"
-#include "controller/MotorController.h"
-#include "controller/ServoController.h"
-
 #include <net/NetReceiver.h>
+
+class DroneSender;
+namespace controller {
+class MotorController;
+class ServoController;
+}
 
 using namespace net;
 using namespace controller;

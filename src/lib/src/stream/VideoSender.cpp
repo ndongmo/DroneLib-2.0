@@ -23,7 +23,7 @@ int VideoSender::begin() {
 	const std::string fps = std::to_string(Config::getInt(VIDEO_FPS));
 
 	av_dict_set(&m_options, "video_size", size.c_str(), 0);
-  	av_dict_set(&m_options, "r", fps.c_str(), 0);
+  	av_dict_set(&m_options, "framerate", fps.c_str(), 0);
 	
 	if(StreamSender::begin() == -1) {
 		return -1;

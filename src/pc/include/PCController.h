@@ -70,6 +70,10 @@ private:
 	std::thread m_initProcess;
     /** Discovering tcp socket */
     net::NetTcp m_conSocket;
+    /** Speaker object */
+    PCSpeaker m_speaker;
+    /** UI & event manager object */
+    PCWindow m_window;
     /** Network sender object */
     PCSender m_sender;
     /** Network receiver object */
@@ -78,10 +82,6 @@ private:
     EventHandler m_evHandler;
     /** FPS limiter object */
     FPSLimiter m_fpsLimiter;
-    /** UI & event manager object */
-    PCWindow m_window;
-    /** Speaker object */
-    PCSpeaker m_speaker;
     /** Video stream receiver object */
     VideoReceiver m_videoStream;
     /** Audio stream receiver object */

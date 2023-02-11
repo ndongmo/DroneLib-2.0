@@ -1,16 +1,19 @@
 #include "PCReceiver.h"
+#include "PCSender.h"
+#include "PCWindow.h"
 #include "Constants.h"
 
 #include <net/NetHelper.h>
 #include <utils/Logger.h>
 #include <utils/Config.h>
 #include <utils/Constants.h>
+#include <stream/StreamReceiver.h>
 
 using namespace utils; 
 
-PCReceiver::PCReceiver(PCSender &sender, StreamReceiver &videoReceiver, 
-	StreamReceiver &audioReceiver) : 
-	NetReceiver(sender), m_pcSender(sender), m_videoReceiver(videoReceiver), 
+PCReceiver::PCReceiver(PCWindow &window, PCSender &sender,
+	StreamReceiver &videoReceiver, StreamReceiver &audioReceiver) : 
+	NetReceiver(sender), m_window(window), m_pcSender(sender), m_videoReceiver(videoReceiver), 
 	m_audioReceiver(audioReceiver) {
 	m_name = "PCReceiver";
 }
@@ -39,6 +42,9 @@ void PCReceiver::innerRun(NetFrame &netFrame) {
 			StreamFragment streamFragment;
 			net::NetHelper::readFrame(netFrame, streamFragment);
 			m_audioReceiver.newFragment(streamFragment);
+		}
+		else if (netFrame.id == NS_ID_BATTERY_LIFE) {
+			m_window.newBatteryLife((int)netFrame.data[0]);
 		}
 	}
 }

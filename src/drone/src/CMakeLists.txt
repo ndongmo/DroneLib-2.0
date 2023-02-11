@@ -10,6 +10,7 @@ SET(SOURCE_FILES
 	controller/LedController.cpp
 	controller/ServoController.cpp
 	controller/MotorController.cpp
+	controller/BatteryController.cpp
 	controller/ComponentController.cpp
 	hardware/I2C.cpp
 )

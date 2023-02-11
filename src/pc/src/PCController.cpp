@@ -7,9 +7,9 @@
 
 using namespace utils;
 
-PCController::PCController() : 
-	m_receiver(m_sender, m_videoStream, m_audioStream), 
-	m_window(m_evHandler), m_speaker(m_audioStream) {
+PCController::PCController() :
+	m_speaker(m_audioStream), m_window(m_evHandler), 
+	m_receiver(m_window, m_sender, m_videoStream, m_audioStream) {
 	m_name = "PCController";
 }
 

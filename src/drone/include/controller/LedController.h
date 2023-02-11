@@ -17,9 +17,10 @@
 
 #define STATE_LEDS 2    // number of leds for state highlighting
 
-namespace controller {
-
 using namespace component;
+
+namespace controller
+{
 
 /**
  * Led controller class in charge of leds manipulation.

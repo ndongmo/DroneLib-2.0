@@ -11,7 +11,7 @@ using namespace utils;
 
 DroneController::DroneController() : 
 	m_receiver(m_sender, m_motorCtrl, m_servoCtrl), m_audioSender(m_sender),
-	m_videoSender(m_sender) {
+	m_videoSender(m_sender), m_batteryCtrl(m_sender) {
 	m_name = "DroneController";
 }
 
@@ -20,6 +20,7 @@ void DroneController::init() {
 		m_initProcess.join();
 	}
 
+	stopService(m_batteryCtrl, BATTERY_ACTIVE);
 	stopService(m_audioSender, MICRO_ACTIVE);
 	stopService(m_videoSender, CAMERA_ACTIVE);
 
@@ -52,6 +53,7 @@ void DroneController::init() {
 		m_sender.start();
 		m_receiver.start();
 
+		startService(m_batteryCtrl, BATTERY_ACTIVE);
 		startService(m_audioSender, MICRO_ACTIVE);
 		startService(m_videoSender, CAMERA_ACTIVE);
 
@@ -84,6 +86,9 @@ int DroneController::begin() {
 	if(beginService(m_servoCtrl, SERVOS_ACTIVE) == -1) {
 		return -1;
 	}
+	if(beginService(m_batteryCtrl, BATTERY_ACTIVE) == -1) {
+		return -1;
+	}
 	if(beginService(m_audioSender, MICRO_ACTIVE) == -1) {
 		return -1;
 	}
@@ -109,6 +114,7 @@ int DroneController::end() {
 	result = result && endService(m_ledCtrl, LEDS_ACTIVE) != -1;
 	result = result && endService(m_motorCtrl, MOTORS_ACTIVE) != -1;
 	result = result && endService(m_servoCtrl, SERVOS_ACTIVE) != -1;
+	result = result && endService(m_batteryCtrl, BATTERY_ACTIVE) != -1;
 	result = result && endService(m_audioSender, MICRO_ACTIVE) != -1;
 	result = result && endService(m_videoSender, CAMERA_ACTIVE) != -1;
 	result = result && m_sender.end() != -1;

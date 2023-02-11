@@ -64,6 +64,13 @@ public:
      */
     void updateState(utils::AppState state, int error);
 
+    /**
+     * @brief Receive new battery life value in percentage.
+     * 
+     * @param life battery life value (%)
+     */
+    void newBatteryLife(int life);
+
 private:
     /**
      * Initialize controller events.

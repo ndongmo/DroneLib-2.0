@@ -8,10 +8,13 @@
 
 #pragma once
 
-#include "PCSender.h"
-
 #include <net/NetReceiver.h>
-#include <stream/StreamReceiver.h>
+
+class PCSender;
+class PCWindow;
+namespace stream {
+class StreamReceiver;
+}
 
 using namespace net;
 using namespace stream;
@@ -26,17 +29,20 @@ public:
      * @brief Construct a new PC network receiver object
      * 
      * @param receiver network sender reference
+     * @param window window reference
      * @param videoReceiver video stream receiver reference
      * @param audioReceiver audio stream receiver reference
      */
-    PCReceiver(PCSender &sender, StreamReceiver &videoReceiver, 
-        StreamReceiver &audioReceiver);
+    PCReceiver(PCWindow &window, PCSender &sender, 
+        StreamReceiver &videoReceiver, StreamReceiver &audioReceiver);
 
     int begin() override;
 
 private:
     void innerRun(NetFrame &netFrame) override;
 
+    /** PC window reference */
+    PCWindow &m_window;
     /** PC network sender reference */
     PCSender &m_pcSender;
     /** Video stream receiver reference */

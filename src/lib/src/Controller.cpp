@@ -11,6 +11,7 @@ void Controller::initConfigs() {
 	Config::setIntDefault(SERVOS_ACTIVE, SERVOS_ACTIVE_DEFAULT);
 	Config::setIntDefault(MOTORS_ACTIVE, MOTORS_ACTIVE_DEFAULT);
 	Config::setIntDefault(LEDS_ACTIVE, LEDS_ACTIVE_DEFAULT);
+	Config::setIntDefault(BATTERY_ACTIVE, BATTERY_ACTIVE_DEFAULT);
 
     Config::setIntDefault(VIDEO_FPS, VIDEO_FPS_DEFAULT);
 	Config::setIntDefault(VIDEO_CODEC, VIDEO_CODEC_DEFAULT);

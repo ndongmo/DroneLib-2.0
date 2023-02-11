@@ -20,7 +20,7 @@ int ServoController::begin() {
 }
 
 int ServoController::end() {
-    if(ComponentController::end() != 1) return -1;
+    int ret = ComponentController::end();
 
     init();
     
@@ -28,7 +28,7 @@ int ServoController::end() {
     m_pca.close();
 #endif
 
-    return 1;
+    return ret;
 }
 
 void ServoController::init() {

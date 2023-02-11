@@ -1,4 +1,5 @@
 #include "stream/StreamReceiver.h"
+#include "net/NetHelper.h"
 #include "utils/Logger.h"
 #include "utils/Config.h"
 #include "utils/Constants.h"

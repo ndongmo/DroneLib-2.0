@@ -1,4 +1,5 @@
 #include "stream/StreamSender.h"
+#include "net/NetSender.h"
 #include "utils/Logger.h"
 #include "utils/Config.h"
 #include "utils/Constants.h"
