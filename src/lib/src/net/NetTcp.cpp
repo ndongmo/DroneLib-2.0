@@ -48,10 +48,17 @@ int NetTcp::openClient(const char *addr, int port) {
 
 	int opt = 1;
 	// Forcefully attaching socket to the port 8080
+#ifdef _WIN32 
+    if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) == SOCKET_ERROR) {
+        logE << "socket set option failed: " << WSAGetLastError() << std::endl;
+		return -1;
+    }
+#else
     if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
         logE << "socket set option failed: " << strerror(errno) << std::endl;
 		return -1;
     }
+#endif
 
 	m_server_addr.sin_family = AF_INET;
 	m_server_addr.sin_port = htons(port);
@@ -77,10 +84,17 @@ int NetTcp::openServer(const char *addr, int port) {
 
 	int opt = 1;
 	// Forcefully attaching socket to the port 8080
+#ifdef _WIN32 
+    if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) == SOCKET_ERROR) {
+        logE << "socket set option failed: " << WSAGetLastError() << std::endl;
+		return -1;
+    }
+#else
     if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
         logE << "socket set option failed: " << strerror(errno) << std::endl;
 		return -1;
     }
+#endif
 
 	m_server_addr.sin_family = AF_INET;
 	m_server_addr.sin_port = htons(port);
@@ -103,7 +117,7 @@ int NetTcp::openServer(const char *addr, int port) {
 
 int NetTcp::listen(struct sockaddr_in &client) {
 	int addrlen = sizeof(client);
-	int new_sock;
+	SOCKET new_sock;
 
 	if (::listen(m_sock, 1) < 0) {
         logE << "Tcp listen failed: " << strerror(errno) << std::endl;

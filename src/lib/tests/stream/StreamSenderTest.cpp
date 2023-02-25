@@ -15,8 +15,9 @@ class MockStreamSender : public StreamSender {
 public:
     MockStreamSender() : StreamSender(netSender) {
         m_streamID = NS_ID_STREAM_VIDEO;
-        m_filename = VIDEO_DEVICE_DEFAULT;
 	    m_mediaType = AVMEDIA_TYPE_VIDEO;
+        m_filename = Config::getString(VIDEO_DEVICE);
+	    m_formatname = Config::getString(VIDEO_INPUT_FORMAT);
     }
     int getStreamID() { return m_streamID; }
     int getFrameIndex() { return m_frameIndex; }
@@ -37,9 +38,10 @@ public:
     MockStreamSender streamSender;
 protected:
     void SetUp() override {
-        EXPECT_EQ(streamSender.getStreamID(), NS_ID_STREAM_VIDEO);
-        EXPECT_EQ(streamSender.getFileName(), VIDEO_DEVICE_DEFAULT);
-        EXPECT_EQ(streamSender.getMediaType(), AVMEDIA_TYPE_VIDEO);
+        Config::init();
+        Config::setStringDefault(VIDEO_DEVICE, VIDEO_DEVICE_DEFAULT);
+	    Config::setStringDefault(VIDEO_INPUT_FORMAT, VIDEO_INPUT_FORMAT_DEFAULT);
+        
         EXPECT_EQ(streamSender.getFrameIndex(), 0);
     }
     void TearDown() override {

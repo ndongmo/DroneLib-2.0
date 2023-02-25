@@ -18,7 +18,7 @@
 #include <condition_variable>
 
 namespace net {
-class StreamFragment;
+struct StreamFragment;
 }
 
 using namespace net;

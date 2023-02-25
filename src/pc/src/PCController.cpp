@@ -8,6 +8,7 @@
 using namespace utils;
 
 PCController::PCController() :
+	m_evHandler(), m_audioStream(),
 	m_speaker(m_audioStream), m_window(m_evHandler), 
 	m_receiver(m_window, m_sender, m_videoStream, m_audioStream) {
 	m_name = "PCController";
@@ -178,7 +179,7 @@ int PCController::discovery() {
 
 	std::string msg = Config::encodeJson({ CTRL_PORT_RCV });
 
-	if (m_conSocket.send(msg.c_str(), msg.length()) == -1) {
+	if (m_conSocket.send(msg.c_str(), (int)msg.length()) == -1) {
 		logE << m_name << " discovery: TCP send PC config failed" << std::endl;
 		return -1;
 	}

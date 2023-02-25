@@ -34,7 +34,7 @@ void NetReceiver::start() {
 void NetReceiver::run() {
 	int len = 0;
 	int maxFragmentSize = Config::getInt(NET_FRAGMENT_SIZE);
-	char buf[maxFragmentSize];
+	char* buf = new char[maxFragmentSize];
 
 	while (m_running) {
 		memset(buf, 0, maxFragmentSize);
@@ -70,9 +70,11 @@ void NetReceiver::run() {
 			innerRun(netFrame);
 		}
 	}
-	if(len < 1 and !is_closing) {
+	if(len < 1 && !is_closing) {
 		sendError(ERROR_NET_RECEIVE);
 	}
+
+	delete[] buf;
 }
 
 bool NetReceiver::isConnected() {

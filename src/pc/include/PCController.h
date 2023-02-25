@@ -68,6 +68,10 @@ private:
 
     /** Init process */
 	std::thread m_initProcess;
+    /** Keyboard/Joystick event handler */
+    EventHandler m_evHandler;
+    /** Audio stream receiver object */
+    AudioReceiver m_audioStream;
     /** Discovering tcp socket */
     net::NetTcp m_conSocket;
     /** Speaker object */
@@ -78,12 +82,8 @@ private:
     PCSender m_sender;
     /** Network receiver object */
     PCReceiver m_receiver;
-    /** Keyboard/Joystick event handler */
-    EventHandler m_evHandler;
     /** FPS limiter object */
     FPSLimiter m_fpsLimiter;
     /** Video stream receiver object */
     VideoReceiver m_videoStream;
-    /** Audio stream receiver object */
-    AudioReceiver m_audioStream;
 };

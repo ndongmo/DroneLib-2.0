@@ -66,12 +66,15 @@ ELSE()
 	SET(ENABLED_DEBUG_MESSAGE " -DNDEBUG")
 ENDIF()
 
-SET(CMAKE_CXX_FLAGS "-Wall -Wno-overloaded-virtual -Wdeprecated-declarations -fmax-errors=5")
+IF(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  SET(CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -Wno-overloaded-virtual -Wdeprecated-declarations -fmax-errors=5")
+  SET(CMAKE_CXX_FLAGS_DEBUG " -Og -ggdb ${ENABLED_DEBUG_MESSAGE}")
+  SET(CMAKE_CXX_FLAGS_RELEASE " -O3  ${ENABLED_DEBUG_MESSAGE}")
+ENDIF()
+
 IF(APPLE)
   string(APPEND CMAKE_CXX_FLAGS " -Qunused-arguments")
 ENDIF(APPLE)
-SET(CMAKE_CXX_FLAGS_DEBUG " -Og -ggdb ${ENABLED_DEBUG_MESSAGE}")
-SET(CMAKE_CXX_FLAGS_RELEASE " -O3  ${ENABLED_DEBUG_MESSAGE}")
 
 add_subdirectory(src/lib)
 

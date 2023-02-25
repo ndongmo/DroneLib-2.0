@@ -6,18 +6,24 @@
 * \version 2.0
 */
 
+#define SDL_MAIN_HANDLED
+
 #include <PCController.h>
 #include <utils/Logger.h>
 #include <utils/Config.h>
 #include <utils/Constants.h>
 
 #include <fstream>
+
+#ifndef _WIN32
 #include <signal.h>
 #include <unistd.h>
+#endif
 
 /** The PC controller */
 static PCController ctrl;
 
+#ifndef _WIN32
 /**
  * @brief Handler method for ctrl_c event.
  * 
@@ -39,10 +45,13 @@ static void setup_handlers(void)
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGTERM, &sa, NULL);
 }
+#endif
 
 int main(int argc, char *argv[])
 {
+#ifndef _WIN32
 	setup_handlers();
+#endif
 
 	if (!Config::exists()) {
 		std::ofstream configFile(CONFIG_FILE);
