@@ -67,8 +67,6 @@ void PCController::initConfigs() {
 	Config::setIntDefault(PC_FONT_SIZE, PC_FONT_SIZE_DEFAULT);
 	Config::setStringDefault(PC_APP_NAME, PC_APP_NAME_DEFAULT);
 
-	Config::setIntDefault(VIDEO_DST_WIDTH, VIDEO_DST_WIDTH_DEFAULT);
-	Config::setIntDefault(VIDEO_DST_HEIGHT, VIDEO_DST_HEIGHT_DEFAULT);
 	Config::setIntDefault(CTRL_PORT_RCV, CTRL_PORT_RCV_DEFAULT);
 	Config::setIntDefault(CTRL_PORT_SEND, CTRL_PORT_SEND_DEFAULT);
 }
@@ -177,7 +175,9 @@ int PCController::discovery() {
         return -1;
 	}
 
-	std::string msg = Config::encodeJson({ CTRL_PORT_RCV });
+	logI << "fps send: " << Config::getInt(VIDEO_FPS) << std::endl;
+
+	std::string msg = Config::encodeJson({ CTRL_PORT_RCV, VIDEO_FPS, VIDEO_WIDTH, VIDEO_HEIGHT });
 
 	if (m_conSocket.send(msg.c_str(), (int)msg.length()) == -1) {
 		logE << m_name << " discovery: TCP send PC config failed" << std::endl;

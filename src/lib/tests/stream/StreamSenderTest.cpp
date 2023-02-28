@@ -14,6 +14,10 @@ using namespace stream;
 class MockStreamSender : public StreamSender {
 public:
     MockStreamSender() : StreamSender(netSender) {
+        Config::init();
+        Config::setStringDefault(VIDEO_DEVICE, VIDEO_DEVICE_DEFAULT);
+	    Config::setStringDefault(VIDEO_INPUT_FORMAT, VIDEO_INPUT_FORMAT_DEFAULT);
+
         m_streamID = NS_ID_STREAM_VIDEO;
 	    m_mediaType = AVMEDIA_TYPE_VIDEO;
         m_filename = Config::getString(VIDEO_DEVICE);
@@ -38,10 +42,6 @@ public:
     MockStreamSender streamSender;
 protected:
     void SetUp() override {
-        Config::init();
-        Config::setStringDefault(VIDEO_DEVICE, VIDEO_DEVICE_DEFAULT);
-	    Config::setStringDefault(VIDEO_INPUT_FORMAT, VIDEO_INPUT_FORMAT_DEFAULT);
-        
         EXPECT_EQ(streamSender.getFrameIndex(), 0);
     }
     void TearDown() override {

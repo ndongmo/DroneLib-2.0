@@ -92,9 +92,6 @@ int DroneController::begin() {
 	if(beginService(m_audioSender, MICRO_ACTIVE) == -1) {
 		return -1;
 	}
-	if(beginService(m_videoSender, CAMERA_ACTIVE) == -1) {
-		return -1;
-	}
 	
 	return 1;
 }
@@ -222,6 +219,13 @@ int DroneController::discovery() {
 	}
 	logI << m_name << " discovery: receive client address[" <<  Config::getString(CTRL_ADDRESS)
 		<< "] port[" << Config::getInt(CTRL_PORT_RCV) << "]" << std::endl;
+
+	if(endService(m_videoSender, CAMERA_ACTIVE) == -1) {
+		return -1;
+	}
+	if(beginService(m_videoSender, CAMERA_ACTIVE) == -1) {
+		return -1;
+	}
 
 	std::string msg = Config::encodeJson({
 		DRONE_PORT_RCV, DRONE_PORT_SEND, NET_FRAGMENT_SIZE, NET_FRAGMENT_NUMBER,

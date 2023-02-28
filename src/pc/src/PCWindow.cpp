@@ -18,8 +18,8 @@ PCWindow::PCWindow(EventHandler& evHandler) : m_evHandler(evHandler)
 }
 
 int PCWindow::begin() {	
-	m_width = Config::getInt(VIDEO_DST_WIDTH);
-    m_height = Config::getInt(VIDEO_DST_HEIGHT);
+	m_width = Config::getInt(VIDEO_WIDTH);
+    m_height = Config::getInt(VIDEO_HEIGHT);
     m_format = Config::getInt(VIDEO_FORMAT);
     
     if(SDL_WasInit(SDL_INIT_EVERYTHING) != SDL_INIT_EVERYTHING) {
@@ -231,10 +231,6 @@ void PCWindow::updateState(utils::AppState state, int error) {
 
         if(Config::getInt(CAMERA_ACTIVE) && (Config::getInt(VIDEO_WIDTH) != m_width || 
             Config::getInt(VIDEO_HEIGHT) != m_height || Config::getInt(VIDEO_FORMAT) != m_format)) {
-
-            Config::setInt(VIDEO_DST_WIDTH, Config::getInt(VIDEO_WIDTH));
-            Config::setInt(VIDEO_DST_HEIGHT, Config::getInt(VIDEO_HEIGHT));
-
             clean();
             begin();
             start();

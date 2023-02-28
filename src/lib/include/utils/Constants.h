@@ -18,7 +18,7 @@
 
 /* Drone config variables */
 #define DRONE_PORT_DISCOVERY_DEFAULT 	4444
-#define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.0.242"
+#define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.0.241"
 
 /* Drone config variables */
 #define DRONE_ADDRESS 		    "drone_address"
@@ -56,16 +56,6 @@
 #define VIDEO_FPS_DEFAULT           30
 #define VIDEO_DEVICE_DEFAULT        "/dev/video0"
 #define VIDEO_INPUT_FORMAT_DEFAULT  "v4l2"
-
-/* Video destination config variables */
-#define VIDEO_DST_FORMAT    "video_dst_format"
-#define VIDEO_DST_WIDTH     "video_dst_width"
-#define VIDEO_DST_HEIGHT    "video_dst_height"
-
-/* Video destination config vairiables default values */
-#define VIDEO_DST_FORMAT_DEFAULT    3 // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
-#define VIDEO_DST_WIDTH_DEFAULT     640
-#define VIDEO_DST_HEIGHT_DEFAULT    480
 
 /* Audio source config variables */
 #define AUDIO_CODEC         "audio_codec"
