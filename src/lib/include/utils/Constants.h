@@ -54,8 +54,14 @@
 #define VIDEO_WIDTH_DEFAULT         640
 #define VIDEO_HEIGHT_DEFAULT        480
 #define VIDEO_FPS_DEFAULT           30
+#ifdef _WIN32 
+/* Cmd to list capture devices on Window: ffmpeg -list_devices true -f dshow -i any */
+#define VIDEO_DEVICE_DEFAULT        "video=EasyCamera"
+#define VIDEO_INPUT_FORMAT_DEFAULT  "dshow"
+#else
 #define VIDEO_DEVICE_DEFAULT        "/dev/video0"
 #define VIDEO_INPUT_FORMAT_DEFAULT  "v4l2"
+#endif
 
 /* Audio source config variables */
 #define AUDIO_CODEC         "audio_codec"

@@ -14,13 +14,10 @@ SET(SOURCE_FILES
 	stream/StreamReceiverTest.cpp
 )
 
-# Apple specific stuff
-if(APPLE)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-endif(APPLE)
-
-FIND_PACKAGE(Threads)
+IF(APPLE)
+	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+ENDIF()
 
 IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
 	FIND_LIBRARY(LIB_GTEST libgtest.a ${THIRD_PARTY_LIB})
@@ -33,6 +30,10 @@ ELSE()
 	FIND_LIBRARY(LIB_GMOCK gmock ${THIRD_PARTY_LIB})
 ENDIF()
 
+IF (WIN32)
+	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${THIRD_PARTY_BIN})
+ENDIF()
+
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 
@@ -41,14 +42,12 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		debug ${LIB}
 		debug ${LIB_GTEST}
 		debug ${LIB_GMOCK}
-		debug Threads::Threads
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${LIB}
 		optimized ${LIB_GTEST}
 		optimized ${LIB_GMOCK}
-		optimized Threads::Threads
 	)
 ENDIF()
 

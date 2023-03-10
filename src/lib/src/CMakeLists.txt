@@ -22,11 +22,12 @@ SET(SOURCE_FILES
 	Service.cpp
 )
 
-# Apple specific stuff
-if(APPLE)
+IF(APPLE)
 	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-endif(APPLE)
+ENDIF()
+
+FIND_PACKAGE(Threads)
 
 IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
 	FIND_LIBRARY(LIB_AV_UTIL libavutil.so ${THIRD_PARTY_BIN})
@@ -63,6 +64,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		debug ${LIB_AV_DEVICE}
 		debug ${LIB_SW_SCALE}
 		debug ${LIB_SW_RESAMPLE}
+		debug Threads::Threads
 		$<$<BOOL:${WIN32}>:wsock32>
 		$<$<BOOL:${WIN32}>:ws2_32>
 	)
@@ -75,6 +77,7 @@ ELSE()
 		optimized ${LIB_AV_DEVICE}
 		optimized ${LIB_SW_SCALE}
 		optimized ${LIB_SW_RESAMPLE}
+		optimized Threads::Threads
 		$<$<BOOL:${WIN32}>:wsock32>
 		$<$<BOOL:${WIN32}>:ws2_32>
 	)

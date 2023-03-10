@@ -1,6 +1,6 @@
 # DroneLib 2.0 C++ project: PC controller package
 
-PROJECT(PC)
+PROJECT(${PC})
 
 SET(SOURCE_FILES
 	main.cpp
@@ -13,13 +13,10 @@ SET(SOURCE_FILES
 	PCWindow.cpp
 )
 
-# Apple specific stuff
-if(APPLE)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-endif(APPLE)
-
-FIND_PACKAGE(Threads)
+IF(APPLE)
+	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+ENDIF()
 
 IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
 	FIND_LIBRARY(LIB_SDL libSDL2.so ${THIRD_PARTY_BIN})
@@ -32,8 +29,7 @@ ELSE()
 	FIND_LIBRARY(LIB_TTF SDL2_ttf ${THIRD_PARTY_LIB})
 ENDIF()
 
-ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
-ADD_LIBRARY(${PCLIB} SHARED ${SOURCE_FILES})
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES 
 	DEBUG_POSTFIX "d"
 )
@@ -50,18 +46,38 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		debug ${LIB}
 		debug ${LIB_SDL}
 		debug ${LIB_TTF}
-		debug Threads::Threads
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${LIB}
 		optimized ${LIB_SDL}
 		optimized ${LIB_TTF}
-		optimized Threads::Threads
 	)
 ENDIF()
 
 add_dependencies(${PROJECT_NAME} ${LIB})
+
+#-----------------------------------------------------
+# Create executable
+#-----------------------------------------------------
+
+SET(PCMain Pc-main)
+
+IF (WIN32)
+	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${THIRD_PARTY_BIN})
+ENDIF()
+
+ADD_EXECUTABLE(${PCMain} ${SOURCE_FILES})
+SET_TARGET_PROPERTIES(${PCMain} PROPERTIES 
+	DEBUG_POSTFIX "d"
+	OUTPUT_NAME ${PROJECT_NAME}
+)
+
+IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	TARGET_LINK_LIBRARIES(${PCMain} debug ${PROJECT_NAME})
+ELSE()
+	TARGET_LINK_LIBRARIES(${PCMain} optimized ${PROJECT_NAME})
+ENDIF()
 
 #-----------------------------------------------------
 # DELIVERING binaries and header to ${LIB_HOME}

@@ -1,6 +1,6 @@
 # DroneLib 2.0 C++ project: Drone package
 
-PROJECT(Drone)
+PROJECT(${DRONE})
 
 SET(SOURCE_FILES
 	main.cpp
@@ -15,13 +15,10 @@ SET(SOURCE_FILES
 	hardware/I2C.cpp
 )
 
-# Apple specific stuff
-if(APPLE)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-endif(APPLE)
-
-FIND_PACKAGE(Threads)
+IF(APPLE)
+	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+ENDIF()
 
 IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
 	FIND_LIBRARY(LIB_WS2811 libws2811.a ${THIRD_PARTY_LIB})
@@ -31,8 +28,7 @@ ELSE()
 	FIND_LIBRARY(LIB_WS2811 libws2811 ${THIRD_PARTY_LIB})
 ENDIF()
 
-ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
-ADD_LIBRARY(${DRONE_LIB} SHARED ${SOURCE_FILES})
+ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -40,18 +36,34 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		debug ${LIB}
 		debug ${LIB_WS2811}
 		debug i2c
-		debug Threads::Threads
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${LIB}
 		optimized ${LIB_WS2811}
 		optimized i2c
-		optimized Threads::Threads
 	)
 ENDIF()
 
 add_dependencies(${PROJECT_NAME} ${LIB})
+
+#-----------------------------------------------------
+# Create executable
+#-----------------------------------------------------
+
+SET(DroneMain Drone-main)
+
+ADD_EXECUTABLE(${DroneMain} ${SOURCE_FILES})
+SET_TARGET_PROPERTIES(${DroneMain} PROPERTIES 
+	DEBUG_POSTFIX "d"
+	OUTPUT_NAME ${PROJECT_NAME}
+)
+
+IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	TARGET_LINK_LIBRARIES(${DroneMain} debug ${PROJECT_NAME})
+ELSE()
+	TARGET_LINK_LIBRARIES(${DroneMain} optimized ${PROJECT_NAME})
+ENDIF()
 
 #-----------------------------------------------------
 # DELIVERING binaries and header to ${APP_OUTPUT_BIN}
