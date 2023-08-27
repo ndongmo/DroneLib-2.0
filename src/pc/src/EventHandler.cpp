@@ -10,6 +10,7 @@ void EventHandler::init()
 	if (SDL_NumJoysticks() > 0) {
 		SDL_JoystickEventState(SDL_ENABLE);
 		m_joystick = SDL_JoystickOpen(0);
+		m_playWith = PlayWith::GAMEPAD;
 	}
 }
 
@@ -28,6 +29,7 @@ void EventHandler::update()
 	{
 		SDL_JoystickEventState(SDL_ENABLE);
 		m_joystick = SDL_JoystickOpen(0);
+		m_playWith = PlayWith::GAMEPAD;
 	}
 	else if (SDL_NumJoysticks() == 0 && m_joystick != nullptr)
 	{
@@ -190,9 +192,6 @@ bool EventHandler::loadConfig()
 	}
 
 	size_t size = 0;
-	int Playwith = 0;
-
-	file >> Playwith;
 	file >> size;
 
 	for (size_t i = 0; i < size; i++) {
@@ -202,7 +201,7 @@ bool EventHandler::loadConfig()
 	}
 	file.close();
 
-	if ((PlayWith)Playwith == PlayWith::GAMEPAD && m_joystick != nullptr)
+	if (m_joystick != nullptr)
 		m_playWith = PlayWith::GAMEPAD;
 	else
 		m_playWith = PlayWith::KEYBOARD;
@@ -220,7 +219,6 @@ bool EventHandler::saveConfigFile()
 		return false;
 	}
 
-	file << (int)m_playWith << '\n';
 	file << m_eventConfig.size() << '\n';
 
 	for (auto& it : m_eventConfig) {
