@@ -15,6 +15,7 @@
 #include <EventHandler.h>
 #include <controller/MotorController.h>
 #include <controller/ServoController.h>
+#include <controller/BuzzerController.h>
 
 using namespace utils;
 using namespace net;
@@ -26,9 +27,11 @@ public:
     MotorController& getMotorController() {
         return m_motorCtrl;
     }
-
     ServoController& getServoController() {
         return m_servoCtrl;
+    }
+    BuzzerController& getBuzzerController() {
+        return m_buzzerCtrl;
     }
 };
 
@@ -133,4 +136,25 @@ TEST_F(IntegrationTest, CameraCmdsWork) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_TRUE(serovoCtrl.isOn(SERVO_VERTICAL));
     EXPECT_LE((int)serovoCtrl.getValue(SERVO_VERTICAL), SERVO_DEFAULT_ANGLE - CAMERA_ROTATION_ANGLE);
+}
+
+// Integration test for buzzer command
+TEST_F(IntegrationTest, BuzzerCmdWorks) {  
+    BuzzerController& buzzerCtrl = droneCtrl.getBuzzerController();
+    SDL_Event sdlevent = {};
+    sdlevent.type = SDL_KEYDOWN;
+    sdlevent.key.keysym.sym = SDLK_b;
+
+    EXPECT_FALSE(buzzerCtrl.isOn(BUZZER_ID));
+
+    SDL_PushEvent(&sdlevent);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(buzzerCtrl.isOn(BUZZER_ID));
+
+    sdlevent.type = SDL_KEYUP;
+    SDL_PushEvent(&sdlevent);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    EXPECT_FALSE(buzzerCtrl.isOn(BUZZER_ID));
 }

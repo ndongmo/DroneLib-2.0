@@ -44,4 +44,11 @@ public:
      * @param angle desired camera rotation angle
 	 */
 	void sendCamera(int deltatime, DroneCamera axe, int angle);
+
+    /**
+	 * Sends buzz request.
+     * 
+     * @param deltatime elapsed time since the last call
+	 */
+	void sendBuzz(int deltatime);
 };

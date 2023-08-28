@@ -41,3 +41,9 @@ void PCSender::sendCamera(int deltatime, DroneCamera axe, int angle) {
 		sendFrame(NS_ID_CAMERA, NS_FRAME_TYPE_DATA, "11b", axe, angle, sign);
 	}
 }
+
+void PCSender::sendBuzz(int deltatime) {
+	if(CheckAndUpdateSend(NS_ID_BUZZER, deltatime)) {
+		sendFrame(NS_ID_BUZZER, NS_FRAME_TYPE_DATA, "");
+	}
+}

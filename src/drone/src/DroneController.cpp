@@ -10,8 +10,8 @@
 using namespace utils;
 
 DroneController::DroneController() : 
-	m_receiver(m_sender, m_motorCtrl, m_servoCtrl), m_audioSender(m_sender),
-	m_videoSender(m_sender), m_batteryCtrl(m_sender) {
+	m_receiver(m_sender, m_motorCtrl, m_servoCtrl, m_buzzerCtrl), 
+	m_audioSender(m_sender), m_videoSender(m_sender), m_batteryCtrl(m_sender) {
 	m_name = "DroneController";
 }
 
@@ -86,6 +86,9 @@ int DroneController::begin() {
 	if(beginService(m_servoCtrl, SERVOS_ACTIVE) == -1) {
 		return -1;
 	}
+	if(beginService(m_buzzerCtrl, BUZZER_ACTIVE) == -1) {
+		return -1;
+	}
 	if(beginService(m_batteryCtrl, BATTERY_ACTIVE) == -1) {
 		return -1;
 	}
@@ -111,6 +114,7 @@ int DroneController::end() {
 	result = result && endService(m_ledCtrl, LEDS_ACTIVE) != -1;
 	result = result && endService(m_motorCtrl, MOTORS_ACTIVE) != -1;
 	result = result && endService(m_servoCtrl, SERVOS_ACTIVE) != -1;
+	result = result && endService(m_buzzerCtrl, BUZZER_ACTIVE) != -1;
 	result = result && endService(m_batteryCtrl, BATTERY_ACTIVE) != -1;
 	result = result && endService(m_audioSender, MICRO_ACTIVE) != -1;
 	result = result && endService(m_videoSender, CAMERA_ACTIVE) != -1;
@@ -128,6 +132,7 @@ void DroneController::start() {
 	startService(m_ledCtrl, LEDS_ACTIVE);
 	startService(m_motorCtrl, MOTORS_ACTIVE);
 	startService(m_servoCtrl, SERVOS_ACTIVE);
+	startService(m_buzzerCtrl, BUZZER_ACTIVE);
 
 	init();
 	run();
@@ -164,6 +169,10 @@ void DroneController::handleEvents() {
 
 	if(Config::getInt(LEDS_ACTIVE)) {
 		m_ledCtrl.play(m_state);
+	}
+
+	if(Config::getInt(BUZZER_ACTIVE)) {
+		m_buzzerCtrl.play(m_state);
 	}
 
 	if(m_state == APP_INIT || m_state == APP_ERROR) {

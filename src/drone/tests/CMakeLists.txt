@@ -10,6 +10,7 @@ SET(SOURCE_FILES
 	controller/LedControllerTest.cpp
 	controller/ServoControllerTest.cpp
 	controller/MotorControllerTest.cpp
+	controller/BuzzerControllerTest.cpp
 	controller/BatteryControllerTest.cpp
 )
 

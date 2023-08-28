@@ -59,6 +59,7 @@ protected:
         remove(CONFIG_FILE);
         ctrl.end();
         tcpClient.close();
+        Config::close();
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";

@@ -176,6 +176,7 @@ void PCWindow::initEvents() {
     if(!m_evHandler.loadConfig()) {
         m_evHandler.addEvent(CtrlEvent::QUIT, SDLK_ESCAPE, Joystick::START);
         m_evHandler.addEvent(CtrlEvent::DISCOVER, SDLK_F1, Joystick::SELECT);
+        m_evHandler.addEvent(CtrlEvent::BUZZ, SDLK_b, Joystick::X);
         m_evHandler.addEvent(CtrlEvent::GO_UP, SDLK_w, Joystick::AXE1_UP);
         m_evHandler.addEvent(CtrlEvent::GO_DOWN, SDLK_s, Joystick::AXE1_DOWN);
         m_evHandler.addEvent(CtrlEvent::GO_LEFT, SDLK_a, Joystick::AXE1_LEFT);

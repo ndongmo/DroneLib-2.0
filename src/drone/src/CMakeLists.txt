@@ -10,6 +10,7 @@ SET(SOURCE_FILES
 	controller/LedController.cpp
 	controller/ServoController.cpp
 	controller/MotorController.cpp
+	controller/BuzzerController.cpp
 	controller/BatteryController.cpp
 	controller/ComponentController.cpp
 	hardware/I2C.cpp
@@ -22,10 +23,13 @@ ENDIF()
 
 IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
 	FIND_LIBRARY(LIB_WS2811 libws2811.a ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WiringPi libwiringPi.so ${THIRD_PARTY_BIN})
 ELSEIF(APPLE)
 	FIND_LIBRARY(LIB_WS2811 libws2811.dylib ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WiringPi libwiringPi.dylib ${THIRD_PARTY_BIN})
 ELSE()
 	FIND_LIBRARY(LIB_WS2811 libws2811 ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_WiringPi libwiringPi ${THIRD_PARTY_BIN})
 ENDIF()
 
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
@@ -35,12 +39,14 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		debug ${LIB}
 		debug ${LIB_WS2811}
+		debug ${LIB_WiringPi}
 		debug i2c
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${LIB}
 		optimized ${LIB_WS2811}
+		optimized ${LIB_WiringPi}
 		optimized i2c
 	)
 ENDIF()

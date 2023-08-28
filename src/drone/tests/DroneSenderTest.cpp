@@ -28,6 +28,7 @@ protected:
     void TearDown() override {
         remove(CONFIG_FILE);
         droneSender.end();
+        Config::close();
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";

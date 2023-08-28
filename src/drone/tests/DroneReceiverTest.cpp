@@ -8,6 +8,7 @@
 #include <utils/Config.h>
 #include <controller/MotorController.h>
 #include <controller/ServoController.h>
+#include <controller/BuzzerController.h>
 
 using namespace utils;
 using namespace controller;
@@ -18,8 +19,9 @@ public:
     DroneReceiver droneRcv;
     MotorController motorCtrl;
     ServoController servoCtrl;
+    BuzzerController buzzerCtrl;
 protected:
-    DroneReceiverTest() : droneRcv(sender, motorCtrl, servoCtrl) {}
+    DroneReceiverTest() : droneRcv(sender, motorCtrl, servoCtrl, buzzerCtrl) {}
     void SetUp() override {
         std::ofstream configFile(CONFIG_FILE);
         configFile << "{\"" << DRONE_ADDRESS << "\":\"" << VAR_DRONE_ADDRESS << "\"}";
@@ -36,6 +38,7 @@ protected:
     void TearDown() override {
         remove(CONFIG_FILE);
         droneRcv.end();
+        Config::close();
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";

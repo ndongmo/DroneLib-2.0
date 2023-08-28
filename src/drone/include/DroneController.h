@@ -13,6 +13,7 @@
 #include "controller/LedController.h"
 #include "controller/MotorController.h"
 #include "controller/ServoController.h"
+#include "controller/BuzzerController.h"
 #include "controller/BatteryController.h"
 
 #include <Controller.h>
@@ -80,6 +81,8 @@ protected:
     MotorController m_motorCtrl;
     /** Servo (camera motors) controller object */
     ServoController m_servoCtrl;
+    /** Buzzer controller object */
+    BuzzerController m_buzzerCtrl;
     /** Battery controller object */
     BatteryController m_batteryCtrl;
 };

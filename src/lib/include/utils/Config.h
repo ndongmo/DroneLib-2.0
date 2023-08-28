@@ -28,6 +28,11 @@ public:
 	static void init();
 
 	/**
+	 * Close the config file.
+	 */
+	static void close();
+
+	/**
 	 * Check if the config file exists.
 	 * @return true if the config file exists, false otherwise
 	 */

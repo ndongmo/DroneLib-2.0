@@ -32,6 +32,7 @@ enum CtrlEvent {
 	CAM_LEFT,
 	CAM_RIGHT,
 	DISCOVER,
+	BUZZ,
 	QUIT,
 };
 

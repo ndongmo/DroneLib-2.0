@@ -1,4 +1,5 @@
 #include "controller/LedController.h"
+#include "Constants.h"
 
 #include <utils/Logger.h>
 
@@ -9,8 +10,6 @@
 
 #include <chrono>
 #include <algorithm>
-
-#define DISCOVERY_LAPS 500  // time laps for led blinking on discovering mode
 
 using namespace utils;
 

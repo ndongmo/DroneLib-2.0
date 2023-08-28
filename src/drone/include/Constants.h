@@ -17,3 +17,5 @@
 /* Fragment default config */
 #define NET_FRAGMENT_SIZE_DEFAULT		4096
 #define NET_FRAGMENT_NUMBER_DEFAULT	    256
+
+#define DISCOVERY_LAPS 500  // time laps for led blinking and buzzer playing on discovering mode

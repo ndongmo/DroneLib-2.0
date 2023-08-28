@@ -249,6 +249,9 @@ void PCController::handleEvents(int elapsedTime) {
 		else if (m_evHandler.isEventDown(CtrlEvent::CAM_RIGHT) && Config::getInt(SERVOS_ACTIVE)) {
 			m_sender.sendCamera(elapsedTime, CAMERA_X_AXE, CAMERA_ROTATION_ANGLE);
 		}
+		else if (m_evHandler.isEventDown(CtrlEvent::BUZZ) && Config::getInt(BUZZER_ACTIVE)) {
+			m_sender.sendBuzz(elapsedTime);
+		}
 	}
 
 	if(m_oldState != copyState) {

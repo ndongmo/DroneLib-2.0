@@ -14,6 +14,7 @@ class DroneSender;
 namespace controller {
 class MotorController;
 class ServoController;
+class BuzzerController;
 }
 
 using namespace net;
@@ -32,7 +33,8 @@ public:
      * @param motorCtrl motor controller reference
      * @param servoCtrl servo controller reference
      */
-    DroneReceiver(DroneSender& sender, MotorController& motorCtrl, ServoController& servoCtrl);
+    DroneReceiver(DroneSender& sender, MotorController& motorCtrl, 
+        ServoController& servoCtrl, BuzzerController& buzzerCtrl);
 
     int begin() override;
 
@@ -45,4 +47,6 @@ private:
     MotorController& m_motorCtrl;
     /** Servo controller reference */
     ServoController& m_servoCtrl;
+    /** Buzzer controller reference */
+    BuzzerController& m_buzzerCtrl;
 };

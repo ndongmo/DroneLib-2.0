@@ -34,6 +34,12 @@ void Config::init() {
     }
 }
 
+void Config::close() {
+    m_config.m_init = false;
+    m_config.m_intBuffer.clear();
+    m_config.m_stringBuffer.clear();
+}
+
 bool Config::exists() {
     std::ifstream file(CONFIG_FILE);
     bool exist = !file.fail();

@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "controller/MotorController.h"
 #include "controller/ServoController.h"
+#include "controller/BuzzerController.h"
 
 #include <IController.h>
 #include <net/NetTcp.h>
@@ -14,8 +15,10 @@
 
 using namespace utils; 
 
-DroneReceiver::DroneReceiver(DroneSender& sender, MotorController& motorCtrl, ServoController& servoCtrl) : 
-	NetReceiver(sender), m_droneSender(sender), m_motorCtrl(motorCtrl), m_servoCtrl(servoCtrl) {
+DroneReceiver::DroneReceiver(DroneSender& sender, MotorController& motorCtrl, 
+	ServoController& servoCtrl, BuzzerController& buzzerCtrl) : 
+	NetReceiver(sender), m_droneSender(sender), m_motorCtrl(motorCtrl), 
+	m_servoCtrl(servoCtrl), m_buzzerCtrl(buzzerCtrl) {
 	m_name = "DroneReceiverService";
 }
 
@@ -51,6 +54,9 @@ void DroneReceiver::innerRun(NetFrame& netFrame) {
 			int sign = (int)netFrame.data[2];
 			if(sign == 0) angle = -angle;
 			m_servoCtrl.rotate((DroneCamera)axe, angle);
+		}
+		else if (netFrame.id == NS_ID_BUZZER) { 
+			m_buzzerCtrl.turn(true);
 		}
 	}
 }
