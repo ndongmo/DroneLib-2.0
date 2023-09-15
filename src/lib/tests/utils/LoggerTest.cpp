@@ -12,6 +12,9 @@ const char *INFO = "info";
 
 // Tests Logger redirect operator for file output
 TEST(LoggerTest, UsingLogAddToFile) {
+    std::ofstream logFile(LOG_FILE); //clear log file
+    logFile.close();
+
     logW << WARNING << std::endl;
     logE << ERROR << std::endl;
     logI << INFO << std::endl;

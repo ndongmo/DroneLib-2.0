@@ -34,7 +34,7 @@ int StreamSender::begin() {
     }
 
     if ((ret = av_find_best_stream(m_ifmt_ctx, m_mediaType, -1, -1, &m_codec, 0)) < 0) {
-		logE << "StreamSender: cannot find a video stream in the input file -> " << av_err2str(ret) << std::endl;
+		logE << "StreamSender: cannot find this stream in the input file -> " << av_err2str(ret) << std::endl;
 		return -1;
     }
 

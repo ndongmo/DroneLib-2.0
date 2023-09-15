@@ -48,6 +48,7 @@ public:
     void stop() override;
     int end() override;
     void run() override;
+    std::string toString() override;
 
 private:
     /**
@@ -70,6 +71,18 @@ private:
 	}
 
     /**
+     * @brief Update stream data length and position.
+     */
+    void updateStream();
+
+    /**
+     * @brief Try to update stream data length and position.
+     * 
+     * @return true when the stream has been updated, false otherwise.
+     */
+    bool tryUpdateStream();
+
+    /**
      * @brief Get the Audio Format enum
      * 
      * @return SDL_AudioFormat 
@@ -78,10 +91,12 @@ private:
 
     /** Current volume */
     int m_volume = 0;
-    /** Current stream frame len to read */
+    /** Current stream frame length to read */
     int m_streamLen = 0;
     /** Current stream data position to read */
     const UINT8 *m_streamPos = nullptr;
     /** Audio stream listener reference */
     IStreamListener& m_stream;
+    /** Obtained speaker parameters */
+    SDL_AudioSpec m_params;
 };

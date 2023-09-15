@@ -25,6 +25,7 @@ void Controller::initConfigs() {
 	Config::setIntDefault(AUDIO_CHANNELS, AUDIO_CHANNELS_DEFAULT);
 	Config::setIntDefault(AUDIO_BIT_RATE, AUDIO_BIT_RATE_DEFAULT);
 	Config::setIntDefault(AUDIO_SAMPLE, AUDIO_SAMPLE_DEFAULT);
+	Config::setIntDefault(AUDIO_NB_SAMPLES, AUDIO_NB_SAMPLES_DEFAULT);
 	Config::setIntDefault(AUDIO_CODEC, AUDIO_CODEC_DEFAULT);
 	Config::setIntDefault(AUDIO_FORMAT, AUDIO_FORMAT_DEFAULT);
     Config::setStringDefault(AUDIO_DEVICE, AUDIO_DEVICE_DEFAULT);
@@ -37,7 +38,7 @@ void Controller::initConfigs() {
 int Controller::beginService(Service& service, const char* activeID) {
 	if(Config::getInt(activeID)) {
 		if(service.begin() == -1) {
-			logE << getName() << ": " << service.getName() << " iwas initialized unsuccessfully!" << std::endl;
+			logE << getName() << ": " << service.getName() << " was initialized unsuccessfully!" << std::endl;
 			return -1;
 		} else {
 			logI << getName() << ": " << service.getName() << " was initialized!" << std::endl;

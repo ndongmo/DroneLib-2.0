@@ -68,6 +68,7 @@
 #define AUDIO_CODEC         "audio_codec"
 #define AUDIO_FORMAT        "audio_format"
 #define AUDIO_SAMPLE        "audio_sample" 
+#define AUDIO_NB_SAMPLES    "audio_nb_samples" 
 #define AUDIO_CHANNELS      "audio_channels" 
 #define AUDIO_BIT_RATE      "audio_bit_rate" 
 #define AUDIO_DEVICE        "audio_device"
@@ -77,6 +78,7 @@
 #define AUDIO_CODEC_DEFAULT         13 // https://ffmpeg.org/doxygen/3.2/avcodec_8h_source.html
 #define AUDIO_FORMAT_DEFAULT        1 // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
 #define AUDIO_SAMPLE_DEFAULT        44100
+#define AUDIO_NB_SAMPLES_DEFAULT    512 // number of audio samples per channel
 #define AUDIO_CHANNELS_DEFAULT      2
 #define AUDIO_BIT_RATE_DEFAULT      1536
 #define AUDIO_DEVICE_DEFAULT        "hw:0"

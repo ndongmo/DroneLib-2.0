@@ -27,8 +27,9 @@ int StreamReceiver::end() {
 }
 
 void StreamReceiver::updateFrame() {
-	std::lock_guard<std::mutex> guard(m_rcvMtx);
 	if(m_currentFrame != m_oldFrame) {
+		std::lock_guard<std::mutex> guard(m_rcvMtx);
+		
 		m_newFrame = true;
 		m_oldFrame = m_currentFrame;
 		m_size = m_pool.getSize(m_oldFrame);

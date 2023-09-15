@@ -29,5 +29,13 @@ public:
 
 	int begin() override;
 	std::string toString() override;
+
+private:
+	/**
+	 * @brief Compute and return the number of samples per channel
+	 * 
+	 * @return number of samples per channel
+	 */
+	int getNbSamples();
 };
 } // namespace stream

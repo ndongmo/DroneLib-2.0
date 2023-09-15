@@ -18,7 +18,7 @@
 typedef uint8_t UINT8;
 #endif
 
-#define POOL_SIZE 128
+#define POOL_SIZE 64
 
 namespace stream
 {
