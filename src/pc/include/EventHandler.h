@@ -1,12 +1,14 @@
 /*!
 * \file EventHandler.h
-* Event handler class, it checks and stores events.
+* \brief Event handler class, it checks and stores events.
 * \author Ndongmo Silatsa
 * \date 24-10-2016
 * \version 1.0
 */
 
 #pragma once
+
+#include <IEventHandler.h>
 
 #include <string>
 #include <unordered_map>
@@ -16,25 +18,6 @@
 #define JOY_AXE_MAX  32767
 #define JOYSTICK_OFFSET 500
 #define KEYS_CONFIG "keys.conf"
-
-/**
- * Define the type of handled controller event.
- */
-enum CtrlEvent {
-	GO_UP,
-	GO_DOWN,
-	GO_LEFT,
-	GO_RIGHT,
-	GO_SPEED_1,
-	GO_SPEED_2,
-	CAM_UP,
-	CAM_DOWN,
-	CAM_LEFT,
-	CAM_RIGHT,
-	DISCOVER,
-	BUZZ,
-	QUIT,
-};
 
 /**
  * Event configuration structure.
@@ -73,7 +56,7 @@ enum Joystick
  * Handle controller (joystick and keyboar) events.
  * Also load and save controller configuration.
  */
-class EventHandler
+class EventHandler : public IEventHandler
 {
 public:
 	/**
@@ -133,14 +116,14 @@ public:
 	 * Handle event down action.
 	 * \param eventID: ID of event
 	 */
-	bool isEventDown(unsigned int eventID);
+	bool isEventDown(unsigned int eventID) override;
 
 	/**
 	 * Check if event has just occured.
 	 * \param eventID: ID of event
 	 * \return true if event has just occured
 	 */
-	bool isEventPressed(unsigned int eventID);
+	bool isEventPressed(unsigned int eventID) override;
 
 	/**
 	 * Check if the event is registered.
@@ -169,29 +152,14 @@ public:
 	void addEvent(unsigned int eventID, unsigned int keyID, unsigned int joyID);
 
 	/**
-	 * Update mapping with pressed key.
-	 * \param eventID: ID of event
-	 */
-	void updateMapping(unsigned int eventID, PlayWith util);
-
-	/**
-	 * Get the key's name.
-	 * \param eventID: ID of event
-	 * \return name of key, joystick or mouse button
-	 */
-	std::string getMapping(unsigned int eventID, PlayWith util);
-
-	/**
 	 * Get the key's name.
 	 * \param eventID: ID of event
 	 * \return name of key, joystick or mouse button
 	 */
 	std::string getMapping(unsigned int eventID);
 
-	void updateConfig();
-	void saveConfig();
+	bool saveConfig();
 	bool loadConfig();
-	void clearConfig();
 
 	/* SETTERS */
 	void setPlayWith(PlayWith util) { m_playWith = util; }
@@ -203,25 +171,9 @@ public:
 	}
 
 private:
-	/**
-	 * Save event keys config file.
-	 * \return true if the config file has been saved, false otherwise
-	 */
-	bool saveConfigFile();
-
-	/**
-	 * Retrieve the controller key name corresponding to the given event ID.
-	 * \param eventID: ID of event
-	 * \param util: controller type
-	 * \param map: database map to search into
-	 * \return controller key name
-	 */
-	std::string getMapping(unsigned int eventID, PlayWith util, std::unordered_map<unsigned int, EventConfig>& map);
 
 	/* configuration of keyboard and gamepad */
 	std::unordered_map<unsigned int, EventConfig> m_eventConfig;
-	/* Allow user to configure keyboard or gamepad */
-	std::unordered_map<unsigned int, EventConfig> m_eventConfigTemp;
 	/* Map of current key ID */	
 	std::unordered_map<unsigned int, bool> m_keyMap;
 	/* util to play with */				

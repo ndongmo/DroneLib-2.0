@@ -29,9 +29,9 @@ protected:
         Config::init();
 
         Config::setString(DRONE_ADDRESS, VAR_DRONE_ADDRESS);
-        Config::setString(CTRL_ADDRESS, VAR_DRONE_ADDRESS);
+        Config::setString(CLIENT_ADDRESS, VAR_DRONE_ADDRESS);
         Config::setInt(DRONE_PORT_RCV, VAR_DRONE_PORT);
-        Config::setInt(CTRL_PORT_RCV, VAR_RCV_PORT);
+        Config::setInt(CLIENT_PORT_RCV, VAR_RCV_PORT);
         Config::setInt(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE);
         Config::setInt(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER);
     }

@@ -2,15 +2,15 @@
 #include <gmock/gmock.h>
 #include <fstream>
 
-#include <PCSender.h>
+#include <ClientSender.h>
 #include <utils/Constants.h>
 #include <utils/Config.h>
 
 using namespace utils;
 
-class PCSenderTest : public ::testing::Test {
+class ClientSenderTest : public ::testing::Test {
 public:
-    PCSender pcsender;
+    ClientSender client;
 protected:
     void SetUp() override {
         std::ofstream configFile(CONFIG_FILE);
@@ -19,14 +19,14 @@ protected:
         Config::init();
 
         Config::setInt(DRONE_PORT_RCV, VAR_DRONE_PORT);
-        Config::setInt(CTRL_PORT_SEND, VAR_SEND_PORT);
+        Config::setInt(CLIENT_PORT_SEND, VAR_SEND_PORT);
         Config::setString(DRONE_ADDRESS, VAR_DRONE_ADDRESS);
 	    Config::setInt(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE);
 	    Config::setInt(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER);
     }
     void TearDown() override {
         remove(CONFIG_FILE);
-        pcsender.end();
+        client.end();
     }
 
     const char* VAR_DRONE_ADDRESS = "127.0.0.1";
@@ -36,15 +36,15 @@ protected:
     const int MAX_FRAGMENT_NUMBER = 256;
 };
 
-// Tests PCSender begin with default config
-TEST_F(PCSenderTest, BeginWithDefaultConfigWorks) {
-    EXPECT_EQ(pcsender.begin(), 1);
-    EXPECT_EQ(pcsender.end(), 1);
+// Tests client begin with default config
+TEST_F(ClientSenderTest, BeginWithDefaultConfigWorks) {
+    EXPECT_EQ(client.begin(), 1);
+    EXPECT_EQ(client.end(), 1);
 }
 
-// Tests PCSender end
-TEST_F(PCSenderTest, EndServiceWorks) {
-    EXPECT_EQ(pcsender.begin(), 1);
-    pcsender.start();
-    EXPECT_EQ(pcsender.end(), 1);
+// Tests ClientSender end
+TEST_F(ClientSenderTest, EndServiceWorks) {
+    EXPECT_EQ(client.begin(), 1);
+    client.start();
+    EXPECT_EQ(client.end(), 1);
 }

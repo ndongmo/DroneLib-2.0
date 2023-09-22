@@ -1,7 +1,6 @@
-#include "PCReceiver.h"
-#include "PCSender.h"
-#include "PCWindow.h"
-#include "Constants.h"
+#include "ClientReceiver.h"
+#include "ClientSender.h"
+#include "BatteryReceiver.h"
 
 #include <net/NetHelper.h>
 #include <utils/Logger.h>
@@ -11,15 +10,15 @@
 
 using namespace utils; 
 
-PCReceiver::PCReceiver(PCWindow &window, PCSender &sender,
-	StreamReceiver &videoReceiver, StreamReceiver &audioReceiver) : 
-	NetReceiver(sender), m_window(window), m_pcSender(sender), m_videoReceiver(videoReceiver), 
-	m_audioReceiver(audioReceiver) {
-	m_name = "PCReceiver";
+ClientReceiver::ClientReceiver(BatteryReceiver &batReceiver, ClientSender &sender, 
+        StreamReceiver &videoReceiver, StreamReceiver &audioReceiver) : 
+	NetReceiver(sender), m_batReceiver(batReceiver), m_clientSender(sender), 
+	m_videoReceiver(videoReceiver), m_audioReceiver(audioReceiver) {
+	m_name = "ClientReceiver";
 }
 
-int PCReceiver::begin() {
-    int rcvPort = Config::getInt(CTRL_PORT_RCV);
+int ClientReceiver::begin() {
+    int rcvPort = Config::getInt(CLIENT_PORT_RCV);
 	int droneSendPort = Config::getInt(DRONE_PORT_SEND);
     std::string droneAddr = Config::getString(DRONE_ADDRESS);
 
@@ -31,7 +30,7 @@ int PCReceiver::begin() {
 	return 1;
 }
 
-void PCReceiver::innerRun(NetFrame &netFrame) {
+void ClientReceiver::innerRun(NetFrame &netFrame) {
 	if(netFrame.type == NS_FRAME_TYPE_DATA) {
 		if (netFrame.id == NS_ID_STREAM_VIDEO) {
 			StreamFragment streamFragment;
@@ -44,7 +43,7 @@ void PCReceiver::innerRun(NetFrame &netFrame) {
 			m_audioReceiver.newFragment(streamFragment);
 		}
 		else if (netFrame.id == NS_ID_BATTERY_LIFE) {
-			m_window.newBatteryLife((int)netFrame.data[0]);
+			m_batReceiver.newBatteryLife((int)netFrame.data[0]);
 		}
 	}
 }

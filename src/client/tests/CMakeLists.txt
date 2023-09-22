@@ -1,12 +1,12 @@
-# DroneLib 2.0 C++ project: PC Tests package
+# DroneLib 2.0 C++ project: Client Tests package
 
-PROJECT(Pc-tests)
+PROJECT(Client-tests)
 
 SET(SOURCE_FILES
 	main.cpp
-	EventHandlerTest.cpp
-	PCWindowTest.cpp
-	PCControllerTest.cpp
+	ClientReceiverTest.cpp
+	ClientSenderTest.cpp
+	ClientControllerTest.cpp
 )
 
 IF(APPLE)
@@ -32,18 +32,10 @@ ENDIF()
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 
-ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
-	POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		${PC_RSC}/arial.ttf
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>
-)
-
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		debug ${LIB}
 		debug ${CLIENT}
-		debug ${PC}
 		debug ${LIB_GTEST}
 		debug ${LIB_GMOCK}
 	)
@@ -51,13 +43,12 @@ ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${LIB}
 		optimized ${CLIENT}
-		optimized ${PC}
 		optimized ${LIB_GTEST}
 		optimized ${LIB_GMOCK}
 	)
 ENDIF()
 
-add_dependencies(${PROJECT_NAME} ${LIB} ${CLIENT} ${PC})
+add_dependencies(${PROJECT_NAME} ${LIB} ${CLIENT})
 
 INCLUDE(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME} EXTRA_ARGS ARGS=-V)

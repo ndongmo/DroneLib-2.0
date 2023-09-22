@@ -27,16 +27,20 @@
 #define DRONE_PORT_RCV 		    "drone_port_rcv"
 #define DRONE_PORT_SEND	        "drone_port_send"
 
-/* Controller config variables */
-#define CTRL_ADDRESS 	        "ctrl_address"
-#define CTRL_PORT_RCV 		    "ctrl_port_rcv"
-#define CTRL_PORT_SEND 		    "ctrl_port_send"
+/* Client config variables */
+#define CLIENT_ADDRESS 	        "client_address"
+#define CLIENT_PORT_RCV 	    "client_port_rcv"
+#define CLIENT_PORT_SEND 	    "client_port_send"
 
-/* Controller config variables */
+/* Client config variables */
 #define NET_FRAGMENT_SIZE 		    "net_fragment_size"
 #define NET_FRAGMENT_NUMBER		    "net_fragment_number"
 #define STREAM_FRAGMENT_SIZE 		"stream_fragment_size"
 #define STREAM_FRAGMENT_PER_FRAME   "stream_fragment_per_frame"
+
+/* Client default config */
+#define CLIENT_PORT_RCV_DEFAULT 		    4450
+#define CLIENT_PORT_SEND_DEFAULT 		    4451
 
 /* Video source config variables */
 #define VIDEO_CODEC         "video_codec"
@@ -135,5 +139,5 @@
 #define ERROR_STREAM_INIT       5   // error initializing stream
 
 // Controller commands
-#define CMD_CTRL_QUIT 1
-#define CMD_CTRL_DISCOVER 2
+#define CMD_CLIENT_QUIT 1
+#define CMD_CLIENT_DISCOVER 2

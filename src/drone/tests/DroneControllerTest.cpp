@@ -28,9 +28,9 @@ public:
     void discovery() {
         EXPECT_EQ(tcpClient.openClient(VAR_DRONE_ADDRESS, DRONE_PORT_DISCOVERY_DEFAULT), 1);
 
-        Config::setInt(CTRL_PORT_RCV, VAR_CLIENT_RCV_PORT);
+        Config::setInt(CLIENT_PORT_RCV, VAR_CLIENT_RCV_PORT);
         
-        std::string msg = Config::encodeJson({ CTRL_PORT_RCV });
+        std::string msg = Config::encodeJson({ CLIENT_PORT_RCV });
 
         EXPECT_GT(tcpClient.send(msg.c_str(), msg.length()), 0);
 
@@ -82,7 +82,7 @@ TEST_F(DroneControllerTest, DiscoveryWithDefaultConfigWorks) {
     clientProcess.join();
 
     ASSERT_EQ(VAR_DRONE_ADDRESS, Config::getString(DRONE_ADDRESS));
-    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getInt(CTRL_PORT_RCV));
+    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getInt(CLIENT_PORT_RCV));
     ASSERT_EQ(ctrl.end(), 1);
 }
 
@@ -102,7 +102,7 @@ TEST_F(DroneControllerTest, RunWorks) {
     clientProcess.join();
     
     ASSERT_EQ(VAR_DRONE_ADDRESS, Config::getString(DRONE_ADDRESS));
-    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getInt(CTRL_PORT_RCV));
+    ASSERT_EQ(VAR_CLIENT_RCV_PORT, Config::getInt(CLIENT_PORT_RCV));
     ASSERT_EQ(ctrl.getState(), APP_RUNNING);
 
     ASSERT_EQ(ctrl.end(), 1);

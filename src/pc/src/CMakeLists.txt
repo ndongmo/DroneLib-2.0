@@ -4,11 +4,8 @@ PROJECT(${PC})
 
 SET(SOURCE_FILES
 	main.cpp
-	FPSLimiter.cpp
 	EventHandler.cpp
 	PCController.cpp
-	PCReceiver.cpp
-	PCSender.cpp
 	PCSpeaker.cpp
 	PCWindow.cpp
 )
@@ -44,18 +41,20 @@ ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		debug ${LIB}
+		debug ${CLIENT}
 		debug ${LIB_SDL}
 		debug ${LIB_TTF}
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${LIB}
+		optimized ${CLIENT}
 		optimized ${LIB_SDL}
 		optimized ${LIB_TTF}
 	)
 ENDIF()
 
-add_dependencies(${PROJECT_NAME} ${LIB})
+add_dependencies(${PROJECT_NAME} ${CLIENT} ${LIB})
 
 #-----------------------------------------------------
 # Create executable

@@ -6,6 +6,7 @@ INCLUDE_DIRECTORIES(
 	include
 	${PC_INC}
 	${DRONE_INC}
+	${CLIENT_INC}
 	${LIB_INC}
 	${THIRD_PARTY_INC}
 )
@@ -43,6 +44,7 @@ ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		debug ${LIB}
+		debug ${CLIENT}
 		debug ${PC}
 		debug ${DRONE}
 		debug ${LIB_GTEST}
@@ -51,6 +53,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 		optimized ${LIB}
+		optimized ${CLIENT}
 		optimized ${PC}
 		optimized ${DRONE}
 		optimized ${LIB_GTEST}
@@ -58,7 +61,7 @@ ELSE()
 	)
 ENDIF()
 
-add_dependencies(${PROJECT_NAME} ${LIB} ${PC} ${DRONE})
+add_dependencies(${PROJECT_NAME} ${LIB} ${CLIENT} ${PC} ${DRONE})
 
 INCLUDE(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME} EXTRA_ARGS ARGS=-V)

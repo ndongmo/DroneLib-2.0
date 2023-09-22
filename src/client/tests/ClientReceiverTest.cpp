@@ -2,9 +2,9 @@
 #include <gmock/gmock.h>
 #include <fstream>
 
-#include <PCSender.h>
-#include <PCReceiver.h>
-#include <PCWindow.h>
+#include <ClientSender.h>
+#include <ClientReceiver.h>
+#include <BatteryReceiver.h>
 #include <stream/StreamReceiver.h>
 #include <utils/Constants.h>
 #include <utils/Config.h>
@@ -12,16 +12,15 @@
 using namespace utils;
 using namespace stream;
 
-class PCReceiverTest : public ::testing::Test {
+class ClientReceiverTest : public ::testing::Test {
 public:
-    EventHandler evHandler;
-    PCSender sender;
-    PCWindow window;
-    PCReceiver pcrcv;
+    ClientSender sender;
+    BatteryReceiver batRecv;
+    ClientReceiver pcrcv;
     StreamReceiver astream;
     StreamReceiver vstream;
 protected:
-    PCReceiverTest() : evHandler(), window(evHandler), pcrcv(window, sender, vstream, astream) {}
+    ClientReceiverTest() : batRecv(), pcrcv(batRecv, sender, vstream, astream) {}
     void SetUp() override {
         std::ofstream configFile(CONFIG_FILE);
         configFile << "{\"" << DRONE_ADDRESS << "\":\"" << VAR_DRONE_ADDRESS << "\"}";
@@ -30,7 +29,7 @@ protected:
 
         Config::setInt(DRONE_PORT_SEND, VAR_DRONE_PORT);
         Config::setString(DRONE_ADDRESS, VAR_DRONE_ADDRESS);
-        Config::setInt(CTRL_PORT_RCV, VAR_RCV_PORT);
+        Config::setInt(CLIENT_PORT_RCV, VAR_RCV_PORT);
         Config::setInt(NET_FRAGMENT_SIZE, MAX_FRAGMENT_SIZE);
         Config::setInt(NET_FRAGMENT_NUMBER, MAX_FRAGMENT_NUMBER);
     }
@@ -46,14 +45,14 @@ protected:
     const int MAX_FRAGMENT_NUMBER = 256;
 };
 
-// Tests PCReceiver begin with default config
-TEST_F(PCReceiverTest, BeginWithDefaultConfigWorks) {
+// Tests ClientReceiver begin with default config
+TEST_F(ClientReceiverTest, BeginWithDefaultConfigWorks) {
     EXPECT_EQ(pcrcv.begin(), 1);
     EXPECT_EQ(pcrcv.end(), 1);
 }
 
-// Tests PCReceiver end
-TEST_F(PCReceiverTest, EndServiceWorks) {
+// Tests ClientReceiver end
+TEST_F(ClientReceiverTest, EndServiceWorks) {
     EXPECT_EQ(pcrcv.begin(), 1);
     pcrcv.start();
     EXPECT_EQ(pcrcv.end(), 1);

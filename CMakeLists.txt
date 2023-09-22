@@ -5,11 +5,13 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
 SET(LIB_HOME ${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(LIB Lib)
+SET(CLIENT Client)
 SET(PC Pc)
 SET(DRONE Drone)
 
 SET(PC_RSC ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/res)
 SET(PC_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/pc/include)
+SET(CLIENT_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/client/include)
 SET(LIB_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/include)
 SET(DRONE_INC ${CMAKE_CURRENT_SOURCE_DIR}/src/drone/include)
 
@@ -84,6 +86,7 @@ IF(UNIX)
 ENDIF()
 
 IF(NOT RASPBERRY_PI_SYS)
+  add_subdirectory(src/client)
   add_subdirectory(src/pc)
 ENDIF()
 

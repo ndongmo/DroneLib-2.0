@@ -4,8 +4,8 @@
 #include <thread>
 #include <chrono>
 
-#include <PCController.h>
-#include <Constants.h>
+#include <ClientController.h>
+#include <IEventHandler.h>
 #include <net/NetTcp.h>
 #include <net/NetHelper.h>
 #include <utils/Constants.h>
@@ -15,7 +15,39 @@
 using namespace utils;
 using namespace net;
 
-class PCControllerTest : public ::testing::Test {
+
+class EventHandlerImpl : public IEventHandler {
+public:
+    bool isEventDown(unsigned int eventID) override {
+        return m_eventID == (int)eventID;
+    }
+	bool isEventPressed(unsigned int eventID) override {
+        bool flag = m_eventID == (int)eventID;
+        if(flag) m_eventID = -1;
+        return flag;
+    }
+    void press(unsigned int eventID) {
+        m_eventID = (int)eventID;
+    }
+private:
+    int m_eventID = -1;
+};
+
+class ClientControllerImpl : public ClientController {
+public:
+    ClientControllerImpl() : ClientController() {
+        m_evHandler = &m_evHandlerImpl;
+    }
+    void innerRunServices() override { }
+    void innerUpdateState(utils::AppState state, int error) override { }
+    void press(unsigned int eventID) {
+        m_evHandlerImpl.press(eventID);
+    }
+private:
+    EventHandlerImpl m_evHandlerImpl;
+};
+
+class ClientControllerTest : public ::testing::Test {
 public:
     void discovery() {
         struct sockaddr_in client;
@@ -61,7 +93,7 @@ public:
         EXPECT_GT(tcpDrone.send(msg.c_str(), msg.length()), 0);
     }
 
-    PCController ctrl;
+    ClientControllerImpl ctrl;
     NetTcp tcpDrone;
 protected:
     void SetUp() override {
@@ -99,8 +131,8 @@ protected:
     const int CAMERA_ACTIVE_VALUE = 1;
 };
 
-// Tests PCController discovery with default config
-TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {    
+// Tests ClientController discovery with default config
+TEST_F(ClientControllerTest, DiscoveryWithDefaultConfigWorks) {    
     std::thread droneProcess([this] { discovery(); });
 
     // sleep 100 milliseconds
@@ -133,8 +165,8 @@ TEST_F(PCControllerTest, DiscoveryWithDefaultConfigWorks) {
     ASSERT_EQ(CAMERA_ACTIVE_VALUE, Config::getInt(CAMERA_ACTIVE));
 }
 
-// Tests PCController end
-TEST_F(PCControllerTest, EndWorks) {      
+// Tests ClientController end
+TEST_F(ClientControllerTest, EndWorks) {      
     std::thread clientProcess([this] { ctrl.start(); });
     
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -146,8 +178,8 @@ TEST_F(PCControllerTest, EndWorks) {
     clientProcess.join();
 }
 
-// Tests PCController start and end
-TEST_F(PCControllerTest, StartAndEndWork) {    
+// Tests ClientController start and end
+TEST_F(ClientControllerTest, StartAndEndWork) {    
     std::thread droneProcess([this] { discovery(); });
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     std::thread clientProcess([this] { ctrl.start(); });
@@ -155,9 +187,7 @@ TEST_F(PCControllerTest, StartAndEndWork) {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_TRUE(ctrl.isRunning());
 
-    SDL_Event sdlevent = {};
-    sdlevent.type = SDL_QUIT;
-    SDL_PushEvent(&sdlevent);
+    ctrl.press(ClientEvent::QUIT);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_FALSE(ctrl.isRunning());
@@ -166,8 +196,8 @@ TEST_F(PCControllerTest, StartAndEndWork) {
     clientProcess.join();
 }
 
-// Tests PCController start with discovering error
-TEST_F(PCControllerTest, StartWithDiscoveryErrorWorks) {    
+// Tests ClientController start with discovering error
+TEST_F(ClientControllerTest, StartWithDiscoveryErrorWorks) {    
     std::thread clientProcess([this] { ctrl.start(); });
     ASSERT_EQ(ctrl.getState(), APP_INIT);
 
@@ -178,16 +208,12 @@ TEST_F(PCControllerTest, StartWithDiscoveryErrorWorks) {
     std::thread droneProcess([this] { discovery(); });
 
     // restart discovering
-    SDL_Event sdlevent = {};
-    sdlevent.type = SDL_KEYDOWN;
-    sdlevent.key.keysym.sym = SDLK_F1;
-    SDL_PushEvent(&sdlevent);
+    ctrl.press(ClientEvent::DISCOVER);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ASSERT_EQ(ctrl.getState(), APP_RUNNING);
 
-    sdlevent.type = SDL_QUIT;
-    SDL_PushEvent(&sdlevent);
+    ctrl.press(ClientEvent::QUIT);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_FALSE(ctrl.isRunning());

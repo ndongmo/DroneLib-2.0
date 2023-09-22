@@ -12,8 +12,7 @@ using namespace utils;
 #define TEXT_BATTERIE_WIDTH 50
 #define TEXT_LINE_HEIGHT 14
 
-PCWindow::PCWindow(EventHandler& evHandler) : m_evHandler(evHandler) 
-{ 
+PCWindow::PCWindow() { 
     m_name = "PCWindow";
 }
 
@@ -170,29 +169,31 @@ void PCWindow::run() {
             }
         }
     }
+    m_evHandler.update();
 }
 
 void PCWindow::initEvents() {
     if(!m_evHandler.loadConfig()) {
-        m_evHandler.addEvent(CtrlEvent::QUIT, SDLK_ESCAPE, Joystick::START);
-        m_evHandler.addEvent(CtrlEvent::DISCOVER, SDLK_F1, Joystick::SELECT);
-        m_evHandler.addEvent(CtrlEvent::BUZZ, SDLK_b, Joystick::X);
-        m_evHandler.addEvent(CtrlEvent::GO_UP, SDLK_w, Joystick::AXE1_UP);
-        m_evHandler.addEvent(CtrlEvent::GO_DOWN, SDLK_s, Joystick::AXE1_DOWN);
-        m_evHandler.addEvent(CtrlEvent::GO_LEFT, SDLK_a, Joystick::AXE1_LEFT);
-        m_evHandler.addEvent(CtrlEvent::GO_RIGHT, SDLK_d, Joystick::AXE1_RIGHT);
-        m_evHandler.addEvent(CtrlEvent::GO_SPEED_1, SDLK_o, Joystick::A);
-        m_evHandler.addEvent(CtrlEvent::GO_SPEED_2, SDLK_p, Joystick::B);
-        m_evHandler.addEvent(CtrlEvent::CAM_UP, SDLK_UP, Joystick::AXE2_UP);
-        m_evHandler.addEvent(CtrlEvent::CAM_DOWN, SDLK_DOWN, Joystick::AXE2_DOWN);
-        m_evHandler.addEvent(CtrlEvent::CAM_LEFT, SDLK_LEFT, Joystick::AXE2_LEFT);
-        m_evHandler.addEvent(CtrlEvent::CAM_RIGHT, SDLK_RIGHT, Joystick::AXE2_RIGHT);
+        m_evHandler.addEvent(ClientEvent::QUIT, SDLK_ESCAPE, Joystick::START);
+        m_evHandler.addEvent(ClientEvent::DISCOVER, SDLK_F1, Joystick::SELECT);
+        m_evHandler.addEvent(ClientEvent::BUZZ, SDLK_b, Joystick::X);
+        m_evHandler.addEvent(ClientEvent::GO_UP, SDLK_w, Joystick::AXE1_UP);
+        m_evHandler.addEvent(ClientEvent::GO_DOWN, SDLK_s, Joystick::AXE1_DOWN);
+        m_evHandler.addEvent(ClientEvent::GO_LEFT, SDLK_a, Joystick::AXE1_LEFT);
+        m_evHandler.addEvent(ClientEvent::GO_RIGHT, SDLK_d, Joystick::AXE1_RIGHT);
+        m_evHandler.addEvent(ClientEvent::GO_SPEED_1, SDLK_o, Joystick::A);
+        m_evHandler.addEvent(ClientEvent::GO_SPEED_2, SDLK_p, Joystick::B);
+        m_evHandler.addEvent(ClientEvent::CAM_UP, SDLK_UP, Joystick::AXE2_UP);
+        m_evHandler.addEvent(ClientEvent::CAM_DOWN, SDLK_DOWN, Joystick::AXE2_DOWN);
+        m_evHandler.addEvent(ClientEvent::CAM_LEFT, SDLK_LEFT, Joystick::AXE2_LEFT);
+        m_evHandler.addEvent(ClientEvent::CAM_RIGHT, SDLK_RIGHT, Joystick::AXE2_RIGHT);
         m_evHandler.saveConfig();
     }
 }
 
-void PCWindow::render(const IStreamListener& stream, unsigned int fps) {
-    m_fps_text.text = "FPS: " + std::to_string(fps);
+void PCWindow::render(const IStreamListener& stream, int life) {
+    m_fps_text.text = "FPS: " + std::to_string(Config::getInt(VIDEO_FPS));
+    m_bat_text.text = "Bat: " + std::to_string(life) + "%";
 
     if(stream.hasNewFrame()) {
         unsigned char * texture_data = NULL;
@@ -218,7 +219,7 @@ void PCWindow::updateState(utils::AppState state, int error) {
 
     if(state == APP_ERROR) {
         m_msg_text.text = logError(error) + " Press [" + 
-            m_evHandler.getMapping(CtrlEvent::DISCOVER) + "] to restart discovering.";
+            m_evHandler.getMapping(ClientEvent::DISCOVER) + "] to restart discovering.";
         updateText(m_msg_text);
     }
     else if(state == APP_DISCOVERING) {
@@ -268,8 +269,4 @@ SDL_PixelFormatEnum PCWindow::getPixelFormat() {
     } else  {
         return SDL_PIXELFORMAT_YUY2;
     }
-}
-
-void PCWindow::newBatteryLife(int life) {
-    m_bat_text.text = "Bat: " + std::to_string(life) + "%";
 }

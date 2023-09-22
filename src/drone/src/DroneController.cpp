@@ -213,7 +213,7 @@ int DroneController::discovery() {
         return -1;
 	}
 
-	Config::setString(CTRL_ADDRESS, net::NetHelper::getIpv4Addr(client));
+	Config::setString(CLIENT_ADDRESS, net::NetHelper::getIpv4Addr(client));
 
 	char buf[1024] = {0};
 
@@ -226,8 +226,8 @@ int DroneController::discovery() {
 		logE << m_name << " discovery: Json parser error" << std::endl;
 		return -1;
 	}
-	logI << m_name << " discovery: receive client address[" <<  Config::getString(CTRL_ADDRESS)
-		<< "] port[" << Config::getInt(CTRL_PORT_RCV) << "]" << std::endl;
+	logI << m_name << " discovery: receive client address[" <<  Config::getString(CLIENT_ADDRESS)
+		<< "] port[" << Config::getInt(CLIENT_PORT_RCV) << "]" << std::endl;
 
 	if(endService(m_videoSender, CAMERA_ACTIVE) == -1) {
 		return -1;

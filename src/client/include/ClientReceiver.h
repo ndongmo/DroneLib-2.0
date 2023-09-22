@@ -1,8 +1,8 @@
 /*!
-* \file PCReceiver.h
-* \brief PC receiver service class.
+* \file ClientReceiver.h
+* \brief Client receiver service class.
 * \author Ndongmo Silatsa
-* \date 09-05-2022
+* \date 20-09-2023
 * \version 2.0
 */
 
@@ -10,8 +10,8 @@
 
 #include <net/NetReceiver.h>
 
-class PCSender;
-class PCWindow;
+class ClientSender;
+class BatteryReceiver;
 namespace stream {
 class StreamReceiver;
 }
@@ -20,20 +20,20 @@ using namespace net;
 using namespace stream;
 
 /**
- * PC receiver service class. Handle pc -> drone connection and received frames.
+ * Client receiver service class. Handle client -> drone connection and received frames.
  */
-class PCReceiver : public NetReceiver
+class ClientReceiver : public NetReceiver
 {
 public:
     /**
-     * @brief Construct a new PC network receiver object
+     * @brief Construct a new Client network receiver object
      * 
-     * @param receiver network sender reference
-     * @param window window reference
+     * @param batReceiver Battery receiver reference
+     * @param sender network sender reference
      * @param videoReceiver video stream receiver reference
      * @param audioReceiver audio stream receiver reference
      */
-    PCReceiver(PCWindow &window, PCSender &sender, 
+    ClientReceiver(BatteryReceiver &batReceiver, ClientSender &sender, 
         StreamReceiver &videoReceiver, StreamReceiver &audioReceiver);
 
     int begin() override;
@@ -41,10 +41,10 @@ public:
 private:
     void innerRun(NetFrame &netFrame) override;
 
-    /** PC window reference */
-    PCWindow &m_window;
-    /** PC network sender reference */
-    PCSender &m_pcSender;
+    /** Battery receiver reference */
+    BatteryReceiver &m_batReceiver;
+    /** Client network sender reference */
+    ClientSender &m_clientSender;
     /** Video stream receiver reference */
     StreamReceiver &m_videoReceiver;
     /** Audio stream receiver reference */

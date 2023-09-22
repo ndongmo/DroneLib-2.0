@@ -1,6 +1,6 @@
 /*!
-* \file PCSender.h
-* \brief PC frame sender class.
+* \file ClientSender.h
+* \brief Client frame sender class.
 * \author Ndongmo Silatsa Fabrice
 * \date 08-03-2019
 * \version 2.0
@@ -15,15 +15,15 @@ using namespace net;
 using namespace utils;
 
 /**
- * PC frame sender service.
+ * Client frame sender service.
  */
-class PCSender : public NetSender
+class ClientSender : public NetSender
 {
 public:
     /**
-     * Construct a new PCSender object
+     * Construct a new ClientSender object
      */
-    PCSender();
+    ClientSender();
 
 	int begin() override;
 

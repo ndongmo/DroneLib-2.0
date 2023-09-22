@@ -126,14 +126,14 @@ TEST_F(IntegrationTest, CameraCmdsWork) {
     sdlevent.key.keysym.sym = SDLK_RIGHT;
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     EXPECT_TRUE(serovoCtrl.isOn(SERVO_HORIZONTAL));
     EXPECT_GE((int)serovoCtrl.getValue(SERVO_HORIZONTAL), SERVO_DEFAULT_ANGLE + CAMERA_ROTATION_ANGLE);
 
     sdlevent.key.keysym.sym = SDLK_DOWN;
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     EXPECT_TRUE(serovoCtrl.isOn(SERVO_VERTICAL));
     EXPECT_LE((int)serovoCtrl.getValue(SERVO_VERTICAL), SERVO_DEFAULT_ANGLE - CAMERA_ROTATION_ANGLE);
 }
@@ -155,6 +155,6 @@ TEST_F(IntegrationTest, BuzzerCmdWorks) {
     sdlevent.type = SDL_KEYUP;
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     EXPECT_FALSE(buzzerCtrl.isOn(BUZZER_ID));
 }

@@ -43,7 +43,7 @@ public:
     /**
      * Constructor for initializing the event handler
      */
-    PCWindow(EventHandler& evHandler);
+    PCWindow();
 
     int begin() override;
     void start() override;
@@ -53,9 +53,9 @@ public:
     /**
      * Render the current frame.
      * @param stream stream frame provider
-     * @param fps current fps
+     * @param life battery life
      */
-    void render(const IStreamListener& stream, unsigned int fps);
+    void render(const IStreamListener& stream, int life);
 
     /**
      * Update the current state.
@@ -65,11 +65,11 @@ public:
     void updateState(utils::AppState state, int error);
 
     /**
-     * @brief Receive new battery life value in percentage.
+     * @brief Get a reference of the event handler.
      * 
-     * @param life battery life value (%)
+     * @return a reference of the event handler
      */
-    void newBatteryLife(int life);
+    EventHandler& getEventHandler() { return m_evHandler; }
 
 private:
     /**
@@ -125,5 +125,5 @@ private:
 	SDL_Texture* m_basic_texture = nullptr;
 	SDL_Renderer* m_renderer = nullptr;
 
-    EventHandler& m_evHandler;
+    EventHandler m_evHandler;
 };

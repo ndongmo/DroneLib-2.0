@@ -13,9 +13,9 @@ using namespace utils;
 
 class PCWindowTest : public ::testing::Test {
 public:
-    PCWindowTest() : window(evHandler) {}
-    EventHandler evHandler;
+    PCWindowTest() : evHandler(window.getEventHandler()) {}
     PCWindow window;
+    EventHandler &evHandler;
 protected:
     void SetUp() override {
         Config::setInt(VIDEO_WIDTH, VIDEO_WIDTH_DEFAULT);
@@ -56,6 +56,6 @@ TEST_F(PCWindowTest, RunServiceWorks) {
 
     window.run();
 
-    ASSERT_TRUE(evHandler.isEventPressed(CtrlEvent::QUIT));
+    ASSERT_TRUE(evHandler.isEventPressed(ClientEvent::QUIT));
     ASSERT_EQ(window.end(), 1);
 }

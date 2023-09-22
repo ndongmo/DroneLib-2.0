@@ -155,32 +155,21 @@ void EventHandler::addEvent(unsigned int eventID, unsigned int keyID, unsigned i
 		m_eventConfig[eventID] = EventConfig(keyID, joyID);
 }
 
-void EventHandler::updateMapping(unsigned int eventID, PlayWith util)
+bool EventHandler::saveConfig()
 {
-	for (auto& it : m_keyMap) {
-		if (isKeyPressed(it.first) && it.first != SDL_BUTTON_LEFT)
-		{
-			if (util == PlayWith::KEYBOARD)
-				m_eventConfigTemp[eventID].keyID = it.first;
-			else
-				m_eventConfigTemp[eventID].joyID = it.first;
-		}
+	std::ofstream file(KEYS_CONFIG);
+	if (file.fail()) {
+		perror(KEYS_CONFIG);
+		return false;
 	}
-}
 
-void EventHandler::updateConfig()
-{
+	file << m_eventConfig.size() << '\n';
+
 	for (auto& it : m_eventConfig) {
-		m_eventConfigTemp[it.first] = it.second;
+		file << it.first << ' ' << it.second.keyID << ' ' << it.second.joyID << '\n';
 	}
-}
-
-void EventHandler::saveConfig()
-{
-	for (auto& it : m_eventConfigTemp) {
-		m_eventConfig[it.first] = it.second;
-	}
-	saveConfigFile();
+	file.close();
+	return true;
 }
 
 bool EventHandler::loadConfig()
@@ -206,50 +195,16 @@ bool EventHandler::loadConfig()
 	else
 		m_playWith = PlayWith::KEYBOARD;
 
-	updateConfig();
-
 	return true;
-}
-
-bool EventHandler::saveConfigFile()
-{
-	std::ofstream file(KEYS_CONFIG);
-	if (file.fail()) {
-		perror(KEYS_CONFIG);
-		return false;
-	}
-
-	file << m_eventConfig.size() << '\n';
-
-	for (auto& it : m_eventConfig) {
-		file << it.first << ' ' << it.second.keyID << ' ' << it.second.joyID << '\n';
-	}
-	file.close();
-	return true;
-}
-
-void EventHandler::clearConfig()
-{
-	m_eventConfigTemp.clear();
 }
 
 std::string EventHandler::getMapping(unsigned int eventID)
 {
-	return getMapping(eventID, m_playWith, m_eventConfig);
-}
-
-std::string EventHandler::getMapping(unsigned int eventID, PlayWith util)
-{
-	return getMapping(eventID, util, m_eventConfigTemp);
-}
-
-std::string EventHandler::getMapping(unsigned int eventID, PlayWith util, std::unordered_map<unsigned int, EventConfig>& map)
-{
 	unsigned int keyID;
 
-	if (util == PlayWith::KEYBOARD)
+	if (m_playWith == PlayWith::KEYBOARD)
 	{
-		keyID = map[eventID].keyID;
+		keyID = m_eventConfig[eventID].keyID;
 		switch (keyID)
 		{
 		case SDL_BUTTON_LEFT: return "Mouse Left button";
@@ -260,7 +215,7 @@ std::string EventHandler::getMapping(unsigned int eventID, PlayWith util, std::u
 	}
 	else
 	{
-		keyID = map[eventID].joyID;
+		keyID = m_eventConfig[eventID].joyID;
 		switch (keyID)
 		{
 		case Joystick::A: return "A button";
