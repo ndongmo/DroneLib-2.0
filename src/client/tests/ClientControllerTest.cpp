@@ -26,6 +26,9 @@ public:
         if(flag) m_eventID = -1;
         return flag;
     }
+    std::string getMapping(unsigned int eventID) override {
+        return "";
+    }
     void press(unsigned int eventID) {
         m_eventID = (int)eventID;
     }

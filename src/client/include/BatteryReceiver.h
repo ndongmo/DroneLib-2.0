@@ -26,7 +26,7 @@ public:
      * 
      * @return life battery life value (%)
      */
-    int getBetteryLife();
+    int getBatteryLife();
 
 protected:
     /** Current battery life percentage */

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Android Drone Controller</string>
+    <string name="fps">FPS: %1</string>
+    <string name="battery">BAT: %1%</string>
+</resources>

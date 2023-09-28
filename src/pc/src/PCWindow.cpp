@@ -215,8 +215,6 @@ void PCWindow::render(const IStreamListener& stream, int life) {
 }
 
 void PCWindow::updateState(utils::AppState state, int error) {
-    std::string str;
-
     if(state == APP_ERROR) {
         m_msg_text.text = logError(error) + " Press [" + 
             m_evHandler.getMapping(ClientEvent::DISCOVER) + "] to restart discovering.";

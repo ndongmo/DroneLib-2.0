@@ -4,6 +4,6 @@
 **/bin/
 **/build/
 
-app/
+./app/
 third-party/
 Testing/

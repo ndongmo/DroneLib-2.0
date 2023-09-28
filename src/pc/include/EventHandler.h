@@ -112,17 +112,8 @@ public:
 	 */
 	bool isKeyPressed(unsigned int keyID);
 
-	/**
-	 * Handle event down action.
-	 * \param eventID: ID of event
-	 */
 	bool isEventDown(unsigned int eventID) override;
 
-	/**
-	 * Check if event has just occured.
-	 * \param eventID: ID of event
-	 * \return true if event has just occured
-	 */
 	bool isEventPressed(unsigned int eventID) override;
 
 	/**
@@ -151,12 +142,7 @@ public:
 	 */
 	void addEvent(unsigned int eventID, unsigned int keyID, unsigned int joyID);
 
-	/**
-	 * Get the key's name.
-	 * \param eventID: ID of event
-	 * \return name of key, joystick or mouse button
-	 */
-	std::string getMapping(unsigned int eventID);
+	std::string getMapping(unsigned int eventID) override;
 
 	bool saveConfig();
 	bool loadConfig();

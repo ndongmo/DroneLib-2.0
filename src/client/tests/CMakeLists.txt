@@ -34,21 +34,19 @@ SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-		debug ${LIB}
 		debug ${CLIENT}
 		debug ${LIB_GTEST}
 		debug ${LIB_GMOCK}
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-		optimized ${LIB}
 		optimized ${CLIENT}
 		optimized ${LIB_GTEST}
 		optimized ${LIB_GMOCK}
 	)
 ENDIF()
 
-add_dependencies(${PROJECT_NAME} ${LIB} ${CLIENT})
+add_dependencies(${PROJECT_NAME} ${CLIENT})
 
 INCLUDE(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME} EXTRA_ARGS ARGS=-V)

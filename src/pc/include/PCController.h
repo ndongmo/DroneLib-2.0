@@ -17,8 +17,6 @@
 #include <stream/VideoReceiver.h>
 #include <ClientController.h>
 
-#include <thread>
-
 /**
  * PC controller service class which starts and stops
  * all others services and handle the input events.

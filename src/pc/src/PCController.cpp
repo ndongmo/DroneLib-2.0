@@ -52,7 +52,7 @@ int PCController::innerEndServices() {
 void PCController::innerRunServices() {
 	m_window.run();
 	m_videoStream.updateFrame();
-	m_window.render(m_videoStream, m_batReceiver.getBetteryLife());
+	m_window.render(m_videoStream, m_batReceiver.getBatteryLife());
 	m_videoStream.frameHandled();
 }
 

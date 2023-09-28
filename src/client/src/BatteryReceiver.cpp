@@ -5,7 +5,7 @@ void BatteryReceiver::newBatteryLife(int life)
     m_life = life;
 }
 
-int BatteryReceiver::getBetteryLife()
+int BatteryReceiver::getBatteryLife()
 {
     return m_life;
 }

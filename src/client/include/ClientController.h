@@ -41,6 +41,13 @@ public:
     int end() override;
     int discovery() override;
 
+    /**
+     * Set the event handler pointer.
+     * 
+     * @param evHandler current event handler
+     */
+    void setEventHandler(IEventHandler *evHandler) { m_evHandler = evHandler; }
+
 protected:
     void run() override;
     void initConfigs() override;
@@ -98,8 +105,6 @@ protected:
      */
     DroneSpeed getSpeed();
 
-    /** Keep the main process running state */
-    bool m_inMainProcess = false;
     /** Elapsed time since the last loop in millisecond */
     int m_elapsedTime = 0;
     /** last recorded clock */

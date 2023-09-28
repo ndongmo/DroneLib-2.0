@@ -41,23 +41,19 @@ ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
 
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-		debug ${LIB}
-		debug ${CLIENT}
 		debug ${PC}
 		debug ${LIB_GTEST}
 		debug ${LIB_GMOCK}
 	)
 ELSE()
 	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-		optimized ${LIB}
-		optimized ${CLIENT}
 		optimized ${PC}
 		optimized ${LIB_GTEST}
 		optimized ${LIB_GMOCK}
 	)
 ENDIF()
 
-add_dependencies(${PROJECT_NAME} ${LIB} ${CLIENT} ${PC})
+add_dependencies(${PROJECT_NAME} ${PC})
 
 INCLUDE(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME} EXTRA_ARGS ARGS=-V)

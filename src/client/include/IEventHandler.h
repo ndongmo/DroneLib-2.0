@@ -8,6 +8,10 @@
 
 #pragma once
 
+#include <string>
+
+#define EVENT_COUNT 13 //nb of events
+
 /**
  * Define the type of handled client event.
  */
@@ -48,4 +52,12 @@ public:
 	 * \return true if the key linked to the event has been pressed, false otherwise.
 	 */
 	virtual bool isEventPressed(unsigned int eventID) = 0;
+
+	/**
+	 * Get the name of the trigger of the given event.
+	 * 
+	 * \param eventID: ID of event
+	 * \return name of the key, joystick, touch or mouse button
+	 */
+	virtual std::string getMapping(unsigned int eventID) = 0;
 };
