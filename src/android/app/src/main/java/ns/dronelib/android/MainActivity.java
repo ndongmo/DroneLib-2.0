@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        m_videoPlayer = new StreamMediaPlayer(this);
+        m_audioPlayer = new StreamMediaPlayer(this);
     }
 
     @Override
