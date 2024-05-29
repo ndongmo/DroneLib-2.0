@@ -1,7 +1,6 @@
 #include "EventHandler.h"
 
-void EventHandler::init()
-{
+void EventHandler::init() {
 	for(size_t i = 0; i < EVENT_COUNT; i++) {
 		m_eventMap[i] = 0;
 	}

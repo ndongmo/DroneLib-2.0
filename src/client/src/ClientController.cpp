@@ -129,6 +129,8 @@ void ClientController::stop() {
 
 void ClientController::run() {
 	m_running = true;
+	m_previousClock = std::chrono::steady_clock::now();
+	m_elapsedTime = 1000 / Config::getInt(VIDEO_FPS);
 	
 	while (m_running)
 	{

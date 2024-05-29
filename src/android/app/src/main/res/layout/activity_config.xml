@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="3">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_margin"
+                android:background="@color/colorAccent">
+                <TextView
+                    android:id="@+id/txt_drone_address"
+                    android:layout_width="@dimen/label_width"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/small_margin"
+                    style="@style/ns_textStyle"
+                    android:text="@string/drone_address" />
+                <EditText
+                    android:id="@+id/et_drone_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number|numberDecimal"
+                    android:digits="123456789."
+                    style="@style/ns_textStyle"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_margin"
+                android:background="@color/colorAccent">
+                <TextView
+                    android:id="@+id/txt_drone_port"
+                    android:layout_width="@dimen/label_width"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/small_margin"
+                    style="@style/ns_textStyle"
+                    android:text="@string/drone_port" />
+                <EditText
+                    android:id="@+id/et_drone_port"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    style="@style/ns_textStyle" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_margin"
+                android:background="@color/colorAccent">
+                <TextView
+                    android:id="@+id/txt_video_fps"
+                    android:layout_width="@dimen/label_width"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/small_margin"
+                    style="@style/ns_textStyle"
+                    android:text="@string/video_fps" />
+                <EditText
+                    android:id="@+id/et_video_fps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    style="@style/ns_textStyle"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_margin"
+                android:background="@color/colorAccent">
+                <TextView
+                    android:id="@+id/txt_video_width"
+                    android:layout_width="@dimen/label_width"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/small_margin"
+                    style="@style/ns_textStyle"
+                    android:text="@string/video_width" />
+                <EditText
+                    android:id="@+id/et_video_width"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    style="@style/ns_textStyle" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_margin"
+                android:background="@color/colorAccent">
+                <TextView
+                    android:id="@+id/txt_video_height"
+                    android:layout_width="@dimen/label_width"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/small_margin"
+                    style="@style/ns_textStyle"
+                    android:text="@string/video_height" />
+                <EditText
+                    android:id="@+id/et_video_height"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    style="@style/ns_textStyle" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="4">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_margin"
+                android:background="@color/colorAccent">
+                <TextView
+                    android:id="@+id/txt_audio_channels"
+                    android:layout_width="@dimen/label_width"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/small_margin"
+                    style="@style/ns_textStyle"
+                    android:text="@string/audio_channels" />
+                <EditText
+                    android:id="@+id/et_audio_channels"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    style="@style/ns_textStyle" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_margin"
+                android:background="@color/colorAccent">
+                <TextView
+                    android:id="@+id/txt_audio_sample"
+                    android:layout_width="@dimen/label_width"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/small_margin"
+                    style="@style/ns_textStyle"
+                    android:text="@string/audio_sample" />
+                <EditText
+                    android:id="@+id/et_audio_sample"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    style="@style/ns_textStyle" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_margin="@dimen/small_margin"
+                android:background="@color/colorAccent">
+                <TextView
+                    android:id="@+id/txt_audio_samples"
+                    android:layout_width="@dimen/label_width"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/small_margin"
+                    style="@style/ns_textStyle"
+                    android:text="@string/audio_samples" />
+                <EditText
+                    android:id="@+id/et_audio_samples"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    style="@style/ns_textStyle" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="@dimen/small_margin"
+            android:layout_weight="4.5">
+            <CheckBox
+                android:id="@+id/chb_camera_active"
+                android:layout_width="@dimen/checkbox_width"
+                android:layout_height="@dimen/label_height"
+                android:layout_margin="@dimen/margin"
+                style="@style/ns_textStyle"
+                android:text="@string/camera_active" />
+            <CheckBox
+                android:id="@+id/chb_micro_active"
+                android:layout_width="@dimen/checkbox_width"
+                android:layout_height="@dimen/label_height"
+                android:layout_margin="@dimen/margin"
+                style="@style/ns_textStyle"
+                android:text="@string/micro_active" />
+            <CheckBox
+                android:id="@+id/chb_servos_active"
+                android:layout_width="@dimen/checkbox_width"
+                android:layout_height="@dimen/label_height"
+                android:layout_margin="@dimen/margin"
+                style="@style/ns_textStyle"
+                android:text="@string/servos_active" />
+            <CheckBox
+                android:id="@+id/chb_motors_active"
+                android:layout_width="@dimen/checkbox_width"
+                android:layout_height="@dimen/label_height"
+                android:layout_margin="@dimen/margin"
+                style="@style/ns_textStyle"
+                android:text="@string/motors_active" />
+            <CheckBox
+                android:id="@+id/chb_leds_active"
+                android:layout_width="@dimen/checkbox_width"
+                android:layout_height="@dimen/label_height"
+                android:layout_margin="@dimen/margin"
+                style="@style/ns_textStyle"
+                android:text="@string/leds_active" />
+            <CheckBox
+                android:id="@+id/chb_buzzer_active"
+                android:layout_width="@dimen/checkbox_width"
+                android:layout_height="@dimen/label_height"
+                android:layout_margin="@dimen/margin"
+                style="@style/ns_textStyle"
+                android:text="@string/buzzer_active" />
+            <CheckBox
+                android:id="@+id/chb_battery_active"
+                android:layout_width="@dimen/checkbox_width"
+                android:layout_height="@dimen/label_height"
+                android:layout_margin="@dimen/margin"
+                style="@style/ns_textStyle"
+                android:text="@string/battery_active" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" >
+        <ImageButton
+            android:id="@+id/bt_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin"
+            app:tint="@android:color/black"
+            android:background="@drawable/button_back"
+            android:src="@android:drawable/ic_menu_save" />
+
+        <ImageButton
+            android:id="@+id/bt_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin"
+            app:tint="@android:color/black"
+            android:background="@drawable/button_back"
+            android:src="@android:drawable/ic_menu_revert" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
