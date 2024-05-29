@@ -29,12 +29,10 @@ public:
     AndroidController();
 
     /**
-     * Update the environment pointer.
-     * 
-     * @param env android environment
-     * @param obj main activity object
+     * Initialize the config.
+     * @param evHandler event handler
      */
-    void updateEnv(JNIEnv* env, jobject obj);
+    void initConfig(IEventHandler* evHandler);
 
     /**
      * Get the audio stream buffer
@@ -42,7 +40,7 @@ public:
      * @param buffer the current audio frame
      * @return the size of the returned buffer
      */
-    int getAudioStream(const UINT8 *buffer);
+    int getAudioStream(const UINT8 **buffer);
 
     /**
      * Get the video stream buffer
@@ -50,13 +48,21 @@ public:
      * @param buffer the current video frame
      * @return the size of the returned buffer
      */
-    int getVideoStream(const UINT8 *buffer);
+    int getVideoStream(const UINT8 **buffer);
+
+    /**
+     * @return the battery level
+     */
+    int getBatteryLevel();
+
+    /**
+     * @return the current debug message, otherwise empty string.
+     */
+    std::string getDebugMessage();
 
 private:
     void innerRunServices() override;
     void innerUpdateState(utils::AppState state, int error) override;
 
-    jstring m_msg;
-    JNIEnv *m_env = nullptr;
-    jobject *m_obj = nullptr;
+    std::string m_msg;
 };

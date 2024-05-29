@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="margin">20px</dimen>
+    <dimen name="margin">10px</dimen>
+    <dimen name="small_margin">2px</dimen>
+    <dimen name="checkbox_width">340px</dimen>
+    <dimen name="label_width">370px</dimen>
+    <dimen name="label_height">60px</dimen>
+    <dimen name="label_size">14sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="icon_size">46dp</dimen>
 </resources>

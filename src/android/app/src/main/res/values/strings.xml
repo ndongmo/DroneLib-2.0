@@ -1,5 +1,25 @@
 <resources>
     <string name="app_name">Android Drone Controller</string>
-    <string name="fps">FPS: %1</string>
-    <string name="battery">BAT: %1%</string>
+    <string name="fps">FPS: %1$d</string>
+    <string name="battery">BAT: %1$d%%</string>
+    <string name="camera_active">Camera active</string>
+    <string name="micro_active">Micro active</string>
+    <string name="servos_active">Servos active</string>
+    <string name="motors_active">Motors active</string>
+    <string name="leds_active">Leds active</string>
+    <string name="buzzer_active">Buzzer active</string>
+    <string name="battery_active">Battery active</string>
+
+    <string name="video_fps">Vidéo FPS</string>
+    <string name="video_width">Vidéo width</string>
+    <string name="video_height">Vidéo height</string>
+
+    <string name="audio_channels">Audio channels</string>
+    <string name="audio_sample">Audio sample</string>
+    <string name="audio_samples">Audio samples</string>
+
+    <string name="drone_address">Drone address</string>
+    <string name="drone_port">Drone port number</string>
+
+    <string name="save_success">Config saved successfully!</string>
 </resources>
