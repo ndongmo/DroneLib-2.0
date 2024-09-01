@@ -15,10 +15,10 @@ void Controller::initConfigs() {
 	Config::setIntDefault(BATTERY_ACTIVE, BATTERY_ACTIVE_DEFAULT);
 
     Config::setIntDefault(VIDEO_FPS, VIDEO_FPS_DEFAULT);
-	Config::setIntDefault(VIDEO_CODEC, VIDEO_CODEC_DEFAULT);
-	Config::setIntDefault(VIDEO_FORMAT, VIDEO_FORMAT_DEFAULT);
 	Config::setIntDefault(VIDEO_WIDTH, VIDEO_WIDTH_DEFAULT);
 	Config::setIntDefault(VIDEO_HEIGHT, VIDEO_HEIGHT_DEFAULT);
+	Config::setStringDefault(VIDEO_ENCODER, VIDEO_ENCODER_DEFAULT);
+	Config::setStringDefault(VIDEO_PIX_FORMAT, VIDEO_PIX_FORMAT_DEFAULT);
     Config::setStringDefault(VIDEO_DEVICE, VIDEO_DEVICE_DEFAULT);
 	Config::setStringDefault(VIDEO_INPUT_FORMAT, VIDEO_INPUT_FORMAT_DEFAULT);
 
@@ -26,13 +26,17 @@ void Controller::initConfigs() {
 	Config::setIntDefault(AUDIO_BIT_RATE, AUDIO_BIT_RATE_DEFAULT);
 	Config::setIntDefault(AUDIO_SAMPLE, AUDIO_SAMPLE_DEFAULT);
 	Config::setIntDefault(AUDIO_NB_SAMPLES, AUDIO_NB_SAMPLES_DEFAULT);
-	Config::setIntDefault(AUDIO_CODEC, AUDIO_CODEC_DEFAULT);
-	Config::setIntDefault(AUDIO_FORMAT, AUDIO_FORMAT_DEFAULT);
+	Config::setIntDefault(AUDIO_SAMPLE_FORMAT, AUDIO_SAMPLE_FORMAT_DEFAULT);
+	Config::setStringDefault(AUDIO_ENCODER, AUDIO_ENCODER_DEFAULT);
     Config::setStringDefault(AUDIO_DEVICE, AUDIO_DEVICE_DEFAULT);
     Config::setStringDefault(AUDIO_INPUT_FORMAT, AUDIO_INPUT_FORMAT_DEFAULT);
 
 	Config::setIntDefault(DRONE_PORT_DISCOVERY, DRONE_PORT_DISCOVERY_DEFAULT);
 	Config::setStringDefault(DRONE_ADDRESS, DRONE_IPV4_ADDRESS_DEFAULT);
+
+	Config::setIntDefault(STREAM_MODE, STREAM_MODE_DEFAULT);
+	Config::setStringDefault(STREAM_PROTOCOL, STREAM_PROTOCOL_DEFAULT);
+	Config::setStringDefault(STREAM_OUTPUT_FORMAT, STREAM_OUTPUT_FORMAT_DEFAULT);
 }
 
 int Controller::beginService(Service& service, const char* activeID) {

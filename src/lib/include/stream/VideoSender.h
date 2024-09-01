@@ -29,5 +29,8 @@ public:
 
 	int begin() override;
 	std::string toString() override;
+	void initDecoderCtx() override;
+	void initEncoderCtx() override;
+	int initFilterCtx() override;
 };
 } // namespace stream

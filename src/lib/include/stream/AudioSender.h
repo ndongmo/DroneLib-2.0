@@ -29,13 +29,17 @@ public:
 
 	int begin() override;
 	std::string toString() override;
+	void initEncoderCtx() override;
+	int initFilterCtx() override;
 
 private:
 	/**
 	 * @brief Compute and return the number of samples per channel
 	 * 
+	 * @param nb_channels number of audio channel
+	 * @param format audio format
 	 * @return number of samples per channel
 	 */
-	int getNbSamples();
+	int getNbSamples(int nb_channels, int format);
 };
 } // namespace stream

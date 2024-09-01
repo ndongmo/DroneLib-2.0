@@ -21,7 +21,7 @@ protected:
         Config::setInt(VIDEO_WIDTH, VIDEO_WIDTH_DEFAULT);
         Config::setInt(VIDEO_HEIGHT, VIDEO_HEIGHT_DEFAULT);
         Config::setInt(VIDEO_FPS, VIDEO_FPS_DEFAULT);
-        Config::setInt(VIDEO_FORMAT, VIDEO_FORMAT_DEFAULT);
+        Config::setString(VIDEO_PIX_FORMAT, VIDEO_PIX_FORMAT_DEFAULT);
     }
     void TearDown() override {
         remove(CONFIG_FILE);

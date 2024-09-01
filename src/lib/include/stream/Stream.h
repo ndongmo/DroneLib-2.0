@@ -13,12 +13,16 @@
 #include <mutex>
 
 extern "C" {
+#include <libavutil/pixdesc.h>
+#include <libavutil/channel_layout.h>
 #include <libavcodec/avcodec.h> 
 #include <libavformat/avformat.h> 
 #include <libavfilter/buffersink.h>
+#include <libavfilter/buffersrc.h>
 #include <libavdevice/avdevice.h>
 #include <libswscale/swscale.h> 
 #include <libswresample/swresample.h>
+#include <libpostproc/postprocess.h>
 }
 
 #define STREAM_FRAME_ACK 18
@@ -35,6 +39,18 @@ av_always_inline std::string av_err2string(int errnum) {
 }
 #define av_err2str(err) av_err2string(err).c_str()
 #endif  // av_err2str
+
+/**
+ * Filter context structure
+ */
+struct FilteringContext {
+    AVFilterContext *buffersink_ctx = NULL;
+    AVFilterContext *buffersrc_ctx = NULL;
+    AVFilterGraph *filter_graph = NULL;
+ 
+    AVPacket *enc_pkt = NULL;
+    AVFrame *filtered_frame = NULL;
+};
 
 /**
  * Binary streams structure to transport live stream

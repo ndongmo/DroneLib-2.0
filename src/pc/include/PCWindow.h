@@ -108,7 +108,7 @@ private:
     /* Window height */
     int m_height;
     /** Stream video format */
-    int m_format;
+    std::string m_format;
 
     /** FPS text */
     PCText m_fps_text;

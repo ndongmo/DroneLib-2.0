@@ -5,6 +5,7 @@ PROJECT(${LIB})
 SET(SOURCE_FILES
 	utils/Config.cpp
 	utils/Logger.cpp
+	utils/Helper.cpp
 	net/NetTcp.cpp
 	net/NetUdp.cpp
 	net/NetHelper.cpp
@@ -37,6 +38,7 @@ IF(UNIX AND NOT APPLE) # for Linux, BSD, Solaris, Minix
 	FIND_LIBRARY(LIB_AV_DEVICE libavdevice.so ${THIRD_PARTY_BIN})
 	FIND_LIBRARY(LIB_SW_SCALE libswscale.so ${THIRD_PARTY_BIN})
 	FIND_LIBRARY(LIB_SW_RESAMPLE libswresample.so ${THIRD_PARTY_BIN})
+	FIND_LIBRARY(LIB_POSTPROC libpostproc.so ${THIRD_PARTY_BIN})
 ELSEIF(APPLE)
 	FIND_LIBRARY(LIB_AV_CODEC libavcodec.dylib ${THIRD_PARTY_BIN})
 	FIND_LIBRARY(LIB_AV_FORMAT libavformat.dylib ${THIRD_PARTY_BIN})
@@ -50,6 +52,7 @@ ELSE()
 	FIND_LIBRARY(LIB_AV_DEVICE avdevice ${THIRD_PARTY_LIB})
 	FIND_LIBRARY(LIB_SW_SCALE swscale ${THIRD_PARTY_LIB})
 	FIND_LIBRARY(LIB_SW_RESAMPLE swresample ${THIRD_PARTY_LIB})
+	FIND_LIBRARY(LIB_POSTPROC libpostproc ${THIRD_PARTY_LIB})
 ENDIF()
 
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCE_FILES})
@@ -64,6 +67,7 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		debug ${LIB_AV_DEVICE}
 		debug ${LIB_SW_SCALE}
 		debug ${LIB_SW_RESAMPLE}
+		debug ${LIB_POSTPROC}
 		debug Threads::Threads
 		$<$<BOOL:${WIN32}>:wsock32>
 		$<$<BOOL:${WIN32}>:ws2_32>
@@ -77,6 +81,7 @@ ELSE()
 		optimized ${LIB_AV_DEVICE}
 		optimized ${LIB_SW_SCALE}
 		optimized ${LIB_SW_RESAMPLE}
+		optimized ${LIB_POSTPROC}
 		optimized Threads::Threads
 		$<$<BOOL:${WIN32}>:wsock32>
 		$<$<BOOL:${WIN32}>:ws2_32>

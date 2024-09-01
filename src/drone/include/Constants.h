@@ -11,8 +11,7 @@
 /* Drone config variables */
 #define DRONE_PORT_RCV_DEFAULT 		    4440
 #define DRONE_PORT_SEND_DEFAULT	        4441
-#define DRONE_PORT_VIDEO_DEFAULT	    4442
-#define DRONE_PORT_AUDIO_DEFAULT	    4443
+#define DRONE_PORT_STREAM_DEFAULT	    4442 // video and audio mixed
 
 /* Fragment default config */
 #define NET_FRAGMENT_SIZE_DEFAULT		4096

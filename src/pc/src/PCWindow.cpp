@@ -19,7 +19,7 @@ PCWindow::PCWindow() {
 int PCWindow::begin() {	
 	m_width = Config::getInt(VIDEO_WIDTH);
     m_height = Config::getInt(VIDEO_HEIGHT);
-    m_format = Config::getInt(VIDEO_FORMAT);
+    m_format = Config::getString(VIDEO_PIX_FORMAT);
     
     if(SDL_WasInit(SDL_INIT_EVERYTHING) != SDL_INIT_EVERYTHING) {
         if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -230,7 +230,7 @@ void PCWindow::updateState(utils::AppState state, int error) {
         m_msg_text.text = "";
 
         if(Config::getInt(CAMERA_ACTIVE) && (Config::getInt(VIDEO_WIDTH) != m_width || 
-            Config::getInt(VIDEO_HEIGHT) != m_height || Config::getInt(VIDEO_FORMAT) != m_format)) {
+            Config::getInt(VIDEO_HEIGHT) != m_height || Config::getString(VIDEO_PIX_FORMAT) != m_format)) {
             clean();
             begin();
             start();
@@ -262,7 +262,9 @@ void PCWindow::updateText(PCText& text) {
 }
 
 SDL_PixelFormatEnum PCWindow::getPixelFormat() {
-    if(m_format == AV_PIX_FMT_YUV420P) {
+    AVPixelFormat format = av_get_pix_fmt(m_format.c_str());
+    
+    if(format == AV_PIX_FMT_YUV420P) {
         return SDL_PIXELFORMAT_YV12;
     } else  {
         return SDL_PIXELFORMAT_YUY2;

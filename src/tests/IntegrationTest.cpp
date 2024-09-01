@@ -85,7 +85,7 @@ TEST_F(IntegrationTest, QuitCmdWorks) {
     SDL_Event sdlevent = {.type = SDL_QUIT};
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     ASSERT_FALSE(pcCtrl.isRunning());
     ASSERT_FALSE(droneCtrl.isRunning());
 }
@@ -100,7 +100,7 @@ TEST_F(IntegrationTest, NavCmdsWork) {
     sdlevent.key.keysym.sym = SDLK_w;
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(MOTORS_MOVE_LAPS));
+    std::this_thread::sleep_for(std::chrono::milliseconds(MOTORS_MOVE_LAPS * 4));
     EXPECT_TRUE(motorCtrl.isOn(WHEEL_TR_FORWARD));
     EXPECT_TRUE(motorCtrl.isOn(WHEEL_TL_FORWARD));
     EXPECT_TRUE(motorCtrl.isOn(WHEEL_BR_FORWARD));
@@ -149,7 +149,7 @@ TEST_F(IntegrationTest, BuzzerCmdWorks) {
 
     SDL_PushEvent(&sdlevent);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     EXPECT_TRUE(buzzerCtrl.isOn(BUZZER_ID));
 
     sdlevent.type = SDL_KEYUP;

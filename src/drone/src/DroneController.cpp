@@ -66,6 +66,7 @@ void DroneController::initConfigs() {
 	
 	Config::setIntDefault(DRONE_PORT_RCV, DRONE_PORT_RCV_DEFAULT);
 	Config::setIntDefault(DRONE_PORT_SEND, DRONE_PORT_SEND_DEFAULT);
+	Config::setIntDefault(DRONE_PORT_STREAM, DRONE_PORT_STREAM_DEFAULT);
 	Config::setIntDefault(NET_FRAGMENT_SIZE, NET_FRAGMENT_SIZE_DEFAULT);
 	Config::setIntDefault(NET_FRAGMENT_NUMBER, NET_FRAGMENT_NUMBER_DEFAULT);
 }
@@ -90,9 +91,6 @@ int DroneController::begin() {
 		return -1;
 	}
 	if(beginService(m_batteryCtrl, BATTERY_ACTIVE) == -1) {
-		return -1;
-	}
-	if(beginService(m_audioSender, MICRO_ACTIVE) == -1) {
 		return -1;
 	}
 	
@@ -232,14 +230,20 @@ int DroneController::discovery() {
 	if(endService(m_videoSender, CAMERA_ACTIVE) == -1) {
 		return -1;
 	}
+	if(endService(m_audioSender, MICRO_ACTIVE) == -1) {
+		return -1;
+	}
 	if(beginService(m_videoSender, CAMERA_ACTIVE) == -1) {
+		return -1;
+	}
+	if(beginService(m_audioSender, MICRO_ACTIVE) == -1) {
 		return -1;
 	}
 
 	std::string msg = Config::encodeJson({
-		DRONE_PORT_RCV, DRONE_PORT_SEND, NET_FRAGMENT_SIZE, NET_FRAGMENT_NUMBER,
-		VIDEO_FPS, VIDEO_CODEC, VIDEO_FORMAT, VIDEO_WIDTH, VIDEO_HEIGHT, 
-		AUDIO_CODEC, AUDIO_FORMAT, AUDIO_SAMPLE, AUDIO_NB_SAMPLES, AUDIO_BIT_RATE, AUDIO_CHANNELS,
+		DRONE_PORT_RCV, DRONE_PORT_SEND, NET_FRAGMENT_SIZE, NET_FRAGMENT_NUMBER, STREAM_OUT_FILE_ADDRESS,
+		VIDEO_FPS, VIDEO_ENCODER, VIDEO_PIX_FORMAT, VIDEO_WIDTH, VIDEO_HEIGHT, 
+		AUDIO_ENCODER, AUDIO_SAMPLE_FORMAT, AUDIO_SAMPLE, AUDIO_NB_SAMPLES, AUDIO_BIT_RATE, AUDIO_CHANNELS,
 		LEDS_ACTIVE, MOTORS_ACTIVE, SERVOS_ACTIVE, MICRO_ACTIVE, CAMERA_ACTIVE
 	});
 

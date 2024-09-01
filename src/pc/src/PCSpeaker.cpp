@@ -106,13 +106,15 @@ bool PCSpeaker::tryUpdateStream() {
 }
 
 SDL_AudioFormat PCSpeaker::getAudioFormat() const {
-    if(Config::getInt(AUDIO_FORMAT) == AV_SAMPLE_FMT_U8) {
+    AVSampleFormat sample_fmt = (AVSampleFormat)Config::getInt(AUDIO_SAMPLE_FORMAT);
+
+    if(sample_fmt == AV_SAMPLE_FMT_U8) {
         return AUDIO_U8;
-    } else if(Config::getInt(AUDIO_FORMAT) == AV_SAMPLE_FMT_S16) {
+    } else if(sample_fmt == AV_SAMPLE_FMT_S16) {
         return AUDIO_S16;
-    } else if(Config::getInt(AUDIO_FORMAT) == AV_SAMPLE_FMT_S32) {
+    } else if(sample_fmt == AV_SAMPLE_FMT_S32) {
         return AUDIO_S32;
-    } else if(Config::getInt(AUDIO_FORMAT) == AV_SAMPLE_FMT_FLT) {
+    } else if(sample_fmt == AV_SAMPLE_FMT_FLT) {
         return AUDIO_F32;
     } else {
         return AUDIO_S16SYS;

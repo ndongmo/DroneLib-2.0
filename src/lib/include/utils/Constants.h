@@ -17,8 +17,13 @@
 #define BATTERY_VOLT_MAX        8.4f    // Battery maximum voltage
 #define BUZZER_LAPS             500     // Buzzer time laps in millisecond
 
-/* Drone config variables */
-#define DRONE_PORT_DISCOVERY_DEFAULT 	4444
+/* Different stream modes */
+#define STREAM_MODE_RAW 0       // Raw packets are sent through the current udp connection
+#define STREAM_MODE_ENCODED 1   // Encoded packets are sent through the current udp connection
+#define STREAM_MODE_FILE 2      // Encoded packets are saved as file or sent through a new streaming address
+
+/* Drone config default values */
+#define DRONE_PORT_DISCOVERY_DEFAULT 	4445
 #define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.0.241"
 
 /* Drone config variables */
@@ -26,6 +31,7 @@
 #define DRONE_PORT_DISCOVERY 	"drone_port_discovery"
 #define DRONE_PORT_RCV 		    "drone_port_rcv"
 #define DRONE_PORT_SEND	        "drone_port_send"
+#define DRONE_PORT_STREAM	    "drone_port_stream"
 
 /* Client config variables */
 #define CLIENT_ADDRESS 	        "client_address"
@@ -38,13 +44,24 @@
 #define STREAM_FRAGMENT_SIZE 		"stream_fragment_size"
 #define STREAM_FRAGMENT_PER_FRAME   "stream_fragment_per_frame"
 
-/* Client default config */
+/* Client default config values */
 #define CLIENT_PORT_RCV_DEFAULT 		    4450
 #define CLIENT_PORT_SEND_DEFAULT 		    4451
 
+/* Stream config variables */
+#define STREAM_MODE             "stream_mode"
+#define STREAM_PROTOCOL         "stream_protocol"
+#define STREAM_OUTPUT_FORMAT    "stream_output_format"
+#define STREAM_OUT_FILE_ADDRESS "stream_out_file_address"
+
+/* Stream default config values */
+#define STREAM_MODE_DEFAULT             STREAM_MODE_RAW
+#define STREAM_PROTOCOL_DEFAULT         "udp"
+#define STREAM_OUTPUT_FORMAT_DEFAULT    "mpegts"
+
 /* Video source config variables */
-#define VIDEO_CODEC         "video_codec"
-#define VIDEO_FORMAT        "video_format"
+#define VIDEO_ENCODER       "video_encoder"
+#define VIDEO_PIX_FORMAT    "video_pix_format"
 #define VIDEO_BIT_RATE      "video_bit_rate"
 #define VIDEO_FPS           "video_fps" // Frame per second
 #define VIDEO_WIDTH         "video_width"
@@ -53,8 +70,8 @@
 #define VIDEO_INPUT_FORMAT  "video_input_format"
 
 /* Video source config vairiables default values */
-#define VIDEO_CODEC_DEFAULT         13 // https://ffmpeg.org/doxygen/3.2/avcodec_8h_source.html
-#define VIDEO_FORMAT_DEFAULT        1 // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
+#define VIDEO_ENCODER_DEFAULT       ""
+#define VIDEO_PIX_FORMAT_DEFAULT    ""          // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
 #define VIDEO_BIT_RATE_DEFAULT      400000
 #define VIDEO_WIDTH_DEFAULT         640
 #define VIDEO_HEIGHT_DEFAULT        480
@@ -69,24 +86,24 @@
 #endif
 
 /* Audio source config variables */
-#define AUDIO_CODEC         "audio_codec"
-#define AUDIO_FORMAT        "audio_format"
+#define AUDIO_ENCODER       "audio_encoder"
 #define AUDIO_SAMPLE        "audio_sample" 
 #define AUDIO_NB_SAMPLES    "audio_nb_samples" 
 #define AUDIO_CHANNELS      "audio_channels" 
 #define AUDIO_BIT_RATE      "audio_bit_rate" 
 #define AUDIO_DEVICE        "audio_device"
 #define AUDIO_INPUT_FORMAT  "audio_input_format"
+#define AUDIO_SAMPLE_FORMAT "audio_sample_format" 
 
 /* Video source config vairiables default values */
-#define AUDIO_CODEC_DEFAULT         13 // https://ffmpeg.org/doxygen/3.2/avcodec_8h_source.html
-#define AUDIO_FORMAT_DEFAULT        1 // https://ffmpeg.org/doxygen/trunk/pixfmt_8h_source.html
+#define AUDIO_ENCODER_DEFAULT       ""
 #define AUDIO_SAMPLE_DEFAULT        44100
 #define AUDIO_NB_SAMPLES_DEFAULT    512 // number of audio samples per channel
 #define AUDIO_CHANNELS_DEFAULT      2
 #define AUDIO_BIT_RATE_DEFAULT      1536
 #define AUDIO_DEVICE_DEFAULT        "hw:0"
 #define AUDIO_INPUT_FORMAT_DEFAULT  "alsa"
+#define AUDIO_SAMPLE_FORMAT_DEFAULT -1 // https://ffmpeg.org/doxygen/trunk/group__lavu__sampfmts.html
 
 /* Resource activation config variables */
 #define CAMERA_ACTIVE               "camera_active"

@@ -164,7 +164,11 @@ int ClientController::discovery() {
 
 	logI << "fps send: " << Config::getInt(VIDEO_FPS) << std::endl;
 
-	std::string msg = Config::encodeJson({ CLIENT_PORT_RCV, VIDEO_FPS, VIDEO_WIDTH, VIDEO_HEIGHT });
+	std::string msg = Config::encodeJson({ 
+		CLIENT_PORT_RCV, 
+		STREAM_MODE, STREAM_PROTOCOL, STREAM_OUTPUT_FORMAT, 
+		VIDEO_FPS, VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_ENCODER, VIDEO_PIX_FORMAT,
+		AUDIO_CHANNELS, AUDIO_SAMPLE, AUDIO_ENCODER, AUDIO_SAMPLE_FORMAT });
 
 	if (m_conSocket.send(msg.c_str(), (int)msg.length()) == -1) {
 		logE << m_name << " discovery: TCP send PC config failed" << std::endl;

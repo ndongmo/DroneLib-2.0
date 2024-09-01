@@ -20,4 +20,7 @@
 #define PC_FONT_TYPE_DEFAULT            "arial.ttf"
 #define PC_VOLUME_DEFAULT               128
 
-#define AUDIO_FREQ_DEFAULT              16000
+#define PC_VIDEO_PIX_FORMAT_DEFAULT     "yuyv422"
+
+#define PC_AUDIO_FREQ_DEFAULT           16000
+#define PC_AUDIO_SAMPLE_FORMAT_DEFAULT  1

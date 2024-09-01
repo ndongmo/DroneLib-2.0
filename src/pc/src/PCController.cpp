@@ -19,6 +19,9 @@ void PCController::initConfigs() {
 	Config::setIntDefault(PC_VOLUME, PC_VOLUME_DEFAULT);
 	Config::setIntDefault(PC_FONT_SIZE, PC_FONT_SIZE_DEFAULT);
 	Config::setStringDefault(PC_APP_NAME, PC_APP_NAME_DEFAULT);
+
+	Config::setStringDefault(VIDEO_PIX_FORMAT, PC_VIDEO_PIX_FORMAT_DEFAULT);
+	Config::setIntDefault(AUDIO_SAMPLE_FORMAT, PC_AUDIO_SAMPLE_FORMAT_DEFAULT);
 }
 
 void PCController::innerStartServices() {
