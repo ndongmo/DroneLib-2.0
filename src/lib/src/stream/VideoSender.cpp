@@ -37,6 +37,10 @@ int VideoSender::begin() {
 	Config::setString(VIDEO_PIX_FORMAT, av_get_pix_fmt_name(codec_ctx->pix_fmt));
 	Config::setString(VIDEO_ENCODER, avcodec_get_name(codec_ctx->codec_id));
 
+	if(Config::getString(VIDEO_ENCODER) == "h264") {
+		Config::setString(VIDEO_ENCODER, "libx264");
+	}
+
 	logI << toString() << std::endl;
 	
 	return 1;
