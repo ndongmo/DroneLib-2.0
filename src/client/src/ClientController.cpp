@@ -19,8 +19,8 @@ void ClientController::init() {
 	}
 
 	innerStopServices();
-	stopService(m_audioStream, MICRO_ACTIVE);
-	stopService(m_videoStream, CAMERA_ACTIVE);
+	stopService(m_audioStream);
+	stopService(m_videoStream);
 
 	m_sender.end();
 	m_receiver.end();
@@ -52,8 +52,8 @@ void ClientController::init() {
 		m_receiver.start();
 
 		innerStartServices();
-		startService(m_audioStream, MICRO_ACTIVE);
-		startService(m_videoStream, CAMERA_ACTIVE);
+		startService(m_audioStream);
+		startService(m_videoStream);
 		
 		m_elapsedTime = 1000 / Config::getInt(VIDEO_FPS);
 

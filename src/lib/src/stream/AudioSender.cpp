@@ -43,6 +43,10 @@ int AudioSender::begin() {
 	return 1;
 }
 
+bool AudioSender::isActive() const {
+    return Config::getInt(MICRO_ACTIVE);
+}
+
 int AudioSender::getNbSamples(int nb_channels, int format) {
 	int ret, nb_samples;
 	if ((ret = av_read_frame(m_ifmt_ctx, m_packet)) < 0) {

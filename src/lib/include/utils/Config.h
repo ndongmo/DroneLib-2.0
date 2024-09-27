@@ -28,6 +28,13 @@ public:
 	static void init();
 
 	/**
+	 * Initialize the json data by reading the config file.
+	 * 
+	 * @param filePath the app file path
+	 */
+	static void initWithFilePath(const std::string& filePath);
+
+	/**
 	 * Close the config file.
 	 */
 	static void close();
@@ -37,6 +44,14 @@ public:
 	 * @return true if the config file exists, false otherwise
 	 */
 	static bool exists();
+
+	/**
+	 * Check if the config file exists.
+	 * 
+	 * @param filePath the app file path
+	 * @return true if the config file exists, false otherwise
+	 */
+	static bool existsFilePath(const std::string& filePath);
 
 	/**
 	 * Retrieve the requested int variable from the global buffer.

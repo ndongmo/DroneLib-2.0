@@ -2,6 +2,7 @@
 #include "Constants.h"
 
 #include <utils/Logger.h>
+#include <utils/Config.h>
 #include <utils/Constants.h>
 
 #include <wiringPi/wiringPi.h>
@@ -33,12 +34,16 @@ int BuzzerController::end() {
     return ret1;
 }
 
+bool BuzzerController::isActive() const {
+    return Config::getInt(BUZZER_ACTIVE);
+}
+
 void BuzzerController::turn(bool state) {
     BuzzerAction a; a.delay = BUZZER_LAPS; a.on = state;
     addAction(a);
 }
 
-void BuzzerController::play(utils::AppState state) {
+void BuzzerController::play(AppState state) {
     if(state == APP_DISCOVERING) {
         BuzzerAction a; a.delay = DISCOVERY_LAPS; a.on = true;  a.repeat = -1;
         addAction(a);

@@ -42,6 +42,10 @@ int VideoSender::begin() {
 	return 1;
 }
 
+bool VideoSender::isActive() const {
+    return Config::getInt(CAMERA_ACTIVE);
+}
+
 std::string VideoSender::toString() {
 	if(m_ifmt_ctx != NULL && m_ifmt_ctx->nb_streams > 0) {
 		return m_name + ": fps=" + std::to_string(Config::getInt(VIDEO_FPS)) +

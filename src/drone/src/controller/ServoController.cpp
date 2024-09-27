@@ -1,6 +1,7 @@
 #include "controller/ServoController.h"
 
 #include <utils/Constants.h>
+#include <utils/Config.h>
 #include <utils/Logger.h>
 
 #include <algorithm>
@@ -29,6 +30,10 @@ int ServoController::end() {
 #endif
 
     return ret;
+}
+
+bool ServoController::isActive() const {
+    return utils::Config::getInt(SERVOS_ACTIVE);
 }
 
 void ServoController::init() {

@@ -25,5 +25,6 @@ class AudioReceiver: public StreamReceiver
 {
 public:
 	AudioReceiver();
+	bool isActive() const override;
 };
 } // namespace stream

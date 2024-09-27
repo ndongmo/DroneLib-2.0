@@ -30,6 +30,7 @@ public:
     
     int begin() override;
     int end() override;
+    bool isActive() const override;
 
     /**
      * Move wheel in the given direction with the given speed.

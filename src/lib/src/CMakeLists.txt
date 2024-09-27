@@ -13,6 +13,7 @@ SET(SOURCE_FILES
 	net/NetReceiver.cpp
 	stream/StreamPool.cpp
 	stream/StreamSender.cpp
+	stream/MediaSender.cpp
 	stream/VideoSender.cpp
 	stream/AudioSender.cpp
 	stream/StreamReceiver.cpp

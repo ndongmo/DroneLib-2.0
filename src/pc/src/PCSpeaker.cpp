@@ -121,6 +121,10 @@ SDL_AudioFormat PCSpeaker::getAudioFormat() const {
     }
 }
 
+bool PCSpeaker::isActive() const {
+    return Config::getInt(MICRO_ACTIVE);
+}
+
 std::string PCSpeaker::toString() {
     if(m_running) {
         return m_name + 

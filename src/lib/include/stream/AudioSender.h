@@ -28,6 +28,7 @@ public:
 	AudioSender(NetSender &sender);
 
 	int begin() override;
+	bool isActive() const override;
 	std::string toString() override;
 	void initEncoderCtx() override;
 	int initFilterCtx() override;

@@ -31,6 +31,7 @@ public:
     int begin() override;
     void start() override;
     int end() override;
+    bool isActive() const override;
 
     /**
      * Rotate the servo motor for the given axe with the given angle.

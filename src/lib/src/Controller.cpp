@@ -37,10 +37,11 @@ void Controller::initConfigs() {
 	Config::setIntDefault(STREAM_MODE, STREAM_MODE_DEFAULT);
 	Config::setStringDefault(STREAM_PROTOCOL, STREAM_PROTOCOL_DEFAULT);
 	Config::setStringDefault(STREAM_OUTPUT_FORMAT, STREAM_OUTPUT_FORMAT_DEFAULT);
+	Config::setStringDefault(STREAM_OUT_FILE_ADDRESS, STREAM_OUT_FILE_ADDRESS_DEFAULT);
 }
 
-int Controller::beginService(Service& service, const char* activeID) {
-	if(Config::getInt(activeID)) {
+int Controller::beginService(Service& service) {
+	if(service.isActive()) {
 		if(service.begin() == -1) {
 			logE << getName() << ": " << service.getName() << " was initialized unsuccessfully!" << std::endl;
 			return -1;
@@ -53,22 +54,22 @@ int Controller::beginService(Service& service, const char* activeID) {
 	return 1;
 }
 
-void Controller::startService(Service& service, const char* activeID) {
-	if(Config::getInt(activeID) && !service.isRunning()) {
+void Controller::startService(Service& service) {
+	if(service.isActive() && !service.isRunning()) {
 		service.start();
 		logI << getName() << ": " << service.getName() << " was started!" << std::endl;
 	}
 }
 
-void Controller::stopService(Service& service, const char* activeID) {
-	if(Config::getInt(activeID) && service.isRunning()) {
+void Controller::stopService(Service& service) {
+	if(service.isActive() && service.isRunning()) {
 		service.stop();
 		logI << getName() << ": " << service.getName() << " was stopped!" << std::endl;
 	}
 }
 
-int Controller::endService(Service& service, const char* activeID) {
-	if(Config::getInt(activeID)) {
+int Controller::endService(Service& service) {
+	if(service.isActive()) {
 		if(service.end() == -1) {
 			logE << getName() << ": " << service.getName() << " was closed unsuccessfully!" << std::endl;
 			return -1;

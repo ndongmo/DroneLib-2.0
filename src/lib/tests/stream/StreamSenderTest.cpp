@@ -13,11 +13,6 @@ using namespace utils;
 using namespace net;
 using namespace stream;
 
-using ::testing::_;
-using ::testing::NotNull;
-using ::testing::AtLeast;
-using ::testing::Return;
-
 // Mock class of the StreamSender
 class MockVideoSender : public VideoSender {
 public:
@@ -232,30 +227,6 @@ TEST_F(VideoSenderTest, RunEncodedVideoStreamMode) {
     ASSERT_FALSE(videoSender.isRunning());
 }
 
-// Tests VideoSender file/link stream mode
-TEST_F(VideoSenderTest, RunFileVideoStreamMode) {  
-    Config::setInt(STREAM_MODE, STREAM_MODE_FILE);
-
-    EXPECT_CALL(videoSender, initDecoderCtx()).Times(1);
-    EXPECT_CALL(videoSender, initEncoderCtx()).Times(1);
-    EXPECT_CALL(videoSender, initFilterCtx()).Times(1);
-
-    EXPECT_EQ(videoSender.begin(), 1);
-
-    EXPECT_NE(videoSender.getDecoderCtx(), nullptr);
-    EXPECT_NE(videoSender.getEncoderCtx(), nullptr);
-    EXPECT_NE(videoSender.getFilterCtx().filter_graph, nullptr);
-    EXPECT_NE(videoSender.getOutputFormatCtx(), nullptr);
-    EXPECT_NE(videoSender.getOutputStream(), nullptr);
-
-    videoSender.start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    ASSERT_TRUE(videoSender.isRunning());
-    EXPECT_EQ(videoSender.end(), 1);
-    ASSERT_FALSE(videoSender.isRunning());
-}
-
 // Tests AudioSender raw stream mode
 TEST_F(AudioSenderTest, RunRawAudioStreamMode) {   
     EXPECT_CALL(audioSender, initDecoderCtx()).Times(1);
@@ -292,30 +263,6 @@ TEST_F(AudioSenderTest, RunEncodedAudioStreamMode) {
     EXPECT_NE(audioSender.getFilterCtx().filter_graph, nullptr);
     EXPECT_EQ(audioSender.getOutputFormatCtx(), nullptr);
     EXPECT_EQ(audioSender.getOutputStream(), nullptr);
-
-    audioSender.start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    ASSERT_TRUE(audioSender.isRunning());
-    EXPECT_EQ(audioSender.end(), 1);
-    ASSERT_FALSE(audioSender.isRunning());
-}
-
-// Tests AudioSender file/link stream mode
-TEST_F(AudioSenderTest, RunFileAudioStreamMode) {  
-    Config::setInt(STREAM_MODE, STREAM_MODE_FILE);
-
-    EXPECT_CALL(audioSender, initDecoderCtx()).Times(1);
-    EXPECT_CALL(audioSender, initEncoderCtx()).Times(1);
-    EXPECT_CALL(audioSender, initFilterCtx()).Times(1);
-
-    EXPECT_EQ(audioSender.begin(), 1);
-
-    EXPECT_NE(audioSender.getDecoderCtx(), nullptr);
-    EXPECT_NE(audioSender.getEncoderCtx(), nullptr);
-    EXPECT_NE(audioSender.getFilterCtx().filter_graph, nullptr);
-    EXPECT_NE(audioSender.getOutputFormatCtx(), nullptr);
-    EXPECT_NE(audioSender.getOutputStream(), nullptr);
 
     audioSender.start();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

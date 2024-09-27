@@ -49,6 +49,14 @@ public:
     }
 
     /**
+     * Get the service active state.
+     * @return true if the service is active, false otherwise. 
+     */
+    virtual bool isActive() const {
+        return false;
+    }
+
+    /**
      * @brief Return the service's name
      * 
      * @return service's name

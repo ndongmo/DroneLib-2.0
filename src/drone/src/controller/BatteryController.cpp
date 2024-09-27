@@ -4,6 +4,7 @@
 #include <net/NetSender.h>
 #include <utils/Constants.h>
 #include <utils/Logger.h>
+#include <utils/Config.h>
 
 using namespace component;
 
@@ -28,6 +29,10 @@ int BatteryController::end() {
     m_pca.close();
 #endif
     return ret;
+}
+
+bool BatteryController::isActive() const {
+    return utils::Config::getInt(BATTERY_ACTIVE);
 }
 
 void BatteryController::handleActions() {

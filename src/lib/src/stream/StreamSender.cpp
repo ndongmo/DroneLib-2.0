@@ -1,4 +1,5 @@
 #include "stream/StreamSender.h"
+#include "stream/MediaSender.h"
 #include "net/NetSender.h"
 #include "utils/Logger.h"
 #include "utils/Config.h"
@@ -15,13 +16,9 @@ StreamSender::StreamSender(NetSender &sender) : m_sender(sender) {
 
 int StreamSender::begin() {
 	m_frameIndex = 0;
+	
 	avdevice_register_all();
-	postproc_version(); // required solving linking libpostproc issue
-
-	if(Config::getInt(STREAM_MODE) < STREAM_MODE_RAW || Config::getInt(STREAM_MODE) > STREAM_MODE_FILE) {
-		Config::setInt(STREAM_MODE, STREAM_MODE_RAW);
-	}
-
+	
 	if(openInputStream() == -1) {
 		return -1;
 	}
@@ -84,12 +81,17 @@ int StreamSender::end() {
 		m_istream = NULL;
 	}
 	if(m_ofmt_ctx != NULL) {
-		if (!(m_ofmt_ctx->oformat->flags & AVFMT_NOFILE)) {
-			avio_closep(&m_ofmt_ctx->pb);
-		}
-		avformat_free_context(m_ofmt_ctx);
 		m_ofmt_ctx = NULL;
 		m_ostream = NULL;
+		m_media_sender = NULL;
+	}
+	if(m_sws_ctx != NULL) {
+		sws_freeContext(m_sws_ctx);
+		m_sws_ctx = NULL;
+	}
+	if(m_swr_ctx != NULL) {
+		swr_free(&m_swr_ctx);
+		m_swr_ctx = NULL;
 	}
 
 	return 1;
@@ -150,9 +152,6 @@ void StreamSender::run() {
 
 	if (m_filter_ctx.filter_graph) {  
 		flushBuffers();
-	}
-	if(m_ofmt_ctx) {
-		av_write_trailer(m_ofmt_ctx);
 	}
 }
 
@@ -242,18 +241,7 @@ int StreamSender::openInputStream() {
 int StreamSender::openOutputStream() {
 	int ret;
 
-	if(Config::getInt(STREAM_MODE) == STREAM_MODE_FILE) {	
-		Config::setStringDefault(STREAM_OUT_FILE_ADDRESS, Helper::generateStreamUrl());
-
-		std::string out_filename = Config::getString(STREAM_OUT_FILE_ADDRESS);
-		std::string out_format = Config::getString(STREAM_OUTPUT_FORMAT);
-
-		if ((ret = avformat_alloc_output_context2(&m_ofmt_ctx, NULL, out_format.c_str(), out_filename.c_str())) < 0) {
-			logE << m_name << ": cannot open output file '" << out_filename << "' with format '" << 
-				out_format << "' -> " << av_err2str(ret) << std::endl;
-			return -1;
-		}
-
+	if(m_ofmt_ctx) {	
         if (!(m_ostream = avformat_new_stream(m_ofmt_ctx, NULL))) {
             logE << m_name << ": failed to allocate the output stream" << std::endl;
             return -1;
@@ -307,28 +295,6 @@ int StreamSender::openOutputStream() {
 				m_ostream->index << " -> " << av_err2str(ret) << std::endl;
 		}
 		m_ostream->time_base = m_encoder_ctx->time_base;
-	}
-
-	if(m_ofmt_ctx) {
-		std::string out_filename = Config::getString(STREAM_OUT_FILE_ADDRESS);
-
-		av_dump_format(m_ofmt_ctx, 0, out_filename.c_str(), 1);
-		
-		if (!(m_ofmt_ctx->oformat->flags & AVFMT_NOFILE)) {
-			AVDictionary *options = NULL;
-
-			av_dict_set(&options, "listen", "1", 0);
-
-			if ((ret = avio_open2(&m_ofmt_ctx->pb, out_filename.c_str(), AVIO_FLAG_WRITE, NULL, &options)) < 0) {
-				logE << m_name << ": could not open server address '" << out_filename << "' -> " << av_err2str(ret) << std::endl;
-				return -1;
-			}
-		}
-	
-		if ((ret = avformat_write_header(m_ofmt_ctx, NULL)) < 0) {
-			logE << m_name << ": error occurred when opening output file '" << out_filename << "' -> " << av_err2str(ret) << std::endl;
-			return -1;
-		}
 	}
 
 	return 1;
@@ -458,14 +424,14 @@ int StreamSender::encodeFrame(bool flush) {
             return 0;
 		}
 
-		if(m_ofmt_ctx && m_ostream) {
+		if(m_ofmt_ctx && m_ostream && m_media_sender) {
 			/* prepare packet for muxing */
 			enc_pkt->stream_index = m_ostream->index;
 			av_packet_rescale_ts(enc_pkt, m_encoder_ctx->time_base,
 				m_ofmt_ctx->streams[m_ostream->index]->time_base);
 	
 			/* mux encoded frame */
-			ret = av_interleaved_write_frame(m_ofmt_ctx, enc_pkt);
+			ret = m_media_sender->writePacket(enc_pkt);
 		} else {
 			sendPacket(enc_pkt);
 			ret = 1;

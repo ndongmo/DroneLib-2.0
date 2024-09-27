@@ -2,6 +2,8 @@
 #include "Constants.h"
 
 #include <utils/Logger.h>
+#include <utils/Config.h>
+#include <utils/Constants.h>
 
 #include <rpi_ws281x/clk.h>
 #include <rpi_ws281x/gpio.h>
@@ -71,6 +73,10 @@ int LedController::end() {
 #endif
 
     return ret1;
+}
+
+bool LedController::isActive() const {
+    return Config::getInt(LEDS_ACTIVE);
 }
 
 void LedController::turn(unsigned int ledIndex, bool state, unsigned int colorIndex) {

@@ -10,6 +10,7 @@ SET(SOURCE_FILES
 	net/NetTcpTest.cpp
 	net/NetHelperTest.cpp
 	stream/StreamPoolTest.cpp
+	stream/MediaSenderTest.cpp
 	stream/StreamSenderTest.cpp
 	stream/StreamReceiverTest.cpp
 )

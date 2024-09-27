@@ -18,8 +18,7 @@
 
 #include <Controller.h>
 #include <net/NetTcp.h>
-#include <stream/VideoSender.h>
-#include <stream/AudioSender.h>
+#include <stream/MediaSender.h>
 
 #include <string>
 #include <thread>
@@ -71,10 +70,8 @@ protected:
     DroneSender m_sender;
     /** Network receiver object */
     DroneReceiver m_receiver;
-    /** Audio stream sender object */
-    AudioSender m_audioSender;
-    /** Video stream sender object */
-    VideoSender m_videoSender;
+    /** Media stream sender object */
+    MediaSender m_mediaSender;
     /** Led controller object */
     LedController m_ledCtrl;
     /** Motors (wheels) controller object */

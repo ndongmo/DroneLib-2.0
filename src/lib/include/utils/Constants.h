@@ -58,6 +58,7 @@
 #define STREAM_MODE_DEFAULT             STREAM_MODE_RAW
 #define STREAM_PROTOCOL_DEFAULT         "udp"
 #define STREAM_OUTPUT_FORMAT_DEFAULT    "mpegts"
+#define STREAM_OUT_FILE_ADDRESS_DEFAULT ""
 
 /* Video source config variables */
 #define VIDEO_ENCODER       "video_encoder"

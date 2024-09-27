@@ -25,13 +25,13 @@ void PCController::initConfigs() {
 }
 
 void PCController::innerStartServices() {
-	startService(m_speaker, MICRO_ACTIVE);
-	startService(m_window, CAMERA_ACTIVE);
+	startService(m_speaker);
+	startService(m_window);
 }
 
 void PCController::innerStopServices() {
-	stopService(m_speaker, MICRO_ACTIVE);
-	stopService(m_window, CAMERA_ACTIVE);
+	stopService(m_speaker);
+	stopService(m_window);
 }
 
 int PCController::innerBeginServices() {	

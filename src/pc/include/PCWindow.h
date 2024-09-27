@@ -49,6 +49,7 @@ public:
     void start() override;
     int end() override;
     void run() override;
+    bool isActive() const override;
 
     /**
      * Render the current frame.

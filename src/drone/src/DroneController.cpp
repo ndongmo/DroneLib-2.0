@@ -11,7 +11,7 @@ using namespace utils;
 
 DroneController::DroneController() : 
 	m_receiver(m_sender, m_motorCtrl, m_servoCtrl, m_buzzerCtrl), 
-	m_audioSender(m_sender), m_videoSender(m_sender), m_batteryCtrl(m_sender) {
+	m_mediaSender(m_sender), m_batteryCtrl(m_sender) {
 	m_name = "DroneController";
 }
 
@@ -20,9 +20,8 @@ void DroneController::init() {
 		m_initProcess.join();
 	}
 
-	stopService(m_batteryCtrl, BATTERY_ACTIVE);
-	stopService(m_audioSender, MICRO_ACTIVE);
-	stopService(m_videoSender, CAMERA_ACTIVE);
+	stopService(m_batteryCtrl);
+	stopService(m_mediaSender);
 
 	m_sender.end();
 	m_receiver.end();
@@ -53,9 +52,8 @@ void DroneController::init() {
 		m_sender.start();
 		m_receiver.start();
 
-		startService(m_batteryCtrl, BATTERY_ACTIVE);
-		startService(m_audioSender, MICRO_ACTIVE);
-		startService(m_videoSender, CAMERA_ACTIVE);
+		startService(m_batteryCtrl);
+		startService(m_mediaSender);
 
 		updateState(APP_RUNNING);
 	});
@@ -78,19 +76,19 @@ int DroneController::begin() {
 	m_sender.setController(this);
 	m_receiver.setController(this);
 
-	if(beginService(m_ledCtrl, LEDS_ACTIVE) == -1) {
+	if(beginService(m_ledCtrl) == -1) {
 		return -1;
 	}
-	if(beginService(m_motorCtrl, MOTORS_ACTIVE) == -1) {
+	if(beginService(m_motorCtrl) == -1) {
 		return -1;
 	}
-	if(beginService(m_servoCtrl, SERVOS_ACTIVE) == -1) {
+	if(beginService(m_servoCtrl) == -1) {
 		return -1;
 	}
-	if(beginService(m_buzzerCtrl, BUZZER_ACTIVE) == -1) {
+	if(beginService(m_buzzerCtrl) == -1) {
 		return -1;
 	}
-	if(beginService(m_batteryCtrl, BATTERY_ACTIVE) == -1) {
+	if(beginService(m_batteryCtrl) == -1) {
 		return -1;
 	}
 	
@@ -109,13 +107,12 @@ int DroneController::end() {
 	m_cv.notify_all();
 	m_conSocket.close();
 
-	result = result && endService(m_ledCtrl, LEDS_ACTIVE) != -1;
-	result = result && endService(m_motorCtrl, MOTORS_ACTIVE) != -1;
-	result = result && endService(m_servoCtrl, SERVOS_ACTIVE) != -1;
-	result = result && endService(m_buzzerCtrl, BUZZER_ACTIVE) != -1;
-	result = result && endService(m_batteryCtrl, BATTERY_ACTIVE) != -1;
-	result = result && endService(m_audioSender, MICRO_ACTIVE) != -1;
-	result = result && endService(m_videoSender, CAMERA_ACTIVE) != -1;
+	result = result && endService(m_ledCtrl) != -1;
+	result = result && endService(m_motorCtrl) != -1;
+	result = result && endService(m_servoCtrl) != -1;
+	result = result && endService(m_buzzerCtrl) != -1;
+	result = result && endService(m_batteryCtrl) != -1;
+	result = result && endService(m_mediaSender) != -1;
 	result = result && m_sender.end() != -1;
 	result = result && m_receiver.end() != -1;
 
@@ -127,10 +124,10 @@ int DroneController::end() {
 }
 
 void DroneController::start() {
-	startService(m_ledCtrl, LEDS_ACTIVE);
-	startService(m_motorCtrl, MOTORS_ACTIVE);
-	startService(m_servoCtrl, SERVOS_ACTIVE);
-	startService(m_buzzerCtrl, BUZZER_ACTIVE);
+	startService(m_ledCtrl);
+	startService(m_motorCtrl);
+	startService(m_servoCtrl);
+	startService(m_buzzerCtrl);
 
 	init();
 	run();
@@ -165,11 +162,11 @@ void DroneController::waitNextEvent() {
 void DroneController::handleEvents() {
 	if(m_oldState == m_state) return;
 
-	if(Config::getInt(LEDS_ACTIVE)) {
+	if(m_ledCtrl.isActive()) {
 		m_ledCtrl.play(m_state);
 	}
 
-	if(Config::getInt(BUZZER_ACTIVE)) {
+	if(m_buzzerCtrl.isActive()) {
 		m_buzzerCtrl.play(m_state);
 	}
 
@@ -224,19 +221,14 @@ int DroneController::discovery() {
 		logE << m_name << " discovery: Json parser error" << std::endl;
 		return -1;
 	}
-	logI << m_name << " discovery: receive client address[" <<  Config::getString(CLIENT_ADDRESS)
+	logI << m_name << " discovery: client address[" <<  Config::getString(CLIENT_ADDRESS)
 		<< "] port[" << Config::getInt(CLIENT_PORT_RCV) << "]" << std::endl;
+	logI << m_name << " discovery: received from client -> " <<  std::string(buf) << std::endl;
 
-	if(endService(m_videoSender, CAMERA_ACTIVE) == -1) {
+	if(endService(m_mediaSender) == -1) {
 		return -1;
 	}
-	if(endService(m_audioSender, MICRO_ACTIVE) == -1) {
-		return -1;
-	}
-	if(beginService(m_videoSender, CAMERA_ACTIVE) == -1) {
-		return -1;
-	}
-	if(beginService(m_audioSender, MICRO_ACTIVE) == -1) {
+	if(beginService(m_mediaSender) == -1) {
 		return -1;
 	}
 

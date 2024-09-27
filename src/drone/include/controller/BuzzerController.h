@@ -28,6 +28,7 @@ public:
     
     int begin() override;
     int end() override;
+    bool isActive() const override;
 
     /**
      * Turn the Buzzer on/off.

@@ -48,6 +48,7 @@ public:
     void stop() override;
     int end() override;
     void run() override;
+    bool isActive() const override;
     std::string toString() override;
 
 private:

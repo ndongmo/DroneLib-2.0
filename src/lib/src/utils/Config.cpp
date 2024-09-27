@@ -13,18 +13,22 @@ Config::Config() {
 }
 
 void Config::init() {
+    initWithFilePath(CONFIG_FILE);
+}
+
+void Config::initWithFilePath(const std::string& filePath) {
     if(!m_config.m_init) {
-        std::ifstream input(CONFIG_FILE);
+        std::ifstream input(filePath);
 
         if(input.fail()) {
-            perror(CONFIG_FILE);
+            perror(filePath.c_str());
             m_config.m_init = false;
         } 
         else {
             std::string str((std::istreambuf_iterator<char>(input)),
                  std::istreambuf_iterator<char>());
             if(m_config.decodeJson(str.c_str()) == -1) {
-                logE << "Config: decoding config file '" << CONFIG_FILE << "' failed" << std::endl;
+                logE << "Config: decoding config file '" << filePath << "' failed" << std::endl;
                 m_config.m_init = false;
             } else {
                 m_config.m_init = true;
@@ -41,7 +45,11 @@ void Config::close() {
 }
 
 bool Config::exists() {
-    std::ifstream file(CONFIG_FILE);
+    return existsFilePath(CONFIG_FILE);
+}
+
+bool Config::existsFilePath(const std::string& filePath) {
+    std::ifstream file(filePath);
     bool exist = !file.fail();
     file.close();
     return exist;

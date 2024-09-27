@@ -14,22 +14,6 @@ namespace stream
 {
 
 /**
- * Video decoder structure.
- */
-struct VideoDecoder {
-	const AVCodec *codec = NULL;
-	AVCodecContext *codecCtx = NULL;
-	AVFrame *frame = NULL;
-	AVFrame *frameScl = NULL;
-	AVPacket *avPacket = NULL;
-	SwsContext *convertCtx = NULL;
-
-	// not really needed: for compilation purpose
-	SwrContext *swr_ctx = NULL;
-	AVFilterGraph *filter_graph = NULL;
-};
-
-/**
  * Video stream receiver service.
  * Send udp video stream frames.
  */
@@ -37,11 +21,6 @@ class VideoReceiver: public StreamReceiver
 {
 public:
 	VideoReceiver();
-
-	int end() override;
-
-private:
-	/** Video decoder object */
-	VideoDecoder m_decoder;
+	bool isActive() const override;
 };
 } // namespace stream

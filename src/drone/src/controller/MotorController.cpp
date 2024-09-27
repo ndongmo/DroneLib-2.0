@@ -1,5 +1,6 @@
 #include "controller/MotorController.h"
 
+#include <utils/Config.h>
 #include <utils/Constants.h>
 
 #include <algorithm>
@@ -28,6 +29,10 @@ int MotorController::end() {
 #endif
 
     return ret;
+}
+
+bool MotorController::isActive() const {
+    return utils::Config::getInt(MOTORS_ACTIVE);
 }
 
 void MotorController::handleActions() {

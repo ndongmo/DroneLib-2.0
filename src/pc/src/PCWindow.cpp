@@ -172,6 +172,10 @@ void PCWindow::run() {
     m_evHandler.update();
 }
 
+bool PCWindow::isActive() const {
+    return Config::getInt(CAMERA_ACTIVE);
+}
+
 void PCWindow::initEvents() {
     if(!m_evHandler.loadConfig()) {
         m_evHandler.addEvent(ClientEvent::QUIT, SDLK_ESCAPE, Joystick::START);

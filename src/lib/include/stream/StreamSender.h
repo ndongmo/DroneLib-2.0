@@ -23,9 +23,12 @@ using namespace net;
 namespace stream
 {
 
+class IMediaSender;
+
 /**
  * Generic stream sender service.
- * Send udp stream frames.
+ * Read Camera and Micro input, decode and encode, filter and send 
+ * the result frames to a network listener.
  */
 class StreamSender: public Service
 {
@@ -33,7 +36,6 @@ public:
 	/**
 	 * @brief Construct a new Stream Sender object
 	 * 
-	 * @param streamID id of the stream
 	 * @param sender  network sender reference
 	 */
 	StreamSender(NetSender &sender);
@@ -42,6 +44,17 @@ public:
 	void start() override;
 	void stop() override;
     int end() override;
+
+	/**
+	 * @brief Set the current output format context.
+	 * 
+	 * @param mediaSender the container media sender
+	 * @param ofmt_ctx the output format context
+	 */
+	void setOutputFormatCtx(IMediaSender* mediaSender, AVFormatContext *ofmt_ctx) {
+		m_media_sender = mediaSender;
+		m_ofmt_ctx = ofmt_ctx;
+	}
 
 protected:
     void run() override;
@@ -105,6 +118,12 @@ protected:
 	AVFormatContext *m_ofmt_ctx = NULL;
 	/** Filter context */
 	FilteringContext m_filter_ctx;
+	/** The container media sender */
+	IMediaSender *m_media_sender = NULL;
+
+	/* not really needed: for compilation purpose */ 
+	SwsContext *m_sws_ctx = NULL;
+	SwrContext *m_swr_ctx = NULL;
 
 private:
 	/**

@@ -30,6 +30,7 @@ public:
     
     int begin() override;
     int end() override;
+    bool isActive() const override;
 
 protected:
     void handleActions() override;

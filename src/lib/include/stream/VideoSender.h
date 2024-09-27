@@ -28,6 +28,7 @@ public:
 	VideoSender(NetSender &sender);
 
 	int begin() override;
+	bool isActive() const override;
 	std::string toString() override;
 	void initDecoderCtx() override;
 	void initEncoderCtx() override;
