@@ -4,6 +4,8 @@ package ns.dronelib.android;
  * JNI class helper which provides method to get or set c++ values.
  */
 public class JNIHelper {
+    public static final String STREAM_OUT_FILE_ADDRESS = "stream_out_file_address";
+
     public static final String DRONE_ADDRESS = "drone_address";
     public static final String DRONE_PORT = "drone_port_discovery";
     public static final String VIDEO_FPS = "video_fps";
@@ -20,8 +22,8 @@ public class JNIHelper {
     public static final String BATTERY_ACTIVE = "battery_active";
     public static final String BUZZER_ACTIVE = "buzzer_active";
 
-    public static final String DRONE_ADDRESS_DEFAULT = "192.168.0.241";
-    public static final int DRONE_PORT_DEFAULT = 4444;
+    public static final String DRONE_ADDRESS_DEFAULT = "192.168.0.239";
+    public static final int DRONE_PORT_DEFAULT = 4445;
     public static final int VIDEO_FPS_DEFAULT = 30;
     public static final int VIDEO_WIDTH_DEFAULT = 640;
     public static final int VIDEO_HEIGHT_DEFAULT = 480;
@@ -79,6 +81,8 @@ public class JNIHelper {
 
     /**
      * Save the current config values.
+     *
+     * @param fileDir
      */
-    public static native void saveConfig();
+    public static native void saveConfig(final String fileDir);
 }

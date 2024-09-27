@@ -1,35 +1,20 @@
 package ns.dronelib.android;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.media3.common.AudioAttributes;
-import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
-import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
-import androidx.media3.datasource.ByteArrayDataSource;
-import androidx.media3.datasource.DataSource;
-import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.HttpDataSource;
-import androidx.media3.datasource.UdpDataSource;
 import androidx.media3.datasource.rtmp.RtmpDataSource;
-import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.dash.DashMediaSource;
-import androidx.media3.exoplayer.hls.HlsMediaSource;
-import androidx.media3.exoplayer.rtsp.RtspMediaSource;
-import androidx.media3.exoplayer.smoothstreaming.SsMediaSource;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
-import androidx.media3.exoplayer.source.MediaSource;
-import androidx.media3.exoplayer.source.ProgressiveMediaSource;
-import androidx.media3.exoplayer.upstream.DefaultAllocator;
 import androidx.media3.ui.PlayerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,30 +23,32 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.io.BufferedInputStream;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity implements IMessageListener {
 
     private final static int MESSAGE_UPDATE_DELAY = 1000;
     private final static int NATIVE_MESSAGE = 1;
     private final static int JAVA_MESSAGE = 2;
+    private final static int APP_RUNNING_STATE = 2;
     private final static String TAG = "MainActivity";
     private TextView tvFps, tvBattery, tvMessage;
     private ImageButton btLeft, btRight, btUp, btDown;
     private ImageButton btX, btY, btA, btB;
     private ImageButton btStart, btStop, btConfig;
     private ExoPlayer m_videoPlayer;
-    private boolean m_isRunning;
+    private boolean m_started, m_running;
     private int m_state = 0;
     private int m_eventID = -1;
 
@@ -87,6 +74,12 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
                 if(msg.arg2 == 0) {
                     stop();
                 }
+                else if(!m_running && getServerStateFromJNI() == APP_RUNNING_STATE) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        run();
+                    });
+
+                }
             }
         }
     };
@@ -95,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
         @Override
         public void run() {
             update(getMessageFromJNI(), getBatteryFromJNI(), getStateFromJNI() ? 1 : 0);
-            if(m_isRunning) {
+            if(m_started) {
                 m_updater.postDelayed(this, MESSAGE_UPDATE_DELAY);
             }
         }
@@ -106,22 +99,20 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
-        initFromJNI();
-        this.requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        initFromJNI(this.getFilesDir().getAbsolutePath());
         this.requestPermissions(new String[] {Manifest.permission.INTERNET}, 1);
 
         m_videoPlayer = new ExoPlayer.Builder(this).build();
-        m_videoPlayer.setMediaSource(new DefaultMediaSourceFactory(new RtmpDataSource.Factory())
-                .createMediaSource(new MediaItem.Builder().setUri(Uri.parse("rtmp://192.168.0.240:4444/stream")).build()));
         m_videoPlayer.addListener(new PlayerListener());
-        m_videoPlayer.setPlayWhenReady(true);
+        m_videoPlayer.setPlayWhenReady(false);
         m_videoPlayer.prepare();
 
         PlayerView playerView = findViewById(R.id.video_view);
         playerView.setPlayer(m_videoPlayer);
-        //playerView.setUseController(false);
+        playerView.setUseController(false);
 
         tvFps = findViewById(R.id.txt_fps);
         tvBattery = findViewById(R.id.txt_bat);
@@ -198,10 +189,21 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
      * Start the streaming process.
      */
     public void start() {
-        if(!m_isRunning && startFromJNI()) {
+        if(!m_started && startFromJNI()) {
+            m_started = true;
+            m_updater.postDelayed(m_updateProcess, MESSAGE_UPDATE_DELAY);
+        }
+    }
+
+    /**
+     * Start the streaming process.
+     */
+    private void run() {
+        if(m_started && !m_running) {
             boolean motors_active = JNIHelper.getInt(JNIHelper.MOTORS_ACTIVE) == 1;
             boolean servos_active = JNIHelper.getInt(JNIHelper.SERVOS_ACTIVE) == 1;
 
+            m_running = true;
             btLeft.setEnabled(motors_active);
             btRight.setEnabled(motors_active);
             btUp.setEnabled(motors_active);
@@ -214,14 +216,20 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
             btStart.setEnabled(false);
             btConfig.setEnabled(false);
 
-            tvFps.setText(this.getString(R.string.fps, JNIHelper.getInt(JNIHelper.VIDEO_FPS)));
             tvMessage.setText("");
-            m_isRunning = true;
-            m_updater.postDelayed(m_updateProcess, MESSAGE_UPDATE_DELAY);
+            tvFps.setText(this.getString(R.string.fps, JNIHelper.getInt(JNIHelper.VIDEO_FPS)));
 
             if(!m_videoPlayer.isPlaying()) {
-                m_videoPlayer.setPlayWhenReady(true);
-                m_videoPlayer.prepare();
+                Uri uri = Uri.parse(JNIHelper.getString(JNIHelper.STREAM_OUT_FILE_ADDRESS));
+                if(uri != null && uri.toString().startsWith("rtmp://")) {
+                    m_videoPlayer.setMediaSource(new DefaultMediaSourceFactory(new RtmpDataSource.Factory())
+                            .createMediaSource(new MediaItem.Builder().setUri(uri).build()));
+                    m_videoPlayer.setPlayWhenReady(true);
+                    m_videoPlayer.prepare();
+                    Log.d(TAG, "Uri: " + uri);
+                } else {
+                    Log.e(TAG, "Client received wrong uri: " + uri);
+                }
             }
         }
     }
@@ -230,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
      * Stop the streaming process.
      */
     public void stop() {
-        if(m_isRunning) {
+        if(m_started) {
             stopFromJNI();
 
             btLeft.setEnabled(false);
@@ -246,10 +254,11 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
             btConfig.setEnabled(true);
             tvMessage.setText("");
 
-            m_isRunning = false;
+            m_started = false;
+            m_running = false;
 
             m_videoPlayer.stop();
-            m_videoPlayer.release();
+            m_updater.removeCallbacks(m_updateProcess);
         }
     }
 
@@ -258,15 +267,17 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
      *
      */
     public void update(String msg, int batLife, int state) {
-        if(m_isRunning) {
+        if(m_started) {
             m_updateHandler.obtainMessage(NATIVE_MESSAGE, batLife, state, msg).sendToTarget();
         }
     }
 
     /**
      * A native method to initialize the environment and config.
+     *
+     * @param fileDir the app file directory
      */
-    public native void initFromJNI();
+    public native void initFromJNI(String fileDir);
 
     /**
      * A native method to start the client controller service.
@@ -348,36 +359,6 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
                 }
             }
             Log.e(TAG, "onPlayerError: " + error.getMessage(), cause);
-        }
-    }
-
-    @UnstableApi public class VideoDataSourceFactory implements DataSource.Factory {
-        public ByteArrayDataSource mydatasource;
-        private CustomVideoDataSource customDatasource;
-        public VideoDataSource datasource = new VideoDataSource(MainActivity.this);
-        public VideoDataSourceFactory() {
-            File file = new File("/sdcard/Movies/output.mp4");
-            int size = (int) file.length();
-            byte[] data = new byte[size];
-            try {
-                BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
-                buf.read(data, 0, data.length);
-                buf.close();
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            mydatasource = new ByteArrayDataSource(data);
-            customDatasource = new CustomVideoDataSource(MainActivity.this, data);
-        }
-
-        @NonNull
-        @Override
-        public DataSource createDataSource() {
-            return datasource;
         }
     }
 }

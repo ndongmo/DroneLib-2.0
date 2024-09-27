@@ -35,8 +35,7 @@
                     android:id="@+id/et_drone_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number|numberDecimal"
-                    android:digits="123456789."
+                    android:digits="0123456789."
                     style="@style/ns_textStyle"/>
             </LinearLayout>
 

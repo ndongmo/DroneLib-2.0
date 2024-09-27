@@ -55,13 +55,13 @@ public class ConfigActivity extends AppCompatActivity {
 
         btReset.setOnClickListener(view -> {
             etDroneAddress.setText(JNIHelper.DRONE_ADDRESS_DEFAULT);
-            etDronePort.setText(JNIHelper.DRONE_PORT_DEFAULT);
-            etVideoFps.setText(JNIHelper.VIDEO_FPS_DEFAULT);
-            etVideoWidth.setText(JNIHelper.VIDEO_WIDTH_DEFAULT);
-            etVideoHeight.setText(JNIHelper.VIDEO_HEIGHT_DEFAULT);
-            etAudioChannels.setText(JNIHelper.AUDIO_CHANNELS_DEFAULT);
-            etAudioSample.setText(JNIHelper.AUDIO_SAMPLE_DEFAULT);
-            etAudioSamples.setText(JNIHelper.AUDIO_NB_SAMPLES_DEFAULT);
+            etDronePort.setText(String.valueOf(JNIHelper.DRONE_PORT_DEFAULT));
+            etVideoFps.setText(String.valueOf(JNIHelper.VIDEO_FPS_DEFAULT));
+            etVideoWidth.setText(String.valueOf(JNIHelper.VIDEO_WIDTH_DEFAULT));
+            etVideoHeight.setText(String.valueOf(JNIHelper.VIDEO_HEIGHT_DEFAULT));
+            etAudioChannels.setText(String.valueOf(JNIHelper.AUDIO_CHANNELS_DEFAULT));
+            etAudioSample.setText(String.valueOf(JNIHelper.AUDIO_SAMPLE_DEFAULT));
+            etAudioSamples.setText(String.valueOf(JNIHelper.AUDIO_NB_SAMPLES_DEFAULT));
 
             chbCamera.setChecked(JNIHelper.CAMERA_ACTIVE_DEFAULT);
             chbMicro.setChecked(JNIHelper.MICRO_ACTIVE_DEFAULT);
@@ -113,7 +113,7 @@ public class ConfigActivity extends AppCompatActivity {
         JNIHelper.setInt(JNIHelper.BUZZER_ACTIVE, (chbBuzzer.isChecked() ? 1 : 0));
         JNIHelper.setInt(JNIHelper.BATTERY_ACTIVE, (chbBattery.isChecked() ? 1 : 0));
 
-        JNIHelper.saveConfig();
+        JNIHelper.saveConfig(this.getFilesDir().getAbsolutePath());
 
         Toast.makeText(this, R.string.save_success, Toast.LENGTH_SHORT).show();
     }

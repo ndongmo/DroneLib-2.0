@@ -19,14 +19,31 @@ static std::thread mainProcess;
 /** Stream redirector */
 static StdStreamRedirector streamRedirector;
 
+std::string getConfigPath(JNIEnv *env, jstring fileDir) {
+    const char *path = env->GetStringUTFChars(fileDir, 0);
+    std::string completePath(path);
+    completePath.append("/").append(CONFIG_FILE);
+    env->ReleaseStringUTFChars(fileDir, path);
+    return completePath;
+}
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_ns_dronelib_android_MainActivity_initFromJNI(JNIEnv *env, jobject obj) {
-    if (!Config::exists()) {
-        std::ofstream configFile(CONFIG_FILE);
-        configFile << "{\n\t\"" << DRONE_ADDRESS << "\":\"" << DRONE_IPV4_ADDRESS_DEFAULT << "\"\n}";
+Java_ns_dronelib_android_MainActivity_initFromJNI(JNIEnv *env, jobject obj, jstring fileDir) {
+    const std::string& path = getConfigPath(env, fileDir);
+
+    if (!Config::existsFilePath(path)) {
+        std::ofstream configFile(path);
+        configFile << "{\n\t\"" << DRONE_ADDRESS << "\":\"" << DRONE_IPV4_ADDRESS_DEFAULT << "\","
+            "\n\t\"" << STREAM_MODE << "\":" << STREAM_MODE_FILE << ","
+            "\n\t\"" << STREAM_PROTOCOL << "\":\"rtmp\","
+            "\n\t\"" << STREAM_OUTPUT_FORMAT << "\":\"flv\","
+            "\n\t\"" << VIDEO_ENCODER << "\":\"libx264\""
+            "}";
         configFile.close();
     }
+
+    Config::initWithFilePath(path);
     ctrl.initConfig(&evHandler);
 }
 
@@ -100,12 +117,6 @@ Java_ns_dronelib_android_VideoDataSource_getVideoFromJNI(JNIEnv *env, jobject /*
         jbyteArray bytes = env->NewByteArray(size);
         env->SetByteArrayRegion(bytes, 0, size, reinterpret_cast<const jbyte*>(buffer));
 
-        /*std::stringstream ss;
-        ss << std::hex;
-        for( int i = 0; i < size; ++i )
-            ss << std::setw(2) << std::setfill('0') << (int)buffer[i];
-        logI << ss.str()<< std::endl << std::endl;*/
-
         return bytes;
     }
     else {
@@ -164,16 +175,15 @@ Java_ns_dronelib_android_JNIHelper_setString(JNIEnv *env, jclass clazz, jstring 
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_ns_dronelib_android_JNIHelper_saveConfig(JNIEnv *env, jclass clazz) {
+Java_ns_dronelib_android_JNIHelper_saveConfig(JNIEnv *env, jclass clazz, jstring fileDir) {
     std::string json = Config::encodeJson({
-        DRONE_ADDRESS, DRONE_PORT_DISCOVERY,
-        VIDEO_FPS, VIDEO_WIDTH, VIDEO_HEIGHT,
+        DRONE_ADDRESS, DRONE_PORT_DISCOVERY, STREAM_MODE, STREAM_PROTOCOL, STREAM_OUTPUT_FORMAT,
+        VIDEO_FPS, VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_ENCODER,
         AUDIO_CHANNELS, AUDIO_SAMPLE, AUDIO_NB_SAMPLES,
         CAMERA_ACTIVE, MICRO_ACTIVE, SERVOS_ACTIVE, MOTORS_ACTIVE,
         LEDS_ACTIVE, BATTERY_ACTIVE, BUZZER_ACTIVE
     });
-
-    std::ofstream configFile(CONFIG_FILE);
+    std::ofstream configFile(getConfigPath(env, fileDir));
     configFile << json;
     configFile.close();
 }
