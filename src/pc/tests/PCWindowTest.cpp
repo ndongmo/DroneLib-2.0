@@ -51,7 +51,7 @@ TEST_F(PCWindowTest, RunServiceWorks) {
     ASSERT_TRUE(window.isRunning());
 
     SDL_Event sdlevent = {};
-    sdlevent.type = SDL_QUIT;
+    sdlevent.type = SDL_EVENT_QUIT;
     SDL_PushEvent(&sdlevent);
 
     window.run();

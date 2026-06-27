@@ -82,7 +82,7 @@ protected:
 
 // Integration test for quit command
 TEST_F(IntegrationTest, QuitCmdWorks) {  
-    SDL_Event sdlevent = {.type = SDL_QUIT};
+    SDL_Event sdlevent = {.type = SDL_EVENT_QUIT};
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -96,8 +96,8 @@ TEST_F(IntegrationTest, NavCmdsWork) {
     ASSERT_TRUE(motorCtrl.isRunning());
 
     SDL_Event sdlevent = {};
-    sdlevent.type = SDL_KEYDOWN;
-    sdlevent.key.keysym.sym = SDLK_w;
+    sdlevent.type = SDL_EVENT_KEY_DOWN;
+    sdlevent.key.key = SDLK_W;
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(MOTORS_MOVE_LAPS * 4));
@@ -106,7 +106,7 @@ TEST_F(IntegrationTest, NavCmdsWork) {
     EXPECT_TRUE(motorCtrl.isOn(WHEEL_BR_FORWARD));
     EXPECT_TRUE(motorCtrl.isOn(WHEEL_BL_FORWARD));
 
-    sdlevent.type = SDL_KEYUP;
+    sdlevent.type = SDL_EVENT_KEY_UP;
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(MOTORS_MOVE_LAPS * 4));
@@ -122,15 +122,15 @@ TEST_F(IntegrationTest, CameraCmdsWork) {
     ASSERT_TRUE(serovoCtrl.isRunning());
 
     SDL_Event sdlevent = {};
-    sdlevent.type = SDL_KEYDOWN;
-    sdlevent.key.keysym.sym = SDLK_RIGHT;
+    sdlevent.type = SDL_EVENT_KEY_DOWN;
+    sdlevent.key.key = SDLK_RIGHT;
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     EXPECT_TRUE(serovoCtrl.isOn(SERVO_HORIZONTAL));
     EXPECT_GE((int)serovoCtrl.getValue(SERVO_HORIZONTAL), SERVO_DEFAULT_ANGLE + CAMERA_ROTATION_ANGLE);
 
-    sdlevent.key.keysym.sym = SDLK_DOWN;
+    sdlevent.key.key = SDLK_DOWN;
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -142,8 +142,8 @@ TEST_F(IntegrationTest, CameraCmdsWork) {
 TEST_F(IntegrationTest, BuzzerCmdWorks) {  
     BuzzerController& buzzerCtrl = droneCtrl.getBuzzerController();
     SDL_Event sdlevent = {};
-    sdlevent.type = SDL_KEYDOWN;
-    sdlevent.key.keysym.sym = SDLK_b;
+    sdlevent.type = SDL_EVENT_KEY_DOWN;
+    sdlevent.key.key = SDLK_B;
 
     EXPECT_FALSE(buzzerCtrl.isOn(BUZZER_ID));
 
@@ -152,7 +152,7 @@ TEST_F(IntegrationTest, BuzzerCmdWorks) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     EXPECT_TRUE(buzzerCtrl.isOn(BUZZER_ID));
 
-    sdlevent.type = SDL_KEYUP;
+    sdlevent.type = SDL_EVENT_KEY_UP;
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));

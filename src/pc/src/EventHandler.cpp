@@ -1,5 +1,5 @@
 #include "EventHandler.h"
-
+#include <utils/Logger.h>
 #include <fstream>
 
 #define JOY_AXE_DEFAULT_SPEED 30
@@ -7,33 +7,49 @@
 
 void EventHandler::init()
 {
-	if (SDL_NumJoysticks() > 0) {
-		SDL_JoystickEventState(SDL_ENABLE);
-		m_joystick = SDL_JoystickOpen(0);
-		m_playWith = PlayWith::GAMEPAD;
+	int count;
+		
+	SDL_JoystickID* joysticks = SDL_GetJoysticks(&count);
+	if (joysticks && count > 0) {
+		SDL_JoystickID instance_id = joysticks[0];
+		logI << "Open Joystick " << instance_id  << " " << 
+			std::string(SDL_GetJoystickNameForID(instance_id)) << std::endl;
+
+		SDL_SetJoystickEventsEnabled(true);
+		m_joystick = SDL_OpenJoystick(instance_id);
+
+		SDL_free(joysticks);
 	}
 }
 
 void EventHandler::destroy()
 {
-	if (m_joystick != nullptr)
-		SDL_JoystickClose(m_joystick);
+	if (m_joystick != nullptr) {
+		SDL_CloseJoystick(m_joystick);
+	}
 
-	SDL_JoystickEventState(SDL_DISABLE);
+	SDL_SetJoystickEventsEnabled(false);
 }
 
 void EventHandler::update()
 {
 	// If gamepad is connected during game
-	if (SDL_NumJoysticks() > 0 && m_joystick == nullptr)
+	int count;
+	SDL_JoystickID* joysticks = SDL_GetJoysticks(&count);
+	if (joysticks && count > 0 && m_joystick == nullptr)
 	{
-		SDL_JoystickEventState(SDL_ENABLE);
-		m_joystick = SDL_JoystickOpen(0);
-		m_playWith = PlayWith::GAMEPAD;
+		SDL_JoystickID instance_id = joysticks[0];
+		logI << "Open Joystick " << instance_id << " " <<
+			std::string(SDL_GetJoystickNameForID(instance_id)) << std::endl;
+
+		SDL_SetJoystickEventsEnabled(true);
+		m_joystick = SDL_OpenJoystick(instance_id);
+
+		SDL_free(joysticks);
 	}
-	else if (SDL_NumJoysticks() == 0 && m_joystick != nullptr)
+	else if (!joysticks && m_joystick != nullptr)
 	{
-		SDL_JoystickClose(m_joystick);
+		SDL_CloseJoystick(m_joystick);
 		m_joystick = nullptr;
 		m_playWith = PlayWith::KEYBOARD;
 	}

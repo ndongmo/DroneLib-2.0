@@ -14,8 +14,8 @@
 #include <stream/Stream.h>
 
 #include <Service.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_ttf.h>
 
 using namespace stream;
 
@@ -30,7 +30,7 @@ struct PCText {
     /** Texture of the text */
     SDL_Texture *texture = nullptr;
     /** Texture rect */
-    SDL_Rect rect;
+    SDL_FRect rect;
 };
 
 /**
@@ -100,9 +100,9 @@ private:
     /**
      * @brief Get the Pixel Format value for the current video format.
      * 
-     * @return an SDL_PixelFormatEnum 
+     * @return an SDL_PixelFormat 
      */
-    SDL_PixelFormatEnum getPixelFormat();
+    SDL_PixelFormat getPixelFormat();
 
     /* Window width */
     int m_width;

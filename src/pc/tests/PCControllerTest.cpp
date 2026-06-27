@@ -156,7 +156,7 @@ TEST_F(PCControllerTest, StartAndEndWork) {
     ASSERT_TRUE(ctrl.isRunning());
 
     SDL_Event sdlevent = {};
-    sdlevent.type = SDL_QUIT;
+    sdlevent.type = SDL_EVENT_QUIT;
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -179,14 +179,14 @@ TEST_F(PCControllerTest, StartWithDiscoveryErrorWorks) {
 
     // restart discovering
     SDL_Event sdlevent = {};
-    sdlevent.type = SDL_KEYDOWN;
-    sdlevent.key.keysym.sym = SDLK_F1;
+    sdlevent.type = SDL_EVENT_KEY_DOWN;
+    sdlevent.key.key = SDLK_F1;
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ASSERT_EQ(ctrl.getState(), APP_RUNNING);
 
-    sdlevent.type = SDL_QUIT;
+    sdlevent.type = SDL_EVENT_QUIT;
     SDL_PushEvent(&sdlevent);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));

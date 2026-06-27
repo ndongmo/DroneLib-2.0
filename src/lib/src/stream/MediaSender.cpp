@@ -71,7 +71,6 @@ int MediaSender::begin() {
     }
 
 	avdevice_register_all();
-	postproc_version(); // required solving linking libpostproc issue
 
 	if(Config::getInt(STREAM_MODE) < STREAM_MODE_RAW || Config::getInt(STREAM_MODE) > STREAM_MODE_FILE) {
 		Config::setInt(STREAM_MODE, STREAM_MODE_RAW);

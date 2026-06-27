@@ -12,7 +12,7 @@
 
 #include <string>
 #include <unordered_map>
-#include <SDL/SDL.h>
+#include <SDL3/SDL.h>
 
 #define JOY_DEAD_ZONE 2000
 #define JOY_AXE_MAX  32767

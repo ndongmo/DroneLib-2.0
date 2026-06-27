@@ -79,8 +79,8 @@ enum MotorMove {
     WHEEL_BL_FORWARD        = 3,  // wheel bottom left forward
     WHEEL_BR_FORWARD        = 4,  // wheel bottom right forward
     WHEEL_BR_BACKWARD       = 5,  // wheel bottom right backward
-    WHEEL_TR_FORWARD        = 6,  // wheel top right forward
-    WHEEL_TR_BACKWARD       = 7,  // wheel top right backward
+    WHEEL_TR_BACKWARD       = 6,  // wheel top right backward
+    WHEEL_TR_FORWARD        = 7,  // wheel top right forward
 };
 
 /**

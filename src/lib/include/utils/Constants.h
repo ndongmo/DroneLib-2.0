@@ -24,7 +24,7 @@
 
 /* Drone config default values */
 #define DRONE_PORT_DISCOVERY_DEFAULT 	4445
-#define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.0.241"
+#define DRONE_IPV4_ADDRESS_DEFAULT 	    "192.168.8.240"
 
 /* Drone config variables */
 #define DRONE_ADDRESS 		    "drone_address"

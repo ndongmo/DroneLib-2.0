@@ -22,7 +22,6 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 #include <libswscale/swscale.h> 
 #include <libswresample/swresample.h>
-#include <libpostproc/postprocess.h>
 }
 
 #define STREAM_FRAME_ACK 18

@@ -19,7 +19,7 @@ protected:
 TEST_F(EventHandlerTest, SaveAndLoadConfigWork) {
     EventHandler eh, eh2;
     eh.addEvent(ClientEvent::QUIT, SDLK_ESCAPE, Joystick::START);
-    eh.addEvent(ClientEvent::GO_UP, SDLK_w, Joystick::AXE1_UP);
+    eh.addEvent(ClientEvent::GO_UP, SDLK_W, Joystick::AXE1_UP);
     eh.saveConfig();
 
     EXPECT_TRUE(eh.eventExists(ClientEvent::QUIT));

@@ -11,7 +11,8 @@
 #include <Service.h>
 #include <stream/Stream.h>
 
-#include <SDL/SDL.h>
+#include <SDL3/SDL.h>
+#include <vector>
 
 #ifdef _WIN32 
 #include <WS2tcpip.h>
@@ -61,15 +62,26 @@ private:
 	void audioCallback(UINT8 *data, int len);
 
 	/**
-	 * @brief Forward callback to simulate SDL audio callback.
+	 * @brief Forward callback matching SDL3 Audio Stream requirements.
 	 * 
-	 * @param userdata callback sender
-	 * @param data audio stream data
-	 * @param len data length
+	 * @param userdata callback sender context
+	 * @param stream the managed SDL audio stream
+	 * @param additional_amount bytes needed immediately
+	 * @param total_amount total bytes requested
 	 */
-	static void forwardCallback(void *userdata, UINT8 *data, int len) {
-		static_cast<PCSpeaker*>(userdata)->audioCallback(data, len);
+	static void forwardCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount) {
+		PCSpeaker* speaker = static_cast<PCSpeaker*>(userdata);
+        
+        // Allocate temporary scratch space matching the requested byte size
+        std::vector<UINT8> scratchBuffer(additional_amount, 0);
+        
+        // Execute legacy stream mixing onto the scratch segment
+        speaker->audioCallback(scratchBuffer.data(), additional_amount);
+        
+        // Pipe mixed stream samples cleanly down into the SDL3 stream subsystem
+        SDL_PutAudioStreamData(stream, scratchBuffer.data(), additional_amount);
 	}
+
 
     /**
      * @brief Update stream data length and position.
@@ -91,13 +103,15 @@ private:
     SDL_AudioFormat getAudioFormat() const;
 
     /** Current volume */
-    int m_volume = 0;
+    float m_volume = 0;
     /** Current stream frame length to read */
     int m_streamLen = 0;
     /** Current stream data position to read */
     const UINT8 *m_streamPos = nullptr;
     /** Audio stream listener reference */
     IStreamListener& m_stream;
+    /** Managed SDL3 audio stream handle */
+    SDL_AudioStream* m_audioStream = nullptr;
     /** Obtained speaker parameters */
     SDL_AudioSpec m_params;
 };
