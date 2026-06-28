@@ -72,26 +72,38 @@ std::string AudioSender::toString() {
 }
 
 void AudioSender::initEncoderCtx() {
+	const int *samplerates = NULL;
+	int ret = avcodec_get_supported_config(NULL, m_encoder, 
+		AV_CODEC_CONFIG_SAMPLE_RATE, 0, (const void **)&samplerates, NULL);
+
 	if (Config::getInt(AUDIO_SAMPLE) > 0) {
 		m_encoder_ctx->sample_rate = Config::getInt(AUDIO_SAMPLE);
-	} else if (m_encoder->supported_samplerates) {
-		m_encoder_ctx->sample_rate = m_encoder->supported_samplerates[0];
+	} else if (ret >= 0 && samplerates && *samplerates != 0) {
+		m_encoder_ctx->sample_rate = samplerates[0];
 	} else {
 		m_encoder_ctx->sample_rate = m_decoder_ctx->sample_rate;
 	}
 
+	const AVSampleFormat *sample_fmts = NULL;
+	ret = avcodec_get_supported_config(NULL, m_encoder, 
+		AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, (const void **)&sample_fmts, NULL);
+
 	if (Config::getInt(AUDIO_SAMPLE_FORMAT) > 0) {
 		m_encoder_ctx->sample_fmt = (AVSampleFormat) Config::getInt(AUDIO_SAMPLE_FORMAT);
-	} else if (m_encoder->sample_fmts) {
-		m_encoder_ctx->sample_fmt = m_encoder->sample_fmts[0];
+	} else if (ret >= 0 && sample_fmts && *sample_fmts != AV_SAMPLE_FMT_NONE) {
+		m_encoder_ctx->sample_fmt = sample_fmts[0];
 	} else {
 		m_encoder_ctx->sample_fmt = m_decoder_ctx->sample_fmt;
 	}
 	
 	m_encoder_ctx->time_base = (AVRational){1, m_encoder_ctx->sample_rate};
 
-	if(m_encoder->ch_layouts) {
-		const AVChannelLayout *p = m_encoder->ch_layouts;
+	const AVChannelLayout *ch_layouts = NULL;
+	ret = avcodec_get_supported_config(NULL, m_encoder, 
+		AV_CODEC_CONFIG_CHANNEL_LAYOUT, 0, (const void **)&ch_layouts, NULL);
+
+	if(ret >= 0 && ch_layouts && ch_layouts->nb_channels > 0) {
+		const AVChannelLayout *p = ch_layouts;
 		const AVChannelLayout *best_ch_layout = p;
     	int best_nb_channels   = 0;
 		while (p->nb_channels) {

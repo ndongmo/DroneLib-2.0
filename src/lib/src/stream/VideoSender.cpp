@@ -72,11 +72,15 @@ void VideoSender::initEncoderCtx() {
 	m_encoder_ctx->time_base = av_inv_q(m_decoder_ctx->framerate);
 	m_encoder_ctx->sample_aspect_ratio = m_decoder_ctx->sample_aspect_ratio;
 
+	const enum AVPixelFormat *pix_fmts = NULL;
+    int ret = avcodec_get_supported_config(NULL, m_encoder, 
+		AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void **)&pix_fmts, NULL);
+
 	if (!Config::getString(VIDEO_PIX_FORMAT).empty()) {
 		m_encoder_ctx->pix_fmt = av_get_pix_fmt(Config::getString(VIDEO_PIX_FORMAT).c_str());
 	}
-	else if (m_encoder->pix_fmts) {
-		m_encoder_ctx->pix_fmt = m_encoder->pix_fmts[0];
+	else if (ret >= 0 && pix_fmts && pix_fmts[0] != AV_PIX_FMT_NONE) {
+		m_encoder_ctx->pix_fmt = pix_fmts[0];
 	}
 	else {
 		m_encoder_ctx->pix_fmt = m_decoder_ctx->pix_fmt;
