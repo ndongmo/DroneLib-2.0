@@ -29,14 +29,14 @@ int StreamPool::next() {
 }
 
 UINT8* StreamPool::getData(int readIndex) const {
-	if(readIndex >= 0 && m_readIndex < POOL_SIZE) {
+	if(readIndex >= 0 && readIndex < POOL_SIZE) {
 		return m_data[readIndex];
 	}
 	return nullptr;
 }
 
 int StreamPool::getSize(int readIndex) const {
-	if(readIndex >= 0 && m_readIndex < POOL_SIZE) {
+	if(readIndex >= 0 && readIndex < POOL_SIZE) {
 		return m_size[readIndex];
 	}
 	return 0;

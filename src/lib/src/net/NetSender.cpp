@@ -157,21 +157,21 @@ UINT8 NetSender::getNextSeqID(int id) {
 
 void NetSender::addCommand(int id, unsigned int frequency) {
 	m_freqs[id] = frequency;
-	m_currentFreqs[id] = 0;
+	m_currentFreqs[id] = frequency; // allow the first command to be sent immediately
 }
 
 bool NetSender::CheckAndUpdateSend(int id, int deltatime) {
-	bool ret = true;
+	if(m_freqs.find(id) == m_freqs.end()) {
+		return true;
+	}
 
-	if(m_freqs.find(id) != m_freqs.end()) {
-		ret = m_freqs[id] <= m_currentFreqs[id] + deltatime;
-	}
-	if(ret) {
+	m_currentFreqs[id] += deltatime;
+	if (m_currentFreqs[id] >= m_freqs[id]) {
 		m_currentFreqs[id] = 0;
-	} else {
-		m_currentFreqs[id] += deltatime;
+		return true;
 	}
-	return ret;
+
+	return false;
 }
 
 bool NetSender::isConnected() {

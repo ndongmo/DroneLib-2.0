@@ -87,7 +87,11 @@ void VideoSender::initEncoderCtx() {
 	}
 
 	if(m_encoder_ctx->codec_id == AV_CODEC_ID_H264) {
-		av_opt_set(m_encoder_ctx->priv_data, "preset", "slow", 0);
+		av_opt_set(m_encoder_ctx->priv_data, "preset", "ultrafast", 0);
+		av_opt_set(m_encoder_ctx->priv_data, "tune", "zerolatency", 0);
+		m_encoder_ctx->flags |= AV_CODEC_FLAG_LOW_DELAY;
+		m_encoder_ctx->max_b_frames = 0;
+		m_encoder_ctx->gop_size = 12;
 	}
 	else if (m_encoder_ctx->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
 		m_encoder_ctx->max_b_frames = 2;

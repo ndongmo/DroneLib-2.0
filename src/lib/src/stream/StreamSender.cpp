@@ -16,6 +16,11 @@ StreamSender::StreamSender(NetSender &sender) : m_sender(sender) {
 
 int StreamSender::begin() {
 	m_frameIndex = 0;
+
+	if (Config::getInt(NET_FRAGMENT_SIZE) > ETH_IPV4_LIMIT) {
+		logW << m_name << ": fragment size is too big, using default value " << ETH_IPV4_LIMIT << std::endl;
+		Config::setInt(NET_FRAGMENT_SIZE, ETH_IPV4_LIMIT);
+	}
 	
 	avdevice_register_all();
 	
@@ -155,8 +160,9 @@ void StreamSender::run() {
 	}
 }
 
-void StreamSender::sendPacket(AVPacket *packet) {	
+void StreamSender::sendPacket(AVPacket *packet) {
 	StreamFragment sf;
+	sf.frameFlags = 0;
 	sf.frameNumber = ++m_frameIndex;
 	sf.frameSize = packet->size;
 	sf.fragmentSize = Config::getInt(NET_FRAGMENT_SIZE) - NET_FRAME_HEADER - STREAM_FRAME_HEADER;
@@ -173,9 +179,11 @@ void StreamSender::sendPacket(AVPacket *packet) {
 		}
 		
 		m_sender.sendFrame(m_streamID, NS_FRAME_TYPE_DATA, sf);
+		/*
 #ifndef __arm__
 		std::this_thread::sleep_for(std::chrono::microseconds(10));
 #endif
+		*/
 	}
 }
 

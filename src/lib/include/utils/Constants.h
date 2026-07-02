@@ -16,6 +16,7 @@
 #define BATTERY_LAPS            1000    // Battery update time laps in millisecond
 #define BATTERY_VOLT_MAX        8.4f    // Battery maximum voltage
 #define BUZZER_LAPS             500     // Buzzer time laps in millisecond
+#define ETH_IPV4_LIMIT		    1400    // Ethernet/IPv4 limit is 1500 bytes, so 1400 bytes is a safe value
 
 /* Different stream modes */
 #define STREAM_MODE_RAW 0       // Raw packets are sent through the current udp connection
