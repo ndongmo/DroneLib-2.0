@@ -14,6 +14,7 @@
 #define SERVOS_MOVE_LAPS        25      // Time laps of servo rotation in millisecond
 #define SERVOS_MOVE_APL         2       // Servo rotation value per laps
 #define BATTERY_LAPS            1000    // Battery update time laps in millisecond
+#define BATTERY_VOLT_MIN        6.0f    // Battery minimum voltage
 #define BATTERY_VOLT_MAX        8.4f    // Battery maximum voltage
 #define BUZZER_LAPS             500     // Buzzer time laps in millisecond
 #define ETH_IPV4_LIMIT		    1400    // Ethernet/IPv4 limit is 1500 bytes, so 1400 bytes is a safe value

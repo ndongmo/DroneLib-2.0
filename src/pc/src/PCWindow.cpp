@@ -272,7 +272,7 @@ SDL_PixelFormat PCWindow::getPixelFormat() {
     AVPixelFormat format = av_get_pix_fmt(m_format.c_str());
     
     if(format == AV_PIX_FMT_YUV420P) {
-        return SDL_PIXELFORMAT_YV12;
+        return SDL_PIXELFORMAT_IYUV; //SDL_PIXELFORMAT_YV12
     } else  {
         return SDL_PIXELFORMAT_YUY2;
     }

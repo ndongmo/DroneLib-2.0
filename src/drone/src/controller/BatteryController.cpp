@@ -40,7 +40,14 @@ void BatteryController::handleActions() {
     #ifdef __arm__
         voltage = m_pca.get_adc_ads7830(BatteryChannel::BAT_TOTAL);
     #endif
-    m_components[0] = (int)((voltage * 100 * 3) / BATTERY_VOLT_MAX);
+    float lifePercentage = (((voltage * 3.0f) - BATTERY_VOLT_MIN) / 
+        (BATTERY_VOLT_MAX - BATTERY_VOLT_MIN)) * 100.0f;
+    
+    if (lifePercentage > 100.0f) lifePercentage = 100.0f;
+    if (lifePercentage < 0.0f)   lifePercentage = 0.0f;
+
+    m_components[0] = (int)lifePercentage;
+
     sendLifePercentage();
 }
 

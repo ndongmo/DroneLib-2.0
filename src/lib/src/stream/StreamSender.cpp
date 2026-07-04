@@ -179,11 +179,9 @@ void StreamSender::sendPacket(AVPacket *packet) {
 		}
 		
 		m_sender.sendFrame(m_streamID, NS_FRAME_TYPE_DATA, sf);
-		/*
 #ifndef __arm__
 		std::this_thread::sleep_for(std::chrono::microseconds(10));
 #endif
-		*/
 	}
 }
 
