@@ -80,6 +80,10 @@ protected:
 	 */
 	virtual int initFilterCtx() { return 1; }
 	
+	/* Stream priority */
+	unsigned int m_streamPriority = 0;
+	/* Stream cpu core index */
+	unsigned int m_streamCpuCore = 0;
 	/** Stream ID */
 	unsigned int m_streamID;
 	/** Frame index */

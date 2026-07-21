@@ -62,6 +62,17 @@
 #define STREAM_OUTPUT_FORMAT_DEFAULT    "mpegts"
 #define STREAM_OUT_FILE_ADDRESS_DEFAULT ""
 
+/* Stream priority and cpu core index */
+#define VIDEO_STREAM_PRIORITY "video_stream_priority"   // between 1 and 99, 99 is the highest priority. 0 means no thread priority change
+#define VIDEO_STREAM_CPU_CORE "video_stream_cpu_core"   // between 1 and the number of cpu cores. 0 means no cpu core affinity change
+#define AUDIO_STREAM_PRIORITY "audio_stream_priority"   // between 1 and 99, 99 is the highest priority. 0 means no thread priority change
+#define AUDIO_STREAM_CPU_CORE "audio_stream_cpu_core"   // between 1 and the number of cpu cores. 0 means no cpu core affinity change
+
+#define VIDEO_STREAM_PRIORITY_DEFAULT       0
+#define VIDEO_STREAM_CPU_CORE_DEFAULT       1
+#define AUDIO_STREAM_PRIORITY_DEFAULT       0
+#define AUDIO_STREAM_CPU_CORE_DEFAULT       3
+
 /* Video source config variables */
 #define VIDEO_ENCODER       "video_encoder"
 #define VIDEO_PIX_FORMAT    "video_pix_format"

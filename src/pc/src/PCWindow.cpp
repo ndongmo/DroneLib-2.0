@@ -199,13 +199,41 @@ void PCWindow::render(const IStreamListener& stream, int life) {
     m_fps_text.text = "FPS: " + std::to_string(Config::getInt(VIDEO_FPS));
     m_bat_text.text = "Bat: " + std::to_string(life) + "%";
 
-    if(stream.hasNewFrame()) {
-        unsigned char * texture_data = NULL;
-	    int texture_pitch = 0;
+    if (stream.hasNewFrame() && stream.getData() != nullptr) {
+        SDL_PixelFormat format = getPixelFormat();
 
-        if (SDL_LockTexture(m_basic_texture, 0, (void **)&texture_data, &texture_pitch)) {
-            memcpy(texture_data, stream.getData(), stream.getSize());
-            SDL_UnlockTexture(m_basic_texture);
+        if (format == SDL_PIXELFORMAT_IYUV || format == SDL_PIXELFORMAT_YV12) {
+            // Clear logic for planar data: Y, U, and V are split across planes
+            const unsigned char* y_plane = (const unsigned char*)stream.getData();
+            const unsigned char* u_plane;
+            const unsigned char* v_plane;
+
+            int y_pitch = m_width;
+            int uv_width = m_width / 2;
+            int uv_height = m_height / 2;
+            int uv_pitch = uv_width;
+
+            if (format == SDL_PIXELFORMAT_YV12) {
+                // YV12 layout: Y plane -> V plane -> U plane
+                v_plane = y_plane + (m_width * m_height);
+                u_plane = v_plane + (uv_width * uv_height);
+            } else {
+                // IYUV / I420 layout: Y plane -> U plane -> V plane
+                u_plane = y_plane + (m_width * m_height);
+                v_plane = u_plane + (uv_width * uv_height);
+            }
+
+            // Use SDL's native planar updater to avoid buffer overflow segmentations
+            SDL_UpdateYUVTexture(m_basic_texture, NULL, y_plane, y_pitch, u_plane, uv_pitch, v_plane, uv_pitch);
+        }
+        else if (format == SDL_PIXELFORMAT_YUY2 || format == SDL_PIXELFORMAT_UYVY) {
+            // Fast, zero-copy direct texture blit for tightly packed 2-bytes-per-pixel streams
+            if (stream.getSize() >= (m_width * m_height * 2)) {
+                int input_pitch = m_width * 2; 
+                SDL_UpdateTexture(m_basic_texture, NULL, stream.getData(), input_pitch);
+            } else {
+                logW << "Warning: Dropping frame. Buffer size " << stream.getSize() << " is smaller than expected YUY2 size.";
+            }
         }
     }
 
@@ -269,6 +297,16 @@ void PCWindow::updateText(PCText& text) {
 }
 
 SDL_PixelFormat PCWindow::getPixelFormat() {
+    if (m_format == "yv12") {
+        return SDL_PIXELFORMAT_YV12;
+    }
+    else if (m_format == "yuv420p" || m_format == "i420") {
+        return SDL_PIXELFORMAT_IYUV;
+    }
+    else if (m_format == "yuyv422" || m_format == "yuy2") {
+        return SDL_PIXELFORMAT_YUY2;
+    }
+
     AVPixelFormat format = av_get_pix_fmt(m_format.c_str());
     
     if(format == AV_PIX_FMT_YUV420P) {

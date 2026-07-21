@@ -18,11 +18,13 @@ AudioSender::AudioSender(NetSender &sender) : StreamSender(sender) {
 int AudioSender::begin() {
 	m_filename = Config::getString(AUDIO_DEVICE);
 	m_formatname = Config::getString(AUDIO_INPUT_FORMAT);
+	m_streamPriority = Config::getInt(AUDIO_STREAM_PRIORITY);
+	m_streamCpuCore = Config::getInt(AUDIO_STREAM_CPU_CORE);
 
 	const std::string channels = std::to_string(Config::getInt(AUDIO_CHANNELS));
 	const std::string sample_rate = std::to_string(Config::getInt(AUDIO_SAMPLE));
 
-	av_dict_set(&m_options, "channels", channels.c_str(), 0);
+	av_dict_set(&m_options, "ch_layout", channels.c_str(), 0);
   	av_dict_set(&m_options, "sample_rate", sample_rate.c_str(), 0);
 	
 	if(StreamSender::begin() == -1) {
@@ -62,6 +64,7 @@ int AudioSender::getNbSamples(int nb_channels, int format) {
 std::string AudioSender::toString() {
 	if(m_ifmt_ctx != NULL && m_ifmt_ctx->nb_streams > 0) {
 		return m_name + ": channels=" + std::to_string(Config::getInt(AUDIO_CHANNELS)) +
+			" device=" + Config::getString(AUDIO_DEVICE) +
 			" bit_rate=" + std::to_string(Config::getInt(AUDIO_BIT_RATE)) +
 			" sample_rate=" + std::to_string(Config::getInt(AUDIO_SAMPLE)) +
 			" nb_samples=" + std::to_string(Config::getInt(AUDIO_NB_SAMPLES)) +

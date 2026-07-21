@@ -17,6 +17,8 @@ VideoSender::VideoSender(NetSender &sender) : StreamSender(sender) {
 int VideoSender::begin() {
 	m_filename = Config::getString(VIDEO_DEVICE);
 	m_formatname = Config::getString(VIDEO_INPUT_FORMAT);
+	m_streamPriority = Config::getInt(VIDEO_STREAM_PRIORITY);
+	m_streamCpuCore = Config::getInt(VIDEO_STREAM_CPU_CORE);
 
 	const std::string size = std::to_string(Config::getInt(VIDEO_WIDTH)) + "x" + 
 		std::to_string(Config::getInt(VIDEO_HEIGHT));
@@ -53,6 +55,7 @@ bool VideoSender::isActive() const {
 std::string VideoSender::toString() {
 	if(m_ifmt_ctx != NULL && m_ifmt_ctx->nb_streams > 0) {
 		return m_name + ": fps=" + std::to_string(Config::getInt(VIDEO_FPS)) +
+			" device=" + Config::getString(VIDEO_DEVICE) +
 			" codec=" + Config::getString(VIDEO_ENCODER) +
 			" format=" + Config::getString(VIDEO_PIX_FORMAT) +
 			" width=" + std::to_string(Config::getInt(VIDEO_WIDTH)) +

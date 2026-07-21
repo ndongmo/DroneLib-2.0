@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <thread>
 
 #define URL_KEY_LENGTH 8
 
@@ -32,5 +33,13 @@ public:
 	 * @return generated url
 	 */
     static std::string generateStreamUrl();
+	/**
+	 * @brief Configure the given process (priority and cpu core affinity).
+	 * 
+	 * @param process the process to configure
+	 * @param priority the priority to set
+	 * @param cpuCore the cpu core to set affinity to
+	 */
+	static void configureProcess(std::thread& process, unsigned int priority, unsigned int cpuCore);
 };
 }

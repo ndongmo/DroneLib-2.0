@@ -105,6 +105,10 @@ int StreamSender::end() {
 void StreamSender::start() {
 	m_running = true;
 	m_process = std::thread([this]{run(); });
+
+	if(m_streamPriority > 0 || m_streamCpuCore > 0) {
+		Helper::configureProcess(m_process, m_streamPriority, m_streamCpuCore);
+	}
 }
 
 void StreamSender::stop() {
@@ -179,9 +183,6 @@ void StreamSender::sendPacket(AVPacket *packet) {
 		}
 		
 		m_sender.sendFrame(m_streamID, NS_FRAME_TYPE_DATA, sf);
-#ifndef __arm__
-		std::this_thread::sleep_for(std::chrono::microseconds(10));
-#endif
 	}
 }
 
