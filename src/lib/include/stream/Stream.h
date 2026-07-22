@@ -104,7 +104,7 @@ public:
 	bool hasNewFrame() const {
 		return m_newFrame;
 	}
-	const UINT8* getData() const {
+	UINT8* getData() const {
 		return m_data;
 	}
 	const int getSize() const {

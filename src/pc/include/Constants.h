@@ -12,7 +12,8 @@
 #define PC_APP_NAME                     "app_name"
 #define PC_FONT_SIZE                    "font_size"
 #define PC_VOLUME                       "volume"
-
+#define AUDIO_AMPLIFICATION             "audio_ampli"
+#define AUDIO_NOISE_FLOOR               "audio_noise_floor"
 
 /* PC application constants default values */
 #define PC_APP_NAME_DEFAULT             "PC controller for Drone"
@@ -24,3 +25,5 @@
 
 #define PC_AUDIO_FREQ_DEFAULT           16000
 #define PC_AUDIO_SAMPLE_FORMAT_DEFAULT  1
+#define PC_AUDIO_AMPLIFICATION_DEFAULT  3
+#define PC_AUDIO_NOISE_FLOOR_DEFAULT    8       // 8 -> 8/1000 = 0.008f LOWERED to make it much more sensitive to quiet voice trailing

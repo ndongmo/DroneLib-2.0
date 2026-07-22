@@ -62,6 +62,19 @@ private:
      */
     SDL_AudioFormat getAudioFormat() const;
 
+    /**
+     * @brief Dynamically amplifies audio and applies a smooth envelope follower gate.
+     * Features an intelligent hold-time and slower release to protect word endings.
+     * 
+     * @param buffer       Pointer to raw byte stream
+     * @param buffer_size  Total size of the packet data in bytes
+     * @param format       The active SDL_AudioFormat (e.g., SDL_AUDIO_S16LE)
+     * @param target_amp   Amplification scale multiplier (e.g., 3.0f)
+     * @param noise_floor  Threshold ratio between 0.0f (silence) and 1.0f (max amplitude)
+     */
+    void amplifyAudio(UINT8 *buffer, int buffer_size, 
+        SDL_AudioFormat format, float target_amp, float noise_floor);
+
     /** Current volume */
     float m_volume = 0;
     /** Audio stream listener reference */

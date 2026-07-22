@@ -22,6 +22,8 @@ void PCController::initConfigs() {
 
 	Config::setStringDefault(VIDEO_PIX_FORMAT, PC_VIDEO_PIX_FORMAT_DEFAULT);
 	Config::setIntDefault(AUDIO_SAMPLE_FORMAT, PC_AUDIO_SAMPLE_FORMAT_DEFAULT);
+	Config::setIntDefault(AUDIO_AMPLIFICATION, PC_AUDIO_AMPLIFICATION_DEFAULT);
+	Config::setIntDefault(AUDIO_NOISE_FLOOR, PC_AUDIO_NOISE_FLOOR_DEFAULT);
 }
 
 void PCController::innerStartServices() {
