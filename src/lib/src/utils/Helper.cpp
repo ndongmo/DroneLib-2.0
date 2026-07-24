@@ -80,9 +80,16 @@ void Helper::configureProcess(std::thread& process, unsigned int priority, unsig
         CPU_ZERO(&cpuset);
         CPU_SET(cpuCore, &cpuset);
 
+#if defined(__ANDROID__)
+        pid_t tid = pthread_gettid_np(handle); 
+        if (sched_setaffinity(tid, sizeof(cpu_set_t), &cpuset) != 0) {
+            logW << "Failed to set thread affinity for core " << cpuCore << std::endl;
+        }
+#else
         if (pthread_setaffinity_np(handle, sizeof(cpu_set_t), &cpuset) != 0) {
             logW << "Failed to set thread affinity for core " << cpuCore << std::endl;
         }
+#endif
     }
 #endif
 }

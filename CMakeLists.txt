@@ -25,7 +25,15 @@ SET(APP_OUTPUT_INC ${LIB_HOME}/app/include)
 SET(APP_OUTPUT_DOC ${LIB_HOME}/app/docs)
 SET(THIRD_PARTY_INC ${LIB_HOME}/third-party/include)
 
-IF(UNIX) # for Linux, BSD, Solaris, Minix
+SET(CMAKE_FIND_ROOT_PATH ${LIB_HOME}/third-party)
+SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
+
+#SET(ANDROID TRUE)
+
+IF(ANDROID) # for Android
+  SET(THIRD_PARTY_BIN ${LIB_HOME}/third-party/android/arm64-v8a/bin)
+  SET(THIRD_PARTY_LIB ${LIB_HOME}/third-party/android/arm64-v8a/lib)
+ELSEIF(UNIX) # for Linux, BSD, Solaris, Minix
   IF(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
     SET(RASPBERRY_PI_SYS 1)
     add_definitions(-DRASPBERRY_PI_SYS)
@@ -83,16 +91,18 @@ ENDIF(APPLE)
 
 add_subdirectory(src/lib)
 
-IF(UNIX)
+IF(UNIX AND NOT ANDROID)
   add_subdirectory(src/drone)
 ENDIF()
 
 IF(NOT RASPBERRY_PI_SYS)
   add_subdirectory(src/client)
-  add_subdirectory(src/pc)
+  IF(NOT ANDROID)
+    add_subdirectory(src/pc)
+  ENDIF()
 ENDIF()
 
-IF(UNIX AND NOT RASPBERRY_PI_SYS)
+IF(UNIX AND NOT ANDROID AND NOT RASPBERRY_PI_SYS)
   add_subdirectory(src/tests)
 ENDIF()
 

@@ -105,45 +105,51 @@ void VideoSender::initEncoderCtx() {
 }
 
 int VideoSender::initFilterCtx() {
-	int ret;
-	char args[512];
-	const AVFilter *buffersrc = avfilter_get_by_name("buffer");
-	const AVFilter *buffersink = avfilter_get_by_name("buffersink");
+    int ret;
+    char args[512];
+    const AVFilter *buffersrc = avfilter_get_by_name("buffer");
+    const AVFilter *buffersink = avfilter_get_by_name("buffersink");
 
-	if (!buffersrc || !buffersink) {
-		logE << m_name << ": filtering source or sink element not found" << std::endl;
+    if (!buffersrc || !buffersink) {
+        logE << m_name << ": filtering source or sink element not found" << std::endl;
         return -1;
-	}
+    }
 
-	snprintf(args, sizeof(args),
-		"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
-		m_decoder_ctx->width, m_decoder_ctx->height, m_decoder_ctx->pix_fmt,
-		m_decoder_ctx->pkt_timebase.num, m_decoder_ctx->pkt_timebase.den,
-		m_decoder_ctx->sample_aspect_ratio.num,
-		m_decoder_ctx->sample_aspect_ratio.den);
+    // 1. Source configuration
+    snprintf(args, sizeof(args),
+        "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
+        m_decoder_ctx->width, m_decoder_ctx->height, m_decoder_ctx->pix_fmt,
+        m_decoder_ctx->pkt_timebase.num, m_decoder_ctx->pkt_timebase.den,
+        m_decoder_ctx->sample_aspect_ratio.num,
+        m_decoder_ctx->sample_aspect_ratio.den);
 
-	ret = avfilter_graph_create_filter(&m_filter_ctx.buffersrc_ctx, buffersrc, "in",
-		args, NULL, m_filter_ctx.filter_graph);
-	if (ret < 0) {
-		logE << m_name << ": failed to create video buffer source -> " << av_err2str(ret) << std::endl;
-		return -1;
-	}
+    ret = avfilter_graph_create_filter(&m_filter_ctx.buffersrc_ctx, buffersrc, "in",
+        args, NULL, m_filter_ctx.filter_graph);
+    if (ret < 0) {
+        logE << m_name << ": failed to create video buffer source -> " << av_err2str(ret) << std::endl;
+        return -1;
+    }
 
-	ret = avfilter_graph_create_filter(&m_filter_ctx.buffersink_ctx, buffersink, "out",
-		NULL, NULL, m_filter_ctx.filter_graph);
-	if (ret < 0) {
-		logE << m_name << ": failed to create video buffer sink -> " << av_err2str(ret) << std::endl;
-		return -1;
-	}
+    // 2. Fetch the clean string name of the target format (e.g. "yuv420p")
+    const char* pix_fmt_name = av_get_pix_fmt_name(m_encoder_ctx->pix_fmt);
+    if (!pix_fmt_name) {
+        logE << m_name << ": encoder has an invalid or unresolvable pixel format!" << std::endl;
+        return -1;
+    }
 
-	ret = av_opt_set_bin(m_filter_ctx.buffersink_ctx, "pix_fmts",
-		(uint8_t*)&m_encoder_ctx->pix_fmt, sizeof(m_encoder_ctx->pix_fmt), AV_OPT_SEARCH_CHILDREN);
-	if (ret < 0) {
-		logE << m_name << ": failed to set output pixel format -> " << av_err2str(ret) << std::endl;
-		return -1;
-	}
+    // 3. Prepare the new options string using the modern "pixel_formats" field
+    char sink_args[128];
+    snprintf(sink_args, sizeof(sink_args), "pixel_formats=%s", pix_fmt_name);
 
-	return 1;
+    // 4. Create AND initialize the sink with those parameters embedded
+    ret = avfilter_graph_create_filter(&m_filter_ctx.buffersink_ctx, buffersink, "out",
+        sink_args, NULL, m_filter_ctx.filter_graph);
+    if (ret < 0) {
+        logE << m_name << ": failed to create video buffer sink -> " << av_err2str(ret) << std::endl;
+        return -1;
+    }
+
+    return 1;
 }
 
 } // namespace net

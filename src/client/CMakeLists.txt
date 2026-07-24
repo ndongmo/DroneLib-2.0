@@ -7,4 +7,7 @@ INCLUDE_DIRECTORIES(
 )
 
 add_subdirectory(src)
-add_subdirectory(tests)
+
+IF(NOT ANDROID)
+	add_subdirectory(tests)
+ENDIF()

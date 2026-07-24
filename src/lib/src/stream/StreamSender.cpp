@@ -357,6 +357,9 @@ int StreamSender::initFilters() {
 		logE << m_name << ": failed to configure the filter graph -> " << av_err2str(ret) << std::endl;
         ret = -1;
 	} else {
+		if (m_istream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            av_buffersink_set_frame_size(m_filter_ctx.buffersink_ctx, m_encoder_ctx->frame_size);
+        }
 		ret = 1;
 	}
 

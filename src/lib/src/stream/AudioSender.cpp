@@ -127,62 +127,44 @@ void AudioSender::initEncoderCtx() {
 }
 
 int AudioSender::initFilterCtx() {
-	int ret;
-	char buf[64];
-	char args[512];
-	const AVFilter *buffersrc = avfilter_get_by_name("abuffer");
-	const AVFilter *buffersink = avfilter_get_by_name("abuffersink");
+    int ret;
+    char decoder_buf[64];
+    char src_args[512];
 
-	if (!buffersrc || !buffersink) {
-		logE << m_name << ": filtering source or sink element not found" << std::endl;
+    const AVFilter *buffersrc  = avfilter_get_by_name("abuffer");
+    const AVFilter *buffersink = avfilter_get_by_name("abuffersink");
+
+    if (!buffersrc || !buffersink) {
+        logE << m_name << ": essential audio filter elements not found" << std::endl;
         return -1;
-	}
+    }
 
-	if (m_decoder_ctx->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC) {
-		av_channel_layout_default(&m_decoder_ctx->ch_layout, m_decoder_ctx->ch_layout.nb_channels);
-	}
-	av_channel_layout_describe(&m_decoder_ctx->ch_layout, buf, sizeof(buf));
+    // 1. Configure input stream source attributes (abuffer)
+    if (m_decoder_ctx->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC) {
+        av_channel_layout_default(&m_decoder_ctx->ch_layout, m_decoder_ctx->ch_layout.nb_channels);
+    }
+    av_channel_layout_describe(&m_decoder_ctx->ch_layout, decoder_buf, sizeof(decoder_buf));
 
-	snprintf(args, sizeof(args), "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
-		m_decoder_ctx->pkt_timebase.num, m_decoder_ctx->pkt_timebase.den, m_decoder_ctx->sample_rate,
-		av_get_sample_fmt_name(m_decoder_ctx->sample_fmt), buf);
-	
-	ret = avfilter_graph_create_filter(&m_filter_ctx.buffersrc_ctx, buffersrc, "in",
-		args, NULL, m_filter_ctx.filter_graph);
-	if (ret < 0) {
-		logE << m_name << ": failed to create audio buffer source -> " << av_err2str(ret) << std::endl;
-		return -1;
-	}
+    snprintf(src_args, sizeof(src_args), "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
+        m_decoder_ctx->pkt_timebase.num, m_decoder_ctx->pkt_timebase.den, m_decoder_ctx->sample_rate,
+        av_get_sample_fmt_name(m_decoder_ctx->sample_fmt), decoder_buf);
+    
+    ret = avfilter_graph_create_filter(&m_filter_ctx.buffersrc_ctx, buffersrc, "in",
+        src_args, NULL, m_filter_ctx.filter_graph);
+    if (ret < 0) {
+        logE << m_name << ": failed to create audio buffer source -> " << av_err2str(ret) << std::endl;
+        return -1;
+    }
 
-	ret = avfilter_graph_create_filter(&m_filter_ctx.buffersink_ctx, buffersink, "out",
-		NULL, NULL, m_filter_ctx.filter_graph);
-	if (ret < 0) {
-		logE << m_name << ": failed to create video buffer sink -> " << av_err2str(ret) << std::endl;
-		return -1;
-	}
+    // 2. Create unconstrained audio sink (abuffersink)
+    ret = avfilter_graph_create_filter(&m_filter_ctx.buffersink_ctx, buffersink, "out",
+        NULL, NULL, m_filter_ctx.filter_graph);
+    if (ret < 0) {
+        logE << m_name << ": failed to create audio buffer sink -> " << av_err2str(ret) << std::endl;
+        return -1;
+    }
 
-	ret = av_opt_set_bin(m_filter_ctx.buffersink_ctx, "sample_fmts",
-		(uint8_t*)&m_encoder_ctx->sample_fmt, sizeof(m_encoder_ctx->sample_fmt), AV_OPT_SEARCH_CHILDREN);
-	if (ret < 0) {
-		logE << m_name << ": failed to set output sample format -> " << av_err2str(ret) << std::endl;
-		return -1;
-	}
-
-	av_channel_layout_describe(&m_encoder_ctx->ch_layout, buf, sizeof(buf));
-	ret = av_opt_set(m_filter_ctx.buffersink_ctx, "ch_layouts", buf, AV_OPT_SEARCH_CHILDREN);
-	if (ret < 0) {
-		logE << m_name << ": failed to set output channel layout -> " << av_err2str(ret) << std::endl;
-		return -1;
-	}
-
-	ret = av_opt_set_bin(m_filter_ctx.buffersink_ctx, "sample_rates",
-		(uint8_t*)&m_encoder_ctx->sample_rate, sizeof(m_encoder_ctx->sample_rate), AV_OPT_SEARCH_CHILDREN);
-	if (ret < 0) {
-		logE << m_name << ": failed to set output sample rate -> " << av_err2str(ret) << std::endl;
-		return -1;
-	}
-
-	return 1;
+    return 1;
 }
 
 } // namespace net
