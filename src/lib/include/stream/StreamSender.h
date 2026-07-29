@@ -88,6 +88,10 @@ protected:
 	unsigned int m_streamID;
 	/** Frame index */
 	unsigned int m_frameIndex = 0;
+	/** Stream start time */
+	int64_t m_stream_start_time = 0;
+	/** Last produced presentation timestamp */
+	int64_t m_last_produced_pts = 0;
 	/** Captured file name */
 	std::string m_filename;
 	/** Media input format */

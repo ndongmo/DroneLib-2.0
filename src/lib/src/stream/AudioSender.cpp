@@ -21,7 +21,7 @@ int AudioSender::begin() {
 	m_streamPriority = Config::getInt(AUDIO_STREAM_PRIORITY);
 	m_streamCpuCore = Config::getInt(AUDIO_STREAM_CPU_CORE);
 
-	const std::string channels = std::to_string(Config::getInt(AUDIO_CHANNELS));
+	const std::string channels = Config::getInt(AUDIO_CHANNELS) > 1 ? "stereo" : "mono";
 	const std::string sample_rate = std::to_string(Config::getInt(AUDIO_SAMPLE));
 
 	av_dict_set(&m_options, "ch_layout", channels.c_str(), 0);
@@ -37,7 +37,7 @@ int AudioSender::begin() {
 	Config::setInt(AUDIO_BIT_RATE, (int)codec_ctx->bit_rate);
 	Config::setInt(AUDIO_SAMPLE, codec_ctx->sample_rate);
 	Config::setInt(AUDIO_SAMPLE_FORMAT, codec_ctx->sample_fmt);
-	Config::setInt(AUDIO_NB_SAMPLES, getNbSamples(codec_ctx->ch_layout.nb_channels, codec_ctx->sample_fmt));
+	Config::setInt(AUDIO_NB_SAMPLES, getNbSamples());
 	Config::setString(AUDIO_ENCODER, avcodec_get_name(codec_ctx->codec_id));
 
 	logI << toString() << std::endl;
@@ -49,16 +49,11 @@ bool AudioSender::isActive() const {
     return Config::getInt(MICRO_ACTIVE);
 }
 
-int AudioSender::getNbSamples(int nb_channels, int format) {
-	int ret, nb_samples;
-	if ((ret = av_read_frame(m_ifmt_ctx, m_packet)) < 0) {
-        logE << m_name << ": cannot read captured frame -> " << av_err2str(ret) << std::endl;
-        nb_samples = Config::getInt(AUDIO_NB_SAMPLES);
-    } else {
-        nb_samples = m_packet->size / nb_channels / av_get_bytes_per_sample((AVSampleFormat)format);
-        av_packet_unref(m_packet);
+int AudioSender::getNbSamples() {
+	if (m_encoder_ctx && m_encoder_ctx->frame_size > 0) {
+        return m_encoder_ctx->frame_size;
     }
-	return nb_samples;
+    return Config::getInt(AUDIO_NB_SAMPLES) > 0 ? Config::getInt(AUDIO_NB_SAMPLES) : 1024;
 }
 
 std::string AudioSender::toString() {
@@ -139,7 +134,7 @@ int AudioSender::initFilterCtx() {
         return -1;
     }
 
-    // 1. Configure input stream source attributes (abuffer)
+    // 1. Configure standard input stream source attributes (abuffer)
     if (m_decoder_ctx->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC) {
         av_channel_layout_default(&m_decoder_ctx->ch_layout, m_decoder_ctx->ch_layout.nb_channels);
     }
@@ -156,11 +151,53 @@ int AudioSender::initFilterCtx() {
         return -1;
     }
 
-    // 2. Create unconstrained audio sink (abuffersink)
-    ret = avfilter_graph_create_filter(&m_filter_ctx.buffersink_ctx, buffersink, "out",
-        NULL, NULL, m_filter_ctx.filter_graph);
+    // 2. Allocate the audio buffer sink (DO NOT use avfilter_graph_create_filter)
+    m_filter_ctx.buffersink_ctx = avfilter_graph_alloc_filter(m_filter_ctx.filter_graph, buffersink, "out");
+    if (!m_filter_ctx.buffersink_ctx) {
+        logE << m_name << ": failed to allocate audio buffer sink" << std::endl;
+        return -1;
+    }
+
+    // 3. Resolve target requirements for the encoder
+    enum AVSampleFormat target_fmt = (m_encoder_ctx->sample_fmt != AV_SAMPLE_FMT_NONE) ? 
+                                      m_encoder_ctx->sample_fmt : m_decoder_ctx->sample_fmt;
+    int target_rate = (m_encoder_ctx->sample_rate > 0) ? 
+                       m_encoder_ctx->sample_rate : m_decoder_ctx->sample_rate;
+
+    // 4. Safely set modern array configurations using official modern FFmpeg APIs
+    // Set Sample Format (e.g., forces conversion to AV_SAMPLE_FMT_FLTP for AAC)
+    ret = av_opt_set_array(m_filter_ctx.buffersink_ctx, "sample_formats", AV_OPT_SEARCH_CHILDREN,
+                           0, 1, AV_OPT_TYPE_SAMPLE_FMT, &target_fmt);
     if (ret < 0) {
-        logE << m_name << ": failed to create audio buffer sink -> " << av_err2str(ret) << std::endl;
+        logE << m_name << ": failed to set sample_formats array -> " << av_err2str(ret) << std::endl;
+        return -1;
+    }
+
+    // Set Sample Rate
+    ret = av_opt_set_array(m_filter_ctx.buffersink_ctx, "samplerates", AV_OPT_SEARCH_CHILDREN,
+                           0, 1, AV_OPT_TYPE_INT, &target_rate);
+    if (ret < 0) {
+        logE << m_name << ": failed to set samplerates array -> " << av_err2str(ret) << std::endl;
+        return -1;
+    }
+
+    // Set Channel Layout
+    if (m_encoder_ctx->ch_layout.nb_channels > 0) {
+        ret = av_opt_set_array(m_filter_ctx.buffersink_ctx, "channel_layouts", AV_OPT_SEARCH_CHILDREN,
+                               0, 1, AV_OPT_TYPE_CHLAYOUT, &m_encoder_ctx->ch_layout);
+    } else {
+        ret = av_opt_set_array(m_filter_ctx.buffersink_ctx, "channel_layouts", AV_OPT_SEARCH_CHILDREN,
+                               0, 1, AV_OPT_TYPE_CHLAYOUT, &m_decoder_ctx->ch_layout);
+    }
+    if (ret < 0) {
+        logE << m_name << ": failed to set channel_layouts array -> " << av_err2str(ret) << std::endl;
+        return -1;
+    }
+
+    // 5. Finalize and initialize the configured sink node context properties
+    ret = avfilter_init_str(m_filter_ctx.buffersink_ctx, NULL);
+    if (ret < 0) {
+        logE << m_name << ": failed to initialize audio buffer sink -> " << av_err2str(ret) << std::endl;
         return -1;
     }
 

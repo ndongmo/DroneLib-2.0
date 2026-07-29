@@ -8,6 +8,8 @@ import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.datasource.HttpDataSource;
 import androidx.media3.datasource.rtmp.RtmpDataSource;
+import androidx.media3.exoplayer.DefaultLoadControl;
+import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.ui.PlayerView;
@@ -105,10 +107,14 @@ public class MainActivity extends AppCompatActivity implements IMessageListener 
         initFromJNI(this.getFilesDir().getAbsolutePath());
         this.requestPermissions(new String[] {Manifest.permission.INTERNET}, 1);
 
-        m_videoPlayer = new ExoPlayer.Builder(this).build();
+        DefaultLoadControl loadControl = new DefaultLoadControl.Builder()
+                .setBufferDurationsMs(100, 500, 50, 100)
+                .setPrioritizeTimeOverSizeThresholds(true)
+                .build();
+
+        m_videoPlayer = new ExoPlayer.Builder(this).setLoadControl(loadControl).build();
         m_videoPlayer.addListener(new PlayerListener());
         m_videoPlayer.setPlayWhenReady(false);
-        m_videoPlayer.prepare();
 
         PlayerView playerView = findViewById(R.id.video_view);
         playerView.setPlayer(m_videoPlayer);

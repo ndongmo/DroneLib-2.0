@@ -13,6 +13,7 @@
 #include <mutex>
 
 extern "C" {
+#include <libavutil/time.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/channel_layout.h>
 #include <libavcodec/avcodec.h> 

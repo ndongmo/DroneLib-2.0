@@ -38,7 +38,8 @@ Java_ns_dronelib_android_MainActivity_initFromJNI(JNIEnv *env, jobject obj, jstr
             "\n\t\"" << STREAM_MODE << "\":" << STREAM_MODE_FILE << ","
             "\n\t\"" << STREAM_PROTOCOL << "\":\"rtmp\","
             "\n\t\"" << STREAM_OUTPUT_FORMAT << "\":\"flv\","
-            "\n\t\"" << VIDEO_ENCODER << "\":\"libx264\""
+            "\n\t\"" << VIDEO_ENCODER << "\":\"libx264\","
+            "\n\t\"" << AUDIO_ENCODER << "\":\"aac\""
             "}";
         configFile.close();
     }

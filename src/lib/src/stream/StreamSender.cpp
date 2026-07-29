@@ -104,6 +104,8 @@ int StreamSender::end() {
 
 void StreamSender::start() {
 	m_running = true;
+	m_last_produced_pts = 0;
+	m_stream_start_time = av_gettime(); 
 	m_process = std::thread([this]{run(); });
 
 	if(m_streamPriority > 0 || m_streamCpuCore > 0) {
@@ -318,10 +320,13 @@ int StreamSender::initFilters() {
         return -1;
     }
 
-	if (m_istream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+	if (m_istream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
 		filter_spec = "null"; /* passthrough (dummy) filter for video */
-	else
-		filter_spec = "anull"; /* passthrough (dummy) filter for audio */
+    } else {
+        // highpass=f=200: Cuts low-frequency background hum and wind rumbles below 200 Hz.
+        // lowpass=f=3000: Cuts high-frequency white noise and electronic tape hiss above 3 kHz.
+        filter_spec = "highpass=f=200, lowpass=f=3000";
+    }
 
 	if (initFilterCtx() < 0) {
 		return -1;
@@ -419,8 +424,22 @@ int StreamSender::encodeFrame(bool flush) {
  
     av_packet_unref(enc_pkt);
 
-    if (filt_frame && filt_frame->pts != AV_NOPTS_VALUE) {
-        filt_frame->pts = av_rescale_q(filt_frame->pts, filt_frame->time_base, m_encoder_ctx->time_base);
+    if (filt_frame && m_stream_start_time > 0) {
+        // 1. Calculate exactly how many microseconds have elapsed since streaming started
+        int64_t current_time = av_gettime();
+        int64_t elapsed_us = current_time - m_stream_start_time;
+
+        // 2. Map the microseconds timeline directly into the encoder's private clock timebase
+        // FFmpeg internal microsecond tracking timebase is always 1/1000000 (AV_TIME_BASE_Q)
+        int64_t calculated_pts = av_rescale_q(elapsed_us, AV_TIME_BASE_Q, m_encoder_ctx->time_base);
+
+        // 3. Enforce monotonic continuity safety 
+        // Prevents minor thread jitter from passing duplicate or backward timestamps to the encoder
+        if (calculated_pts <= m_last_produced_pts) {
+            calculated_pts = m_last_produced_pts + 1;
+        }
+        m_last_produced_pts = calculated_pts;
+        filt_frame->pts = calculated_pts;
 	}
   
     if ((ret = avcodec_send_frame(m_encoder_ctx, filt_frame)) < 0) {
@@ -435,14 +454,12 @@ int StreamSender::encodeFrame(bool flush) {
 		}
 
 		if(m_ofmt_ctx && m_ostream && m_media_sender) {
-			/* prepare packet for muxing */
 			enc_pkt->stream_index = m_ostream->index;
-			av_packet_rescale_ts(enc_pkt, m_encoder_ctx->time_base,
-				m_ofmt_ctx->streams[m_ostream->index]->time_base);
-	
-			/* mux encoded frame */
+            enc_pkt->dts = enc_pkt->pts;
+			av_packet_rescale_ts(enc_pkt, m_encoder_ctx->time_base, m_ostream->time_base);
 			ret = m_media_sender->writePacket(enc_pkt);
 		} else {
+            enc_pkt->dts = enc_pkt->pts;
 			sendPacket(enc_pkt);
 			ret = 1;
 		}
